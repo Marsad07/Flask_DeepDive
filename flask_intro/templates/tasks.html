@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table, th, td {
+  border: 3px solid black;
+  border-collapse: collapse;
+  border-color: #01796f;
+  background-color: #C6AA58;
+}
+    </style>
+    <meta charset="UTF-8">
+    <title>Task Manager</title>
+</head>
+<body>
+
+
+        <h1 style="text-align:center;">My Tasks <br><br> <br> </h1>
+
+        <h1>Add Task</h1>
+        <form>
+            Task Name: <input type="text" name="Task Name">
+            <br><br>
+            Task Description: <input type="text" name="Task Description">
+            <button> Add Task</button>
+        </form>
+        <br><br>
+        <br><br>
+
+         <h1>Task List</h1>
+        <table style="width:50%">
+
+            <tr>
+                <th>Task Number</th>
+                <th>Task Name</th>
+                <th>Task Description</th>
+                <th>Action</th>
+                <th>Added Date</th>
+            </tr>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.number }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.description }}</td>
+                <td>Action</td>
+                <td>{{ task.date }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+</body>
+</html>
