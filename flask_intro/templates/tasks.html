@@ -2,13 +2,47 @@
 <html lang="en">
 <head>
     <style>
-        table, th, td {
-            border: 3px solid black;
+        body {
+        background-color: #FFFDD0; /* cream page background */
+        }
+
+
+        table{
+            border: 2.5px solid black;
             border-collapse: collapse;
             border-color: #01796f;
-            background-color: #C6AA58;
+            background-color: #CFB291;
+        }
+        th {
+            background-color: #008080; /* teal headers */
+            color: white;              /* white text for contrast */
+            border: 2.5px solid #008080;
+            padding: 8px;
+        }
+
+        td{
+            background-color: #FFFDD0; /* cream cells */
+            border: 2.5px solid #008080;
+            padding: 8px;
+        }
+
+        button {
+            background-color: #008080; /* teal buttons */
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #006666; /* darker teal on hover */
+        }
+
+        .myDiv{
+            text-align: left;
         }
     </style>
+
     <meta charset="UTF-8">
     <title>Task Manager</title>
 </head>
@@ -38,7 +72,7 @@
         </tr>
         {% for task in tasks %}
         <tr>
-            <td>{{ task.number }}</td>
+            <td>{{ loop.index }}</td>
             <td>{{ task.name }}</td>
             <td>{{ task.description }}</td>
             <td>
@@ -53,8 +87,12 @@
     </table>
     <br><br>
 
-
-    <h1>Completed Tasks</h1>
+    <div class="myDiv">
+        <h1 style="display:inline-block;">Completed Tasks</h1>
+        <form method="POST" action="/clear_completed" style="display:inline-block; margin-left-20px">
+            <button type="submit">Clear Tasks</button>
+        </form>
+    </div>
     <table style="width:60%">
         <tr>
             <th>Task Name</th>
@@ -69,6 +107,5 @@
         </tr>
         {% endfor %}
     </table>
-
 </body>
 </html>

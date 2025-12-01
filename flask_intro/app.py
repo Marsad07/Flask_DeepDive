@@ -38,5 +38,10 @@ def complete_task():
             break
     return redirect(url_for("home"))
 
+@app.route("/clear_completed", methods=["POST"])
+def clear_completed():
+    completed_tasks.clear()
+    return redirect(url_for("home"))
+
 if __name__ == "__main__":
     app.run(debug=True)
