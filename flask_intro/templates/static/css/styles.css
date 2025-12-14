@@ -13,5 +13,21 @@ p {
   color: #555;
 }
 
+.edit-icon {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 1s ease, transform 1s ease;
+    margin-left: 8px;
+    cursor: pointer;
+    background: yellow; /* temporary to see it clearly */
+}
+
+td:hover .edit-icon {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+
 
 

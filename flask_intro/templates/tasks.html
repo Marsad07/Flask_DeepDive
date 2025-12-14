@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='mystyles.css') }}">
     <style>
         body {
         background-color: #FFFDD0; /* cream page background */
@@ -72,16 +73,22 @@
         </tr>
         {% for task in tasks %}
         <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ task.name }}</td>
-            <td>{{ task.description }}</td>
+            <td>{{ task.id }}</td>
+            <td>
+                {{ task.task_name }}
+                <span class="edit-icon">️</span>
+            </td>
+            <td>
+                {{ task.task_description }}
+                <span class="edit-icon">⬛</span>
+            </td>
             <td>
 
                 <form method="POST" action="/complete">
-                    <input type="checkbox" name="task_number" value="{{ task.number }}" onclick="this.form.submit()">
+                    <input type="checkbox" name="task_number" value="{{ task.id }}" onclick="this.form.submit()">
                 </form>
             </td>
-            <td>{{ task.date }}</td>
+            <td>{{ task.added_date }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -101,9 +108,9 @@
         </tr>
         {% for task in completed_tasks %}
         <tr>
-            <td>{{ task.name }}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.date }}</td>
+            <td>{{ task.task_name }}</td>
+            <td>{{ task.task_description }}</td>
+            <td>{{ task.completed_date }}</td>
         </tr>
         {% endfor %}
     </table>
