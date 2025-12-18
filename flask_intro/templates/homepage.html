@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Task Manager</title>
+</head>
+<body>
+    <h1>Welcome to Task Manager</h1>
+    <p>Here you can organise, track and complete your tasks easily</p>
+
+    <p>You currently have {{ active_count }} active tasks and {{ completed_tasks }} completed tasks.</p>
+
+    <nav>
+        <a href="{{ url_for('tasks_page') }}">View Tasks</a>
+    </nav>
+</body>
+</html>

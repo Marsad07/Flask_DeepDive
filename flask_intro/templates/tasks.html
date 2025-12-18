@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='mystyles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
         body {
         background-color: #FFFDD0; /* cream page background */
@@ -76,12 +76,13 @@
             <td>{{ task.id }}</td>
             <td>
                 {{ task.task_name }}
-                <span class="edit-icon">️</span>
+                <a href="/edit/{{ task.id }}"  class="edit-icon">🖉</a>
             </td>
             <td>
                 {{ task.task_description }}
-                <span class="edit-icon">⬛</span>
+                <a href="/edit/{{ task.id }}" class="edit-icon">🖉</a>
             </td>
+
             <td>
 
                 <form method="POST" action="/complete">
