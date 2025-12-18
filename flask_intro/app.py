@@ -11,8 +11,19 @@ db = mysql.connector.connect(
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-@app.route("/")
-def home():
+@app.route('/')
+def homepage():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) AS active_count FROM tasks WHERE status = 'active'")
+    active_count = cursor.fetchone()['active_count']
+
+    cursor.execute("SELECT COUNT(*) AS completed_count FROM tasks WHERE status = 'completed'")
+    completed_count = cursor.fetchone()['completed_count']
+
+    return render_template('homepage.html', active_count=active_count, completed_count=completed_count)
+
+@app.route("/tasks")
+def tasks_page():
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM tasks WHERE status='active'")
     tasks = cursor.fetchall()
@@ -32,7 +43,7 @@ def add_task():
         (name, description)
     )
     db.commit()
-    return redirect(url_for("home"))
+    return redirect(url_for("tasks_page"))
 
 
 @app.route("/complete", methods=["POST"])
@@ -44,7 +55,7 @@ def complete_task():
         (task_id,)
     )
     db.commit()
-    return redirect(url_for("home"))
+    return redirect(url_for("tasks_page"))
 
 
 @app.route("/clear_completed", methods=["POST"])
@@ -52,7 +63,7 @@ def clear_completed():
     cursor = db.cursor()
     cursor.execute("DELETE FROM tasks WHERE status='completed'")
     db.commit()
-    return redirect(url_for("home"))
+    return redirect(url_for("tasks_page"))
 
 
 @app.route('/testdb')
@@ -61,6 +72,21 @@ def testdb():
     cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
     return str(tasks)
+
+@app.route("/edit/<int:task_id>", methods=["GET", "POST"])
+def edit_task(task_id):
+    cursor = db.cursor(dictionary=True)
+    if request.method == "POST":
+        new_task_name = request.form["task_name"]
+        new_task_description = request.form["task_description"]
+        cursor.execute("UPDATE tasks SET task_name=%s, task_description=%s WHERE id=%s",
+                       (new_task_name, new_task_description, task_id))
+        db.commit()
+        return redirect(url_for("tasks_page"))
+    else:
+        cursor.execute("SELECT * FROM tasks WHERE id=%s", (task_id,))
+        task = cursor.fetchone()
+        return render_template("edit.html", task=task)
 
 if __name__ == "__main__":
     app.run(debug=True)
