@@ -32,6 +32,10 @@ def tasks_page():
     completed_tasks = cursor.fetchall()
     return render_template("tasks.html", tasks=tasks, completed_tasks=completed_tasks)
 
+@app.route("/add_task_page")
+def add_task_page():
+    return render_template("add_tasks.html")
+
 @app.route("/add", methods=["POST"])
 def add_task():
     name = request.form["Task Name"]
@@ -43,8 +47,7 @@ def add_task():
         (name, description)
     )
     db.commit()
-    return redirect(url_for("tasks_page"))
-
+    return redirect(url_for("add_task_page"))
 
 @app.route("/complete", methods=["POST"])
 def complete_task():
