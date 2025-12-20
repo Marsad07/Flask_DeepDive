@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Flask Intro Site</title>
+  <title>{% block title %}Task Manager{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-  {% block content %}{% endblock %}
+
+  <ul>
+      <li><a href="{{ url_for('homepage') }}">Home</a></li>
+      <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
+      <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
+  </ul>
+
+  <div class="content">
+      {% block content %}{% endblock %}
+  </div>
+
 </body>
 </html>
-
-
-
