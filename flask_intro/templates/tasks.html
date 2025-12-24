@@ -14,6 +14,7 @@
             <th>Task Number</th>
             <th>Task Name</th>
             <th>Task Description</th>
+            <th>Priority</th>
             <th>Action</th>
             <th>Added Date</th>
         </tr>
@@ -28,6 +29,9 @@
             <td>
                 {{ task.task_description }}
                 <a href="/edit/{{ task.id }}" class="edit-icon">🖉</a>
+            </td>
+            <td>
+                {{ task.priority }}
             </td>
             <td>
                 <form method="POST" action="/complete">
@@ -53,13 +57,22 @@
         <tr>
             <th>Task Name</th>
             <th>Task Description</th>
+            <th>Priority</th>
             <th>Date Completed</th>
         </tr>
-
         {% for task in completed_tasks %}
         <tr>
             <td>{{ task.task_name }}</td>
             <td>{{ task.task_description }}</td>
+            <td>
+                  {% if task.priority == 'low' %}
+                    <span style="color:red; font-weight:bold;">Low</span>
+                  {% elif task.priority == 'medium' %}
+                    <span style="color:orange;">Medium</span>
+                  {% else %}
+                    <span style="color:green;">High</span>
+                  {% endif %}
+            </td>
             <td>{{ task.completed_date }}</td>
         </tr>
         {% endfor %}

@@ -40,11 +40,13 @@ def add_task_page():
 def add_task():
     name = request.form["Task Name"]
     description = request.form["Task Description"]
+    priority = request.form.get("priority")
 
     cursor = db.cursor()
     cursor.execute(
-        "INSERT INTO tasks (task_name, task_description, status, added_date) VALUES (%s, %s, 'active', NOW())",
-        (name, description)
+        "INSERT INTO tasks (task_name, task_description, priority, status, added_date) "
+        "VALUES (%s, %s, %s, 'active', NOW())",
+        (name, description, priority)
     )
     db.commit()
     return redirect(url_for("add_task_page"))
