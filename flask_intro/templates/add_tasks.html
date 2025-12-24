@@ -3,60 +3,69 @@
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
-        body{
+        body {
             background-color: #FFFDD0;
             margin: 0;
             font-family: Arial, sans-serif;
         }
 
-        ul{
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        width: 200px;
-        background-color: #013d38;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 200px;
+            background-color: #013d38;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
 
-    li a{
-        display: block;
-        color: white;
-        padding: 8px 16px;
-        text-decoration: none;
-    }
+        li a {
+            display: block;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
 
-    li a:hover{
-        background-color: #111613;
-        color: white;
-    }
+        li a:hover {
+            background-color: #111613;
+            color: white;
+        }
 
-    .content {
-        margin-left: 220px; /* sidebar width (200px) + padding */
-        padding: 20px;
-    }
+        .content {
+            margin-left: 220px; /* sidebar width (200px) + padding */
+            padding: 20px;
+        }
     </style>
 
     <meta charset="UTF-8">
     <title>Add Task</title>
 </head>
 <body>
-
     <ul>
         <li><a href="{{ url_for('homepage') }}">Home</a></li>
         <li><a class="active" href="{{ url_for('add_task_page') }}">Add Task</a></li>
         <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
     </ul>
-
     <div class="content">
         <h1>Add Task</h1>
         <form method="POST" action="/add">
-            Task Name: <input type="text" name="Task Name">
+            <label>Task Name:</label>
+            <input type="text" name="Task Name" required>
             <br><br>
-            Task Description: <input type="text" name="Task Description">
-            <button type="submit" class="add-task-btn" name="Add Task" value="Add Task">Add Task</button>
+
+            <label>Task Description:</label>
+            <input type="text" name="Task Description">
+            <br><br>
+
+            <label>Priority:</label>
+            <input type="radio" name="priority" value="low"> Low
+            <input type="radio" name="priority" value="medium"> Medium
+            <input type="radio" name="priority" value="high"> High
+            <br><br>
+
+            <button type="submit" class="add-task-btn">Add Task</button>
         </form>
     </div>
 </body>
