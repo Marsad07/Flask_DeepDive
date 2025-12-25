@@ -1,2 +1,17 @@
 # Flask_DeepDive
-Flask_DeepDive is my showcase project where you can see all of my Flask apps. It contains mini apps I've built but also one main application that brings these pieces together into a structured, professional project.
+Flask_DeepDive is my showcase project where you can see all of my Flask apps. It contains one main application that brings pieces from other small flask apps together into a structured, professional project.
+
+Here is a breakdown of my progress, day by day.
+Click the buttons to view the code for each day
+
+## Contents ## 
+| Day |  Description | Git Tag |
+|:---:|--------------|:-------:|
+|1     | Initial task management page with         | [day-1](https://github.com/Marsad07/Flask_DeepDive/commit/1a1d9e9823b2169cfefa75c23914961b96119c1a)|
+|2     |           | [day-2](https://github.com/Marsad07/Flask_DeepDive/commit/70bdfbd2f40c168bcbc59e120f82abe523ea8b66)| 
+|3     |          | [day-3](https://github.com/Marsad07/Flask_DeepDive/commit/3403c760a506a075a5fe9241e338beca321a2557)| 
+|4     |          | [day-4](https://github.com/Marsad07/Flask_DeepDive/commit/995528d0a3a5a818ebfd574c6b09c2bebc58f61e)| 
+|5     |          | [day-5](https://github.com/Marsad07/Flask_DeepDive/commit/1f75c1abced8b845fed82fe9b8d82e8714399662)| ll
+|6     |          | [day-6](https://github.com/Marsad07/Flask_DeepDive/commit/95e85068dfc1ca3d9b64e83a73831d55207e6af7)| 
+|7     |          | [day-7](https://github.com/Marsad07/Flask_DeepDive/commit/1be101c8fe9d786831f0634d159b4aeb1832c073)| 
+|8     |          | [day-8](https://github.com/Marsad07/Flask_DeepDive/commit/f40ea91d1a73fcfa1263351620c78097f35dee42)| 
