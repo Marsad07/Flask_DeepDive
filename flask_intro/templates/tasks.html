@@ -17,6 +17,7 @@
             <th>Priority</th>
             <th>Action</th>
             <th>Added Date</th>
+            <th>Due Date</th>
         </tr>
 
         {% for task in tasks %}
@@ -39,6 +40,9 @@
                 </form>
             </td>
             <td>{{ task.added_date }}</td>
+            <td>
+                {{ task.due_date.strftime("%d/%m/%Y") if task.due_date else "" }}
+            </td>
         </tr>
         {% endfor %}
     </table>
