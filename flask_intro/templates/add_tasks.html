@@ -43,6 +43,13 @@
     <title>Add Task</title>
 </head>
 <body>
+    {% if session.get('user_id') %}
+    <div class="account-bar">
+        <span>Welcome, {{ session['user_name'] }}</span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
+
     <ul>
         <li><a href="{{ url_for('homepage') }}">Home</a></li>
         <li><a class="active" href="{{ url_for('add_task_page') }}">Add Task</a></li>

@@ -39,9 +39,9 @@
                     <input type="checkbox" name="task_number" value="{{ task.id }}" onclick="this.form.submit()">
                 </form>
             </td>
-            <td>{{ task.added_date }}</td>
+            <td>{{ task.added_date.strftime("%d/%m/%Y") if task.added_date else "" }}</td>
             <td>
-                {{ task.due_date.strftime("%d/%m/%Y") if task.due_date else "" }}
+                {{ task.due_date.strftime("%d/%m/%Y") if task.added_date else "" }}
             </td>
         </tr>
         {% endfor %}

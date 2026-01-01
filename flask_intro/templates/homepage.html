@@ -36,10 +36,26 @@
     </style>
 </head>
 <body>
+    {% if session.get('user_id') %}
+    <div class="account-bar">
+        <span>Welcome, {{ session['user_name'] }}</span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
+
     <ul>
         <li><a class="active" href="{{ url_for('homepage') }}">Home</a></li>
         <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
         <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
+
+        <br><br><br><br><br><br><br><br>
+        <br><br><br><br><br><br><br><br>
+        <br><br><br><br><br><br><br><br>
+        <br><br><br><br><br><br><br><br>
+        <br><br><br><br><br><br><br><br>
+
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('register') }}">Register</a></li>
     </ul>
 
     <div style="margim-left:220px; text-align:center;">

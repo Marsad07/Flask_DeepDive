@@ -7,6 +7,13 @@
 
 </head>
 <body>
+    {% if session.get('user_id') %}
+    <div class="account-bar">
+        <span>Welcome, {{ session['user_name'] }}</span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
+
     <h1>Edit Task</h1>
     <form method="POST">
         Task Name: <input type="text" name="task_name" value="{{ task.task_name }}">
