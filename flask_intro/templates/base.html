@@ -5,7 +5,40 @@
   <title>{% block title %}Task Manager{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+<style>
+    .account-bar {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    background-color: #013d38;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    z-index: 1000;
+}
+
+.account-bar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.account-bar a:hover {
+    text-decoration: underline;
+}
+
+
+</style>
 <body>
+    {% if session.get('user_id') %}
+    <div class="account-bar">
+        <span>Welcome, {{ session['user_name'] }}</span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    {% endif %}
 
   <ul>
       <li><a href="{{ url_for('homepage') }}">Home</a></li>
