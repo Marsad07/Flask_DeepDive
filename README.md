@@ -15,7 +15,7 @@ Click the Git Tags to view the code for each day
 |6     | Added homepage navigation and edit functionality for task name/description         | [day-6](https://github.com/Marsad07/Flask_DeepDive/commit/95e85068dfc1ca3d9b64e83a73831d55207e6af7)| 
 |7     | Fixed CSS loading, button styling/ regular styling and vertical sidebar         | [day-7](https://github.com/Marsad07/Flask_DeepDive/commit/1be101c8fe9d786831f0634d159b4aeb1832c073)| 
 |8     | Introduced priority column with user‑selectable task priority in add‑task form         | [day-8](https://github.com/Marsad07/Flask_DeepDive/commit/f40ea91d1a73fcfa1263351620c78097f35dee42)| 
-|9     | Introduced priority column with user‑selectable task priority in add‑task form         | [day-9](https://github.com/Marsad07/Flask_DeepDive/commit/7a5fa6e3fb168b2f9b87fc77af37c29294fc22f8)|
-|10    | Implemented a unified layout system with a shared base template, top‑right account bar, and improved navigation structure      |[ day-10 ](https://github.com/Marsad07/Flask_DeepDive/commit/7e33338af6b925907a9951cd3625425e5273b494)|
+|9     | Added a due date section for tasks         | [day-9](https://github.com/Marsad07/Flask_DeepDive/commit/7a5fa6e3fb168b2f9b87fc77af37c29294fc22f8)|
+|10    | Unified app layout with a shared base template, added top‑right account bar, and linked a new SQL data base to have an account system in the navigation.     |[ day-10 ](https://github.com/Marsad07/Flask_DeepDive/commit/7e33338af6b925907a9951cd3625425e5273b494)|
 |11    | Implemented profile update flow with POST route and fixed form action     | [day-11 ](https://github.com/Marsad07/Flask_DeepDive/commit/c88b7024d5253936521a6642225fcb395a035738)|
 |12    | Added green success flash message for task creation, fixed username session sync, and pre-filled Update Details form for smoother UX     | [day-12 ](https://github.com/Marsad07/Flask_DeepDive/commit/a9087b7b91fa936249ff802e05c77f85b555be47)|
