@@ -7,10 +7,10 @@
 
     <form method="POST" action="{{ url_for('update_details') }}">
         <label>New Username:</label><br>
-        <input type="text" name="username"><br><br>
+        <input type="text" name="username" value="{{user.user_name}}"><br><br>
 
         <label>New Email:</label><br>
-        <input type="email" name="email"><br><br>
+        <input type="email" name="email" value="{{ user.user_email}}"><br><br>
 
         <label>New Password:</label><br>
         <input type="password" name="password"><br><br>
