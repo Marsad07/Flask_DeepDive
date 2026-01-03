@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div style="margin-left:220px; padding-top:40px;">
+    <h1>Profile Settings</h1>
+    <br><br>
+    <h2>Account Info</h2>
+    <p><strong>Name:</strong> {{ user.user_name }}</p>
+    <p><strong>Email:</strong> {{ user.user_email }}</p>
+    <p><strong>Member Since:</strong> {{ user.created_date }}</p>
+    <p><strong>Last Login:</strong> {{ user.last_login }}</p>
+    <a href="{{ url_for('update_details_page') }}">
+        <button>Update Details</button>
+    </a>
+    <br><br>
+    <h2>Task Stats</h2>
+    <p><strong>Total Tasks:</strong> {{ total_tasks }}</p>
+    <p><strong>Active Tasks:</strong> {{ active_tasks }}</p>
+    <p><strong>Completed Tasks:</strong> {{ completed_tasks }}</p>
+</div>
+{% endblock %}
+

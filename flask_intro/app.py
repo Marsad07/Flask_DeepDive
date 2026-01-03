@@ -1,3 +1,4 @@
+from threading import active_count
 from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
 import mysql.connector
@@ -22,11 +23,18 @@ app.secret_key = "ajd82h9d8ahd92h9ahd92h9ahd92h9ahd9"
 
 @app.route('/')
 def homepage():
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return render_template('homepage.html', active_count=0, completed_count=0)
+
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(*) AS active_count FROM tasks_new WHERE status = 'active'")
+    cursor.execute("SELECT COUNT(*) AS active_count FROM tasks_new "
+                   "WHERE status = 'active' AND user_id = %s", (user_id,))
     active_count = cursor.fetchone()['active_count']
 
-    cursor.execute("SELECT COUNT(*) AS completed_count FROM tasks_new WHERE status = 'completed'")
+    cursor.execute("SELECT COUNT(*) AS completed_count FROM tasks_new "
+                   "WHERE status = 'completed' AND user_id = %s", (user_id,))
     completed_count = cursor.fetchone()['completed_count']
 
     return render_template('homepage.html', active_count=active_count,
@@ -59,7 +67,6 @@ def logout():
     session.clear()
     return redirect(url_for("homepage"))
 
-
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -85,13 +92,98 @@ def register():
         return redirect("/login")
     return render_template('register.html')
 
+@app.route("/profile")
+def profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for("login"))
+
+    cursor = db2.cursor(dictionary=True)
+    cursor.execute("SELECT user_name, user_email, created_date, last_login FROM users "
+                   "WHERE user_id = %s", (user_id,))
+    user = cursor.fetchone()
+
+    cursor2 = db.cursor(dictionary=True)
+    cursor2.execute("SELECT COUNT(*) AS total FROM tasks_new WHERE user_id=%s", (user_id,))
+    total_tasks = cursor2.fetchone()['total']
+
+    cursor2.execute("SELECT COUNT(*) AS active FROM tasks_new "
+                    "WHERE user_id=%s AND status='active'", (user_id,))
+    active_tasks = cursor2.fetchone()['active']
+
+    cursor2.execute("SELECT COUNT(*) AS completed FROM tasks_new "
+                    "WHERE user_id=%s AND status='completed'", (user_id,))
+    completed_tasks = cursor2.fetchone()['completed']
+
+    return render_template("profile_settings.html",
+                           user=user,
+                           total_tasks=total_tasks,
+                           active_tasks=active_tasks,
+                           completed_tasks=completed_tasks)
+
+@app.route("/update_details_page")
+def update_details_page():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    cursor = db2.cursor(dictionary=True)
+    cursor.execute("SELECT user_name, user_email FROM users WHERE user_id=%s", (user_id,))
+    user = cursor.fetchone()
+
+    return render_template("update_details.html", user=user)
+
+@app.route("/update_details", methods=['POST'])
+def update_details():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for("login"))
+
+    cursor = db2.cursor(dictionary=True)
+
+    new_username = request.form.get('username')
+    new_email = request.form.get('email')
+    new_password = request.form.get('password')
+    confirm = request.form.get('confirm')
+
+    if new_username:
+        cursor.execute("UPDATE users SET user_name=%s WHERE user_id=%s",
+                       (new_username, user_id))
+
+    if new_email:
+        cursor.execute("UPDATE users SET user_email=%s WHERE user_id=%s",
+                       (new_email, user_id))
+
+    if new_password or confirm:
+        if new_password == confirm:
+            hashed = generate_password_hash(new_password)
+            cursor.execute("UPDATE users SET user_password_hash=%s WHERE user_id=%s",
+                           (hashed, user_id))
+        else:
+            return "Passwords do not match"
+
+    db2.commit()
+    return redirect(url_for("profile"))
+
+@app.route("/profile_settings")
+def profile_settings():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+    cursor = db2.cursor(dictionary=True)
+    cursor.execute("SELECT user_name, user_email FROM users WHERE user_id=%s", (user_id,))
+    user = cursor.fetchone()
+    return render_template("profile_settings.html", user=user)
+
 @app.route("/tasks")
 def tasks_page():
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM tasks_new WHERE status='active' ORDER BY due_date IS NULL, due_date ASC")
+    user_id = session["user_id"]
+    cursor.execute("SELECT * FROM tasks_new WHERE status='active' AND user_id = %s "
+                   "ORDER BY due_date IS NULL, due_date ASC ", (user_id,))
     tasks = cursor.fetchall()
 
-    cursor.execute("SELECT * FROM tasks_new WHERE status = 'completed'")
+    cursor.execute("SELECT * FROM tasks_new WHERE status = 'completed' AND user_id = %s ", (user_id,))
     completed_tasks = cursor.fetchall()
     return render_template("tasks.html", tasks=tasks, completed_tasks=completed_tasks)
 
@@ -105,12 +197,14 @@ def add_task():
     description = request.form["Task Description"]
     priority = request.form.get("priority")
     due_date = request.form["due_date"]
+    user_id = session["user_id"]
 
     cursor = db.cursor()
     cursor.execute(
-        "INSERT INTO tasks_new (task_name, task_description, priority, status, added_date, due_date) "
-        "VALUES (%s, %s, %s, 'active', NOW(), %s)",
-        (name, description, priority, due_date)
+        "INSERT INTO tasks_new (task_name, task_description,"
+        "priority, status, added_date, due_date, user_id) "
+        "VALUES (%s, %s, %s, 'active', NOW(), %s, %s)",
+        (name, description, priority, due_date, user_id)
     )
     db.commit()
     return redirect(url_for("add_task_page"))
@@ -118,22 +212,24 @@ def add_task():
 @app.route("/complete", methods=["POST"])
 def complete_task():
     task_id = int(request.form["task_number"])
+    user_id = session["user_id"]
     cursor = db.cursor()
     cursor.execute(
-        "UPDATE tasks_new SET status='completed', completed_date=NOW() WHERE id=%s",
-        (task_id,)
+        "UPDATE tasks_new SET status='completed', "
+        "completed_date=NOW() WHERE id=%s AND user_id=%s",
+        (task_id, user_id)
     )
     db.commit()
     return redirect(url_for("tasks_page"))
 
-
 @app.route("/clear_completed", methods=["POST"])
 def clear_completed():
     cursor = db.cursor()
-    cursor.execute("DELETE FROM tasks_new WHERE status='completed'")
+    user_id = session["user_id"]
+    cursor.execute("DELETE FROM tasks_new WHERE status='completed' AND user_id = %s",
+                   (user_id,))
     db.commit()
     return redirect(url_for("tasks_page"))
-
 
 @app.route('/testdb')
 def testdb():
@@ -145,15 +241,17 @@ def testdb():
 @app.route("/edit/<int:task_id>", methods=["GET", "POST"])
 def edit_task(task_id):
     cursor = db.cursor(dictionary=True)
+    user_id = session["user_id"]
     if request.method == "POST":
         new_task_name = request.form["task_name"]
         new_task_description = request.form["task_description"]
-        cursor.execute("UPDATE tasks_new SET task_name=%s, task_description=%s WHERE id=%s",
-                       (new_task_name, new_task_description, task_id))
+        cursor.execute("UPDATE tasks_new SET task_name=%s, task_description=%s WHERE id=%s "
+                       "AND user_id=%s",
+                       (new_task_name, new_task_description, task_id, user_id))
         db.commit()
         return redirect(url_for("tasks_page"))
     else:
-        cursor.execute("SELECT * FROM tasks_new WHERE id=%s", (task_id,))
+        cursor.execute("SELECT * FROM tasks_new WHERE id=%s AND user_id=%s", (task_id, user_id))
         task = cursor.fetchone()
         return render_template("edit.html", task=task)
 

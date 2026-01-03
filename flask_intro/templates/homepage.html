@@ -1,68 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home - Task Manager</title>
-    <style>
-        body{
-            background-color: #FFFDD0;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+{% extends "base.html" %}
+{% block title %}Home - Task Manager{% endblock %}
 
-        ul{
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        width: 200px;
-        background-color: #013d38;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
-
-    li a{
-        display: block;
-        color: white;
-        padding: 8px 16px;
-        text-decoration: none;
-    }
-
-    li a:hover{
-        background-color: #111613;
-        color: white;
-    }
-    </style>
-</head>
-<body>
-    {% if session.get('user_id') %}
-    <div class="account-bar">
-        <span>Welcome, {{ session['user_name'] }}</span>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
-    {% endif %}
-
-    <ul>
-        <li><a class="active" href="{{ url_for('homepage') }}">Home</a></li>
-        <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
-        <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
-
-        <br><br><br><br><br><br><br><br>
-        <br><br><br><br><br><br><br><br>
-        <br><br><br><br><br><br><br><br>
-        <br><br><br><br><br><br><br><br>
-        <br><br><br><br><br><br><br><br>
-
-        <li><a href="{{ url_for('login') }}">Login</a></li>
-        <li><a href="{{ url_for('register') }}">Register</a></li>
-    </ul>
-
-    <div style="margim-left:220px; text-align:center;">
-        <h1>Welcome to Task Manager</h1>
-        <p>Here you can organise, track and complete your tasks easily</p>
-        <p>You currently have {{ active_count }} active tasks
-           and {{ completed_count }} completed tasks.</p>
-    </div>
-</body>
-</html>
+{% block content %}
+<div style="text-align:center; padding-top: 40px;">
+    <h1>Welcome to Task Manager</h1>
+    <p>Here you can organise, track and complete your tasks easily</p>
+    <p>You currently have {{ active_count }} active tasks
+       and {{ completed_count }} completed tasks.</p>
+</div>
+{% endblock %}
