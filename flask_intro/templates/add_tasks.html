@@ -5,6 +5,7 @@
 <div style="margin-left: 220px; padding-top: 40px;">
     <h1>Add Task</h1>
 
+
     <form method="POST" action="{{ url_for('add_task') }}">
         <label>Task Name:</label>
         <input type="text" name="Task Name" required>
@@ -24,7 +25,17 @@
         <input type="radio" name="priority" value="high"> High
         <br><br>
 
-        <button type="submit" class="add-task-btn">Add Task</button>
+        <button type="submit" name="action" value="add_task" class="add-task-btn">Add Task</button>
     </form>
+    <br><br><br><br>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 </div>
 {% endblock %}

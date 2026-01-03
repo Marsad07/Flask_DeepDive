@@ -1,8 +1,9 @@
 from threading import active_count
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
 import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
+
 
 db = mysql.connector.connect(
     host="localhost",
@@ -59,7 +60,7 @@ def login():
             return redirect("/tasks")
 
         else:
-            return "Invalid Email or Password"
+            return render_template('login.html', error="Invalid Email or Password")
     return render_template('login.html')
 
 @app.route("/logout")
@@ -149,6 +150,7 @@ def update_details():
     if new_username:
         cursor.execute("UPDATE users SET user_name=%s WHERE user_id=%s",
                        (new_username, user_id))
+        session['user_name'] = new_username
 
     if new_email:
         cursor.execute("UPDATE users SET user_email=%s WHERE user_id=%s",
@@ -207,6 +209,7 @@ def add_task():
         (name, description, priority, due_date, user_id)
     )
     db.commit()
+    flash("Task added successfully")
     return redirect(url_for("add_task_page"))
 
 @app.route("/complete", methods=["POST"])
