@@ -16,5 +16,5 @@ Click the Git Tags to view the code for each day
 |7     | Fixed CSS loading, button styling/ regular styling and vertical sidebar         | [day-7](https://github.com/Marsad07/Flask_DeepDive/commit/1be101c8fe9d786831f0634d159b4aeb1832c073)| 
 |8     | Introduced priority column with user‑selectable task priority in add‑task form         | [day-8](https://github.com/Marsad07/Flask_DeepDive/commit/f40ea91d1a73fcfa1263351620c78097f35dee42)| 
 |9     | Introduced priority column with user‑selectable task priority in add‑task form         | [day-9](https://github.com/Marsad07/Flask_DeepDive/commit/7a5fa6e3fb168b2f9b87fc77af37c29294fc22f8)|
-|10    | Implemented a unified layout system with a shared base template, top‑right account bar, and improved navigation structure      | [day-10 ](https://github.com/Marsad07/Flask_DeepDive/commit/7e33338af6b925907a9951cd3625425e5273b494)|
-|11    | Implemented profile update flow with POST route and fixed form action     | [day-11 ](https://github.com/Marsad07/Flask_DeepDive/commit/c88b7024d5253936521a6642225fcb395a035738)|
+|10    | Implemented a unified layout system with a shared base template, top‑right account bar, and improved navigation structure      | [ day-10 ](https://github.com/Marsad07/Flask_DeepDive/commit/7e33338af6b925907a9951cd3625425e5273b494)|
+|11    | Implemented profile update flow with POST route and fixed form action     | [ day-11 ](https://github.com/Marsad07/Flask_DeepDive/commit/c88b7024d5253936521a6642225fcb395a035738)|
