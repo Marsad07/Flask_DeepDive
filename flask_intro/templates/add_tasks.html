@@ -1,83 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        body {
-            background-color: #FFFDD0;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+{% extends "base.html" %}
+{% block title %}Add Task{% endblock %}
 
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            width: 200px;
-            background-color: #013d38;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
+{% block content %}
+<div style="margin-left: 220px; padding-top: 40px;">
+    <h1>Add Task</h1>
 
-        li a {
-            display: block;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-        }
+    <form method="POST" action="{{ url_for('add_task') }}">
+        <label>Task Name:</label>
+        <input type="text" name="Task Name" required>
+        <br><br>
 
-        li a:hover {
-            background-color: #111613;
-            color: white;
-        }
+        <label>Task Description:</label>
+        <input type="text" name="Task Description">
+        <br><br>
 
-        .content {
-            margin-left: 220px; /* sidebar width (200px) + padding */
-            padding: 20px;
-        }
-    </style>
+        <label for="due_date">Due Date:</label>
+        <input type="date" id="due_date" name="due_date">
+        <br><br>
 
-    <meta charset="UTF-8">
-    <title>Add Task</title>
-</head>
-<body>
-    {% if session.get('user_id') %}
-    <div class="account-bar">
-        <span>Welcome, {{ session['user_name'] }}</span>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
-    {% endif %}
+        <label>Priority:</label>
+        <input type="radio" name="priority" value="low"> Low
+        <input type="radio" name="priority" value="medium"> Medium
+        <input type="radio" name="priority" value="high"> High
+        <br><br>
 
-    <ul>
-        <li><a href="{{ url_for('homepage') }}">Home</a></li>
-        <li><a class="active" href="{{ url_for('add_task_page') }}">Add Task</a></li>
-        <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
-    </ul>
-    <div class="content">
-        <h1>Add Task</h1>
-        <form method="POST" action="/add">
-            <label>Task Name:</label>
-            <input type="text" name="Task Name" required>
-            <br><br>
-
-            <label>Task Description:</label>
-            <input type="text" name="Task Description">
-            <br><br>
-
-            <label for="due_date">Due Date:</label>
-            <input type="date" id="due_date" name="due_date">
-            <br><br>
-
-            <label>Priority:</label>
-            <input type="radio" name="priority" value="low"> Low
-            <input type="radio" name="priority" value="medium"> Medium
-            <input type="radio" name="priority" value="high"> High
-            <br><br>
-
-            <button type="submit" class="add-task-btn">Add Task</button>
-        </form>
-    </div>
-</body>
-</html>
+        <button type="submit" class="add-task-btn">Add Task</button>
+    </form>
+</div>
+{% endblock %}

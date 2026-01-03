@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div style="margin-left:220px; padding-top:40px;">
+    <h1>Update Your Details</h1>
+
+    <form method="POST" action="{{ url_for('update_details') }}">
+        <label>New Username:</label><br>
+        <input type="text" name="username"><br><br>
+
+        <label>New Email:</label><br>
+        <input type="email" name="email"><br><br>
+
+        <label>New Password:</label><br>
+        <input type="password" name="password"><br><br>
+
+        <label>Confirm Password:</label><br>
+        <input type="password" name="confirm"><br><br>
+
+        <button type="submit" class="add-task-btn">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

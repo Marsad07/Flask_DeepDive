@@ -118,3 +118,25 @@ textarea:focus {
 .add-task-btn:hover {
     background-color: #006666;
 }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    border: 2px solid #008080;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #FFFDD0;
+    width: 60%;
+    margin-bottom: 12px;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #006666;
+    box-shadow: 0 0 4px rgba(0, 128, 128, 0.5);
+
