@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Your Subjects</h1>
+
+    <div class="subjects-list">
+        {% for subject in subjects %}
+            <a href="/subjects/{{ subject['id'] }}" class="subject-item">
+                {{ subject['name'] }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <form action="/subjects/add" method="POST" class="add-subject-form">
+        <input type="text" name="name" placeholder="New subject name" required>
+        <select name="color">
+            <option value="teal">Teal</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+        </select>
+        <button type="submit">Add Subject</button>
+    </form>
+</div>
+{% endblock %}

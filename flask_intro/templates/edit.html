@@ -1,26 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Task</title>
+{% extends "base.html" %}
+{% block title %}Edit Task{% endblock %}
 
-
-</head>
-<body>
-    {% if session.get('user_id') %}
-    <div class="account-bar">
-        <span>Welcome, {{ session['user_name'] }}</span>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
-    {% endif %}
-
+{% block content %}
+<div style="margin-left: 220px; padding-top: 40px; position: relative;">
+    <a href="{{ url_for('tasks_page') }}" class="back-btn">← Back to Tasks</a>
     <h1>Edit Task</h1>
+
     <form method="POST">
-        Task Name: <input type="text" name="task_name" value="{{ task.task_name }}">
+        <label>Task Name:</label>
+        <input type="text" name="task_name" value="{{ task.task_name }}" required>
         <br><br>
-        Task Description: <input type="text" name="task_description" value="{{ task.task_description }}">
+
+        <label>Task Description:</label>
+        <input type="text" name="task_description" value="{{ task.task_description }}">
         <br><br>
-        <button type="submit">Save Changes</button>
+
+        <label>Due Date:</label>
+        <input type="date" name="due_date" value="{{ task.due_date }}">
+        <br><br>
+
+        <button type="submit" class="add-task-btn">Save Changes</button>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}
