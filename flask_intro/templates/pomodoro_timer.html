@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Pomodoro Timer{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Pomodoro Timer</h1>
+
+    <div class="timebox">
+        <div class="time">
+            <h2 id="minutes">25</h2>
+            <p>Minutes</p>
+        </div>
+        <div class="time">
+            <h2 id="seconds">00</h2>
+            <p>Seconds</p>
+        </div>
+    </div>
+
+    <div class="mode-select">
+    <label for="mode">Mode:</label>
+    <select id="mode">
+        <option value="normal" selected>Break Mode</option>
+        <option value="focus">Focus Mode</option>
+    </select>
+</div>
+
+    <div class="duration-select">
+        <label for="duration">Session Length:</label>
+        <select id="duration">
+            <option value="5">5 minutes</option>
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="25" selected>25 minutes</option>
+            <option value="30">30 minutes</option>
+        </select>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn" class="pomodoro-btn">Start</button>
+        <button id="pauseBtn" class="pomodoro-btn">Pause</button>
+        <button id="resetBtn" class="pomodoro-btn">Reset</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pomodoro.js') }}"></script>
+{% endblock %}

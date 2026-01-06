@@ -139,6 +139,7 @@ textarea:focus {
     outline: none;
     border-color: #006666;
     box-shadow: 0 0 4px rgba(0, 128, 128, 0.5);
+}
 
 .alert.success {
     background-color: #d4edda;
@@ -147,4 +148,114 @@ textarea:focus {
     border-radius: 6px;
     border: 1px solid #c3e6cb;
     margin-bottom: 25px;
+}
+
+.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #008080;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: transparent;
+    padding: 5px 10px;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}
+
+.pomodoro-btn {
+    background-color: #008080;
+    color: #FFFDD0;
+    border: none;
+    padding: 12px 28px;
+    margin: 10px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-weight: 500;
+}
+
+.pomodoro-btn:hover {
+    background-color: #006666;
+    transform: translateY(-2px);
+}
+
+.pomodoro-btn:active {
+    transform: translateY(0);
+}
+
+.controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.duration-select {
+    margin-top: 20px;
+    color: #008080;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+#duration {
+    padding: 8px 12px;
+    margin-left: 10px;
+    border-radius: 6px;
+    border: 2px solid #008080;
+    background-color: #006666;
+    color: #FFFFFF;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#duration:hover {
+    border-color: #006666;
+}
+
+.mode-select {
+    margin-top: 20px;
+    color: #008080;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+#mode {
+    padding: 8px 12px;
+    margin-left: 10px;
+    border-radius: 6px;
+    border: 2px solid #008080;
+    background-color: #FFFDD0;
+    color: #008080;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#mode:hover {
+    border-color: #006666;
+}
+
+.subjects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.subject-item {
+    padding: 15px 20px;
+    background-color: #008080;
+    color: #FFFDD0;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: 0.2s ease;
+}
+
+.subject-item:hover {
+    background-color: #006666;
 }

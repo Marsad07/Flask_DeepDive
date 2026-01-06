@@ -19,6 +19,13 @@ db2 = mysql.connector.connect(
     database="user_manager"
 )
 
+db3 = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    passwd="PYTHONCOURSE",
+    database="subject_manager"
+)
+
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = "ajd82h9d8ahd92h9ahd92h9ahd92h9ahd9"
 
@@ -257,6 +264,33 @@ def edit_task(task_id):
         cursor.execute("SELECT * FROM tasks_new WHERE id=%s AND user_id=%s", (task_id, user_id))
         task = cursor.fetchone()
         return render_template("edit.html", task=task)
+
+@app.route('/pomodoro')
+def pomodoro():
+    return render_template("pomodoro_timer.html")
+
+@app.route("/subjects")
+def subjects():
+    user_id = session["user_id"]
+
+    cursor = db3.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM subjects WHERE user_id = %s", (user_id,))
+    subjects = cursor.fetchall()
+
+    return render_template("subjects.html", subjects=subjects)
+
+@app.route("/add_subject", methods=["POST"])
+def add_subject():
+    name = request.form["name"]
+    color = request.form["color"]
+    user_id = session["user_id"]
+    cursor = db3.cursor()
+    cursor.execute(
+        "INSERT INTO subjects (user_id, name, color) VALUES (%s, %s, %s)",
+        (user_id, name, color)
+    )
+    db3.commit()
+    return redirect("/subjects")
 
 if __name__ == "__main__":
     app.run(debug=True)
