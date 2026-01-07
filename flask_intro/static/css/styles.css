@@ -256,6 +256,80 @@ textarea:focus {
     transition: 0.2s ease;
 }
 
-.subject-item:hover {
-    background-color: #006666;
+/* Keep your form clean and compact */
+.add-subject-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px auto;   /* centers the form */
+    width: 300px;
 }
+
+.add-subject-form input,
+.add-subject-form select,
+.add-subject-form textarea,
+.add-subject-form button {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.add-subject-form input,
+.add-subject-form select,
+.add-subject-form textarea {
+    width: 250px;
+    max-width: 100%;
+}
+
+.subjects-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.subject-item {
+    display: block;
+    background: #013d38;
+    color: white;
+    padding: 10px 20px;
+    width: 200px;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.subject-item:hover {
+    background: #0a5a52;
+}
+
+.hero {
+    display: block;
+}
+
+.add-subject-form button {
+    background-color: #013d38;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.add-subject-form button:hover {
+    background-color: #0a5a52;
+    transform: translateY(-2px);
+}
+
+.add-subject-form select {
+    background-color: white;
+    border: 2px solid #013d38;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
