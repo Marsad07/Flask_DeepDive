@@ -12,18 +12,11 @@ db = mysql.connector.connect(
     database="task_manager"
 )
 
-db2 = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="PYTHONCOURSE",
-    database="user_manager"
-)
-
 db3 = mysql.connector.connect(
     host="localhost",
     user="root",
     passwd="PYTHONCOURSE",
-    database="subject_manager"
+    database="subject_manager_2"
 )
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -51,23 +44,19 @@ def homepage():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
 
-        cursor = db2.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE user_email = %s", (email,))
+        cursor = db3.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE user_name = %s", (username,))
         user = cursor.fetchone()
 
         if user and check_password_hash(user["user_password_hash"], password):
             session['user_id'] = user["user_id"]
             session['user_name'] = user["user_name"]
-            cursor.execute("UPDATE users SET last_login = NOW() WHERE user_id = %s",
-                           (user["user_id"],))
-            db2.commit()
             return redirect("/tasks")
+        return render_template('login.html', error="Invalid username or password")
 
-        else:
-            return render_template('login.html', error="Invalid Email or Password")
     return render_template('login.html')
 
 @app.route("/logout")
@@ -81,22 +70,19 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-
         hashed = generate_password_hash(password)
-        cursor = db2.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE user_email = %s", (email,))
+        cursor = db3.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE user_name = %s", (username,))
         user = cursor.fetchone()
-
         if user:
-            return "An account with this email already exists."
-
+            return "An account with this username already exists."
         cursor.execute(
             "INSERT INTO users (user_name, user_email, user_password_hash, created_date) "
             "VALUES (%s, %s, %s, NOW())",
             (username, email, hashed)
         )
-        db2.commit()
+        db3.commit()
         return redirect("/login")
     return render_template('register.html')
 
@@ -106,7 +92,7 @@ def profile():
     if not user_id:
         return redirect(url_for("login"))
 
-    cursor = db2.cursor(dictionary=True)
+    cursor = db3.cursor(dictionary=True)
     cursor.execute("SELECT user_name, user_email, created_date, last_login FROM users "
                    "WHERE user_id = %s", (user_id,))
     user = cursor.fetchone()
@@ -135,7 +121,7 @@ def update_details_page():
     if not user_id:
         return redirect(url_for("login"))
 
-    cursor = db2.cursor(dictionary=True)
+    cursor = db3.cursor(dictionary=True)
     cursor.execute("SELECT user_name, user_email FROM users WHERE user_id=%s", (user_id,))
     user = cursor.fetchone()
 
@@ -147,7 +133,7 @@ def update_details():
     if not user_id:
         return redirect(url_for("login"))
 
-    cursor = db2.cursor(dictionary=True)
+    cursor = db3.cursor(dictionary=True)
 
     new_username = request.form.get('username')
     new_email = request.form.get('email')
@@ -171,7 +157,7 @@ def update_details():
         else:
             return "Passwords do not match"
 
-    db2.commit()
+    db3.commit()
     return redirect(url_for("profile"))
 
 @app.route("/profile_settings")
@@ -179,7 +165,7 @@ def profile_settings():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("login"))
-    cursor = db2.cursor(dictionary=True)
+    cursor = db3.cursor(dictionary=True)
     cursor.execute("SELECT user_name, user_email FROM users WHERE user_id=%s", (user_id,))
     user = cursor.fetchone()
     return render_template("profile_settings.html", user=user)
@@ -269,28 +255,52 @@ def edit_task(task_id):
 def pomodoro():
     return render_template("pomodoro_timer.html")
 
-@app.route("/subjects")
-def subjects():
-    user_id = session["user_id"]
+@app.route("/subjects/<int:subject_id>")
+def subject_page(subject_id):
+    user_id = session.get("user_id")
 
-    cursor = db3.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM subjects WHERE user_id = %s", (user_id,))
-    subjects = cursor.fetchall()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM subjects WHERE id=%s AND user_id=%s", (subject_id, user_id))
+    subject = cursor.fetchone()
 
-    return render_template("subjects.html", subjects=subjects)
+    cursor.execute("SELECT * FROM tasks_new WHERE subject_id=%s AND user_id=%s", (subject_id, user_id))
+    tasks = cursor.fetchall()
+
+    return render_template("subject_page.html", subject=subject, tasks=tasks)
 
 @app.route("/add_subject", methods=["POST"])
 def add_subject():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect("/login")
+
     name = request.form["name"]
     color = request.form["color"]
-    user_id = session["user_id"]
+    description = request.form.get("description") or ""
+    study_goal = request.form.get("study_goal") or ""
+
     cursor = db3.cursor()
-    cursor.execute(
-        "INSERT INTO subjects (user_id, name, color) VALUES (%s, %s, %s)",
-        (user_id, name, color)
-    )
+    cursor.execute("""
+        INSERT INTO subjects (user_id, name, color, description, study_goal)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (user_id, name, color, description, study_goal))
     db3.commit()
     return redirect("/subjects")
+
+@app.route("/subjects/<int:subject_id>/add_task", methods=['POST'])
+def add_task(subject_id):
+    user_id = session.get("user_id")
+    title = request.form['title']
+
+    cursor = db.cursor()
+    cursor.execute(
+        "INSERT INTO tasks_new (title, status, user_id, subject_id) VALUES (%s, 'active', %s, %s)",
+        (title, user_id, subject_id)
+    )
+    db.commit()
+
+    return redirect(f"/subjects/{subject_id}")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

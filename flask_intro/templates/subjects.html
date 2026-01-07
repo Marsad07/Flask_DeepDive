@@ -2,25 +2,27 @@
 {% block title %}Subjects{% endblock %}
 
 {% block content %}
-<div class="hero">
-    <h1>Your Subjects</h1>
+<h1>Your Subjects</h1>
 
-    <div class="subjects-list">
-        {% for subject in subjects %}
-            <a href="/subjects/{{ subject['id'] }}" class="subject-item">
-                {{ subject['name'] }}
-            </a>
-        {% endfor %}
-    </div>
+<form action="/add_subject" method="POST" class="add-subject-form">
+    <input type="text" name="name" placeholder="New subject name" required>
+    <select name="color">
+        <option value="purple">Purple🟣</option>
+        <option value="red">Red🔴</option>
+        <option value="green">Green🟢</option>
+    </select>
+    <textarea name="description" placeholder="Description (optional)"></textarea>
+    <input type="text" name="study_goal" placeholder="Study goal (optional)">
+    <button type="submit">Add Subject</button>
+</form>
 
-    <form action="/subjects/add" method="POST" class="add-subject-form">
-        <input type="text" name="name" placeholder="New subject name" required>
-        <select name="color">
-            <option value="teal">Teal</option>
-            <option value="red">Red</option>
-            <option value="blue">Blue</option>
-        </select>
-        <button type="submit">Add Subject</button>
-    </form>
+<div class="subjects-list">
+    {% for subject in subjects %}
+        <a href="/subjects/{{ subject['id'] }}" class="subject-item">
+            {{ subject['name'] }}
+        </a>
+    {% endfor %}
 </div>
+
 {% endblock %}
+

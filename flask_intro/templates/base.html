@@ -5,34 +5,35 @@
   <title>{% block title %}Task Manager{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+
 <style>
     .account-bar {
-    position: fixed;
-    top: 10px;
-    right: 20px;
-    background-color: #013d38;
-    padding: 10px 15px;
-    border-radius: 8px;
-    color: white;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    z-index: 1000;
-}
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        background-color: #013d38;
+        padding: 10px 15px;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        z-index: 1000;
+    }
 
-.account-bar a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
+    .account-bar a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
 
-.account-bar a:hover {
-    text-decoration: underline;
-}
-
-
+    .account-bar a:hover {
+        text-decoration: underline;
+    }
 </style>
+
 <body>
+
     {% if session.get('user_id') %}
     <div class="account-bar">
         <span>Welcome, {{ session['user_name'] }}</span>
@@ -40,17 +41,24 @@
     </div>
     {% endif %}
 
-  <ul>
-      <li><a href="{{ url_for('homepage') }}">Home</a></li>
-      <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
-      <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
-      <li><a href="{{ url_for('profile') }}">Profile</a></li>
-      <li><a href="{{ url_for('pomodoro') }}">Pomodoro Timer</a></li>
-  </ul>
+    <ul>
+        <li><a href="{{ url_for('homepage') }}">Home</a></li>
 
-  <div class="content">
-      {% block content %}{% endblock %}
-  </div>
+        {% if session.get('user_id') %}
+            <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
+            <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('pomodoro') }}">Pomodoro Timer</a></li>
+            <li><a href="{{ url_for('subjects') }}">Subjects</a></li>
+        {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+        {% endif %}
+    </ul>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
 
 </body>
 </html>
