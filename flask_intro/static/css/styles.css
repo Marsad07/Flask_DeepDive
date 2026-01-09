@@ -10,10 +10,12 @@ ul {
     padding: 0;
     width: 200px;
     background-color: #013d38;
-    height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 li a {
@@ -119,10 +121,8 @@ textarea:focus {
     background-color: #006666;
 }
 
-input[type="text"],
 input[type="email"],
-input[type="password"],
-textarea {
+input[type="password"] {
     border: 2px solid #008080;
     border-radius: 6px;
     padding: 10px;
@@ -132,10 +132,8 @@ textarea {
     margin-bottom: 12px;
 }
 
-input[type="text"]:focus,
 input[type="email"]:focus,
-input[type="password"]:focus,
-textarea:focus {
+input[type="password"]:focus {
     outline: none;
     border-color: #006666;
     box-shadow: 0 0 4px rgba(0, 128, 128, 0.5);
@@ -256,12 +254,11 @@ textarea:focus {
     transition: 0.2s ease;
 }
 
-/* Keep your form clean and compact */
 .add-subject-form {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin: 20px auto;   /* centers the form */
+    margin: 20px auto;
     width: 300px;
 }
 
@@ -333,3 +330,19 @@ textarea:focus {
     transition: 0.2s ease;
 }
 
+.dropdown-content {
+    display: none;
+    padding-left: 20px;
+    background-color: #013d38;
+}
+
+.dropdown-content li a {
+    display: block;
+    padding: 6px 16px;
+    color: white;
+    text-decoration: none;
+}
+
+.dropdown-content li a:hover {
+    background-color: #111613;
+}

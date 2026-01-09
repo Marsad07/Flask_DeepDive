@@ -30,6 +30,32 @@
     .account-bar a:hover {
         text-decoration: underline;
     }
+
+    .dropdown-btn {
+        cursor: pointer;
+        display: block;
+        padding: 8px 16px;
+        color: white;
+    }
+
+    .dropdown-content {
+        list-style: none;
+        padding-left: 20px;
+        margin: 0;
+        background-color: #013d38;
+        display: none;
+    }
+
+    .dropdown-content li a {
+        display: block;
+        padding: 6px 16px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .dropdown-content li a:hover {
+        background-color: #111613;
+    }
 </style>
 
 <body>
@@ -46,10 +72,24 @@
 
         {% if session.get('user_id') %}
             <li><a href="{{ url_for('add_task_page') }}">Add Task</a></li>
-            <li><a href="{{ url_for('tasks_page') }}">View Tasks</a></li>
             <li><a href="{{ url_for('profile') }}">Profile</a></li>
             <li><a href="{{ url_for('pomodoro') }}">Pomodoro Timer</a></li>
-            <li><a href="{{ url_for('subjects') }}">Subjects</a></li>
+
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropdown-btn" id="subjectsTitle" onclick="toggleSubjects()">
+                    Subjects ▼
+                </a>
+
+                <ul id="subjectsDropdown" class="dropdown-content">
+                    <li><a href="javascript:void(0)" onclick="toggleSubjects()">← Back</a></li>
+
+                    {% for subject in sidebar_subjects %}
+                        <li><a href="/subjects/{{ subject.id }}">{{ subject.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+
+
         {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
             <li><a href="{{ url_for('register') }}">Register</a></li>
@@ -60,5 +100,20 @@
         {% block content %}{% endblock %}
     </div>
 
+    <script>
+        function toggleSubjects()
+        {
+            const menu = document.getElementById("subjectsDropdown");
+            const title = document.getElementById("subjectsTitle");
+
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+                title.innerHTML = "Subjects ▼";
+            } else {
+                menu.style.display = "block";
+                title.innerHTML = "← Back";
+            }
+        }
+        </script>
 </body>
 </html>
