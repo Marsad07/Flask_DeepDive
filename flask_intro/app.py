@@ -116,15 +116,22 @@ def tasks_page():
     cursor = db.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT * FROM tasks_new 
-        WHERE status='active' AND user_id=%s
-        ORDER BY due_date IS NULL, due_date ASC
-    """, (user_id,))
+            SELECT t.*, s.name AS subject_name
+            FROM tasks_new t
+            LEFT JOIN subjects s ON t.subject_id = s.id
+            WHERE t.status='active' AND t.user_id=%s
+            ORDER BY t.due_date IS NULL, t.due_date ASC
+        """, (user_id,))
     tasks = cursor.fetchall()
 
-    cursor.execute("SELECT * FROM tasks_new WHERE status='completed' AND user_id=%s", (user_id,))
-    completed_tasks = cursor.fetchall()
+    cursor.execute("""
+            SELECT t.*, s.name AS subject_name
+            FROM tasks_new t
+            LEFT JOIN subjects s ON t.subject_id = s.id
+            WHERE t.status='completed' AND t.user_id=%s
+        """, (user_id,))
 
+    completed_tasks = cursor.fetchall()
     return render_template("tasks.html", tasks=tasks, completed_tasks=completed_tasks)
 
 @app.route("/add_task_page")
@@ -201,7 +208,7 @@ def subject_page(subject_id):
     cursor2.execute("SELECT * FROM tasks_new WHERE subject_id=%s AND user_id=%s", (subject_id, user_id))
     tasks = cursor2.fetchall()
 
-    return render_template("subject_page.html", subject=subject, tasks=tasks)
+    return render_template("subject_content.html", subject=subject, tasks=tasks)
 
 @app.route("/add_subject", methods=["POST"])
 def add_subject():
@@ -276,7 +283,8 @@ def update_details():
     if new_password or confirm:
         if new_password == confirm:
             hashed = generate_password_hash(new_password)
-            cursor.execute("UPDATE users SET user_password_hash=%s WHERE user_id=%s", (hashed, user_id))
+            cursor.execute(
+                "UPDATE users SET user_password_hash=%s WHERE user_id=%s", (hashed, user_id))
         else:
             return "Passwords do not match"
 

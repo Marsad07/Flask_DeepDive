@@ -1,10 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ subject }}</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}{{ subject.name }}{% endblock %}
+
+{% block content %}
+<div class="subject-header">
+    <h1>{{ subject.name }}</h1>
+    <p class="subtitle">Tasks for {{ subject.name }}</p>
+</div>
+
+<h2>Active Tasks</h2>
+
+{% if tasks %}
+<table>
+    <tr>
+        <th>Task</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+        <th>Edit</th>
+        <th>Complete</th>
+    </tr>
+
+    {% for task in tasks if task.status == 'active' %}
+    <tr>
+        <td>{{ task.task_name }}</td>
+        <td>{{ task.priority }}</td>
+        <td>{{ task.due_date }}</td>
+        <td>
+            <a href="/edit_task/{{ task.id }}">
+                <span class="edit-icon">✏️</span>
+            </a>
+        </td>
+        <td>
+            <form action="/subjects/{{ subject.id }}/complete_task" method="POST">
+                <input type="hidden" name="task_id" value="{{ task.id }}">
+                <button type="submit" style="background:none;border:none;cursor:pointer;">✔</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No tasks added for {{ subject.name }} yet.</p>
+{% endif %}
+
+<h2>Completed Tasks</h2>
+
+<table>
+    <tr>
+        <th>Task</th>
+        <th>Priority</th>
+        <th>Completed</th>
+        <th>Delete</th>
+    </tr>
+
+    {% for task in tasks if task.status == 'completed' %}
+    <tr>
+        <td>{{ task.task_name }}</td>
+        <td>{{ task.priority }}</td>
+        <td>✔</td>
+        <td>
+            <form action="/subjects/{{ subject.id }}/delete_task" method="POST">
+                <input type="hidden" name="task_id" value="{{ task.id }}">
+                <button type="submit" style="background:none;border:none;cursor:pointer;">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
