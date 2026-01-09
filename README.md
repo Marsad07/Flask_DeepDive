@@ -20,3 +20,5 @@ Click the Git Tags to view the code for each day
 |11    | Implemented profile update flow with POST route and fixed form action     | [day-11 ](https://github.com/Marsad07/Flask_DeepDive/commit/c88b7024d5253936521a6642225fcb395a035738)|
 |12    | Added green success flash message for task creation, fixed username session sync, and pre-filled Update Details form for smoother UX     | [day-12 ](https://github.com/Marsad07/Flask_DeepDive/commit/a9087b7b91fa936249ff802e05c77f85b555be47)|
 |13    | Added subjects database setup + fixed edit.html styling    | [day-13 ](https://github.com/Marsad07/Flask_DeepDive/commit/fbaf1b78ddc16dd03eb3c87122bf37bfdf8adaed)|
+|14    | Created subject content page, added subject-specific task logic and improved subjects UI    | [day-14 ](https://github.com/Marsad07/Flask_DeepDive/commit/cae64cf89263450c6a52917e82958e5d7a3d12f0)|
+|15    | Added sidebar subjects submenu with back-button toggle and fix dropdown collapse behavior    | [day-15 ](https://github.com/Marsad07/Flask_DeepDive/commit/8683ae42e1509685488b5cec5e926556776e8af1)|
