@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Add Subject{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <h1 class="page-title">Add a New Subject</h1>
+
+    <form action="/add_subject" method="POST" class="subject-form">
+
+        <label for="name">Subject Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="color">Subject Colour</label>
+        <input type="color" id="color" name="color" value="#4CAF50">
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Optional"></textarea>
+
+        <label for="study_goal">Study Goal</label>
+        <input type="text" id="study_goal" name="study_goal" placeholder="Optional">
+
+        <button type="submit" class="btn-primary">Add Subject</button>
+    </form>
+
+</div>
+
+<style>
+    .page-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-title {
+        margin-bottom: 20px;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .subject-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .subject-form input,
+    .subject-form textarea {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .subject-form textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .btn-primary {
+        padding: 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+</style>
+{% endblock %}

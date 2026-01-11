@@ -1,48 +1,47 @@
 {% extends "base.html" %}
-{% block title %}{{ subject.name }}{% endblock %}
+{% block title %}Your Subjects{% endblock %}
 
 {% block content %}
 
-<h1 style="color: {{ subject.color }};">
-    {{ subject.name }}
-</h1>
+<h1>Your Subjects</h1>
 
-{% if subject.description %}
-<p><strong>Description:</strong> {{ subject.description }}</p>
-{% endif %}
+<a href="/add_subject_page" class="btn-primary">Add Subject</a>
 
-{% if subject.study_goal %}
-<p><strong>Study Goal:</strong> {{ subject.study_goal }}</p>
-{% endif %}
-<hr>
-<h2>Tasks for {{ subject.name }}</h2>
-
-<div class="task-list">
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="task-item">
-                <p>{{ task.task_name }}</p>
-
-                <form method="POST" action="/subjects/{{ subject.id }}/complete_task" style="display:inline;">
-                    <input type="hidden" name="task_id" value="{{ task.id }}">
-                    <button type="submit">Complete</button>
-                </form>
-
-                <form method="POST" action="/subjects/{{ subject.id }}/delete_task" style="display:inline;">
-                    <input type="hidden" name="task_id" value="{{ task.id }}">
-                    <button type="submit">Delete</button>
-                </form>
-            </div>
+<div class="subjects-container">
+    {% if subjects %}
+        {% for subject in subjects %}
+            <a href="/subjects/{{ subject.id }}" class="subject-card" style="border-left: 6px solid {{ subject.color }};">
+                <h2>{{ subject.name }}</h2>
+                {% if subject.description %}
+                    <p>{{ subject.description }}</p>
+                {% endif %}
+            </a>
         {% endfor %}
     {% else %}
-        <p>No tasks yet for this subject.</p>
+        <p>You have no subjects yet.</p>
     {% endif %}
 </div>
-<hr>
 
-<h3>Add a Task to This Subject</h3>
-<form method="POST" action="/subjects/{{ subject.id }}/add_task">
-    <input type="text" name="title" placeholder="Task title" required>
-    <button type="submit">Add Task</button>
-</form>
+<style>
+.subjects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.subject-card {
+    padding: 15px;
+    background: #f7f7f7;
+    border-radius: 6px;
+    text-decoration: none;
+    color: black;
+    transition: 0.2s;
+}
+
+.subject-card:hover {
+    background: #eaeaea;
+}
+</style>
+
 {% endblock %}

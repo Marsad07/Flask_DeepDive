@@ -14,7 +14,7 @@ db3 = mysql.connector.connect(
     host="localhost",
     user="root",
     passwd="PYTHONCOURSE",
-    database="subject_manager_2"
+    database="task_manager"
 )
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -27,13 +27,16 @@ def homepage():
         return render_template('homepage.html', active_count=0, completed_count=0)
 
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT COUNT(*) AS active_count FROM tasks_new WHERE status='active' AND user_id=%s", (user_id,))
+    cursor.execute("SELECT COUNT(*) AS active_count "
+                   "FROM tasks_new WHERE status='active' AND user_id=%s", (user_id,))
     active_count = cursor.fetchone()['active_count']
 
-    cursor.execute("SELECT COUNT(*) AS completed_count FROM tasks_new WHERE status='completed' AND user_id=%s", (user_id,))
+    cursor.execute("SELECT COUNT(*) AS completed_count "
+                   "FROM tasks_new WHERE status='completed' AND user_id=%s", (user_id,))
     completed_count = cursor.fetchone()['completed_count']
 
-    return render_template('homepage.html', active_count=active_count, completed_count=completed_count)
+    return render_template('homepage.html',
+                           active_count=active_count, completed_count=completed_count)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -91,17 +94,20 @@ def profile():
         return redirect(url_for("login"))
 
     cursor = db3.cursor(dictionary=True)
-    cursor.execute("SELECT user_name, user_email, created_date, last_login FROM users WHERE user_id=%s", (user_id,))
+    cursor.execute("SELECT user_name, user_email, created_date,"
+                   " last_login FROM users WHERE user_id=%s", (user_id,))
     user = cursor.fetchone()
 
     cursor2 = db.cursor(dictionary=True)
     cursor2.execute("SELECT COUNT(*) AS total FROM tasks_new WHERE user_id=%s", (user_id,))
     total_tasks = cursor2.fetchone()['total']
 
-    cursor2.execute("SELECT COUNT(*) AS active FROM tasks_new WHERE user_id=%s AND status='active'", (user_id,))
+    cursor2.execute("SELECT COUNT(*) AS active FROM tasks_new "
+                    "WHERE user_id=%s AND status='active'", (user_id,))
     active_tasks = cursor2.fetchone()['active']
 
-    cursor2.execute("SELECT COUNT(*) AS completed FROM tasks_new WHERE user_id=%s AND status='completed'", (user_id,))
+    cursor2.execute("SELECT COUNT(*) AS completed FROM tasks_new "
+                    "WHERE user_id=%s AND status='completed'", (user_id,))
     completed_tasks = cursor2.fetchone()['completed']
 
     return render_template("profile_settings.html",
@@ -155,7 +161,8 @@ def add_task():
 
     cursor = db.cursor()
     cursor.execute("""
-            INSERT INTO tasks_new (task_name, task_description, priority, status, added_date, due_date, user_id, subject_id)
+            INSERT INTO tasks_new (task_name, task_description, priority, 
+            status, added_date, due_date, user_id, subject_id)
             VALUES (%s, %s, %s, 'active', NOW(), %s, %s, %s)
         """, (name, description, priority, due_date, user_id, subject_id))
     db.commit()
@@ -205,7 +212,8 @@ def subject_page(subject_id):
     subject = cursor.fetchone()
 
     cursor2 = db.cursor(dictionary=True)
-    cursor2.execute("SELECT * FROM tasks_new WHERE subject_id=%s AND user_id=%s", (subject_id, user_id))
+    cursor2.execute("SELECT * FROM tasks_new "
+                    "WHERE subject_id=%s AND user_id=%s", (subject_id, user_id))
     tasks = cursor2.fetchall()
 
     return render_template("subject_content.html", subject=subject, tasks=tasks)
@@ -332,6 +340,9 @@ def inject_subjects():
 
     return dict(sidebar_subjects=subjects)
 
+@app.route("/add_subject_page")
+def add_subject_page():
+    return render_template("add_subject_page.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
