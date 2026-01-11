@@ -1,11 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Home - Task Manager{% endblock %}
+{% block title %}Home - Study App{% endblock %}
 
 {% block content %}
 <div style="text-align:center; padding-top: 40px;">
-    <h1>Welcome to Task Manager</h1>
-    <p>Here you can organise, track and complete your tasks easily</p>
-    <p>You currently have {{ active_count }} active tasks
-       and {{ completed_count }} completed tasks.</p>
+    <h1>Welcome to Your Study Dashboard</h1>
+    <p>Plan your work, track your progress, and stay organised across all your subjects.</p>
+
+    <p>You currently have <strong>{{ active_count }}</strong> active tasks
+       and <strong>{{ completed_count }}</strong> completed tasks.</p>
 </div>
 {% endblock %}
+

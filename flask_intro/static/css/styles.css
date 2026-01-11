@@ -5,57 +5,102 @@ body {
 }
 
 nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: 200px;
     background-color: #013d38;
+    width: 220px;
+    height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    min-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-top: 0px;
+    padding: 0;
+    border-radius: 0 20px 20px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+}
+
+nav ul li {
+    margin: 6px 0;
 }
 
 nav ul li a {
     display: block;
+    padding: 12px 18px;
     color: white;
-    padding: 10px 16px;
     text-decoration: none;
+    border-radius: 8px;
+    transition: 0.25s ease;
 }
 
 nav ul li a:hover {
-    background-color: #111613;
+    background-color: #0a4f48;
+    padding-left: 26px;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    color: white;
+    cursor: pointer;
+}
+
+.subjects-link {
+    color: white;
+    text-decoration: none;
+    flex-grow: 1;
+}
+
+.subjects-toggle {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    list-style: none;
+    padding-left: 20px;
+    margin: 0;
+    background-color: #024b44;
+    border-left: 3px solid #0a6f63;
+    border-radius: 0 0 10px 0;
+    display: none;
+}
+
+.dropdown-content li a {
+    padding: 8px 16px;
+    color: white;
+    text-decoration: none;
+    display: block;
+    border-radius: 6px;
+}
+
+.dropdown-content li a:hover {
+    background-color: #0a5a52;
 }
 
 .content {
-    margin-left: 220px;
-    padding: 20px;
-    background-color: #FFFDD0;
+    margin-left: 240px;
+    padding: 25px;
     min-height: 100vh;
 }
 
 table {
-    width: 60%;
+    width: 70%;
     border: 2.5px solid #01796f;
     border-collapse: collapse;
     background-color: #CFB291;
     margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 th {
     background-color: #008080;
     color: white;
-    border: 2.5px solid #008080;
-    padding: 8px;
+    padding: 10px;
 }
 
 td {
     background-color: #FFFDD0;
-    border: 2.5px solid #008080;
-    padding: 8px;
+    padding: 10px;
+    border: 2px solid #008080;
 }
 
 tr:hover td {
@@ -65,54 +110,20 @@ tr:hover td {
 .edit-icon {
     opacity: 0;
     transform: translateX(-10px);
-    transition: opacity 1s ease, transform 2s ease;
+    transition: 0.3s ease;
     margin-left: 8px;
     cursor: pointer;
 }
 
 td:hover .edit-icon {
-    opacity: 5;
+    opacity: 1;
     transform: translateX(0);
 }
 
-.clear-btn {
-    background-color: #008080;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.clear-btn:hover {
-    background-color: #111613;
-}
-
-input[type="text"],
-textarea,
-input[type="email"],
-input[type="password"] {
-    border: 2px solid #008080;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 15px;
-    background-color: #FFFDD0;
-    width: 60%;
-    margin-bottom: 12px;
-}
-
-input[type="text"]:focus,
-textarea:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
-    outline: none;
-    border-color: #006666;
-    box-shadow: 0 0 4px rgba(0, 128, 128, 0.5);
-}
-
-.add-task-btn {
+.clear-btn,
+.add-task-btn,
+.pomodoro-btn,
+.add-subject-form button {
     background-color: #008080;
     color: white;
     border: none;
@@ -121,11 +132,97 @@ input[type="password"]:focus {
     cursor: pointer;
     font-size: 15px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    transition: 0.25s ease;
 }
 
-.add-task-btn:hover {
+.clear-btn:hover,
+.add-task-btn:hover,
+.add-subject-form button:hover {
     background-color: #006666;
+}
+
+.pomodoro-btn {
+    margin: 10px;
+    font-size: 1.1rem;
+}
+
+.pomodoro-btn:hover {
+    transform: translateY(-2px);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    border: 2px solid #008080;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #FFFDD0;
+    width: 60%;
+    margin-bottom: 12px;
+    transition: 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #006666;
+    box-shadow: 0 0 4px rgba(0, 128, 128, 0.5);
+}
+
+.subjects-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.subject-item {
+    background: #013d38;
+    color: white;
+    padding: 12px 20px;
+    width: 220px;
+    text-align: center;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+
+.subject-item:hover {
+    background: #0a5a52;
+}
+
+.add-subject-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px auto;
+    width: 320px;
+}
+
+.add-subject-form select {
+    background-color: white;
+    border: 2px solid #013d38;
+    border-radius: 6px;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-item {
+    background: #f4f4f4;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+.priority {
+    font-size: 0.9em;
+    color: #666;
 }
 
 .alert.success {
@@ -142,163 +239,10 @@ input[type="password"]:focus {
     top: 10px;
     left: 10px;
     color: #008080;
-    text-decoration: none;
     font-weight: bold;
-    background-color: transparent;
-    padding: 5px 10px;
+    text-decoration: none;
 }
 
 .back-btn:hover {
     text-decoration: underline;
-}
-
-.pomodoro-btn {
-    background-color: #008080;
-    color: #FFFDD0;
-    border: none;
-    padding: 12px 28px;
-    margin: 10px;
-    font-size: 1.1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease;
-    font-weight: 500;
-}
-
-.pomodoro-btn:hover {
-    background-color: #006666;
-    transform: translateY(-2px);
-}
-
-.pomodoro-btn:active {
-    transform: translateY(0);
-}
-
-.controls {
-    margin-top: 30px;
-    display: flex;
-    gap: 20px;
-}
-
-.duration-select,
-.mode-select {
-    margin-top: 20px;
-    color: #008080;
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
-#duration,
-#mode {
-    padding: 8px 12px;
-    margin-left: 10px;
-    border-radius: 6px;
-    border: 2px solid #008080;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-#duration {
-    background-color: #006666;
-    color: #FFFFFF;
-}
-
-#mode {
-    background-color: #FFFDD0;
-    color: #008080;
-}
-
-#duration:hover,
-#mode:hover {
-    border-color: #006666;
-}
-
-.subjects-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 30px;
-    gap: 10px;
-}
-
-.subject-item {
-    display: block;
-    background: #013d38;
-    color: white;
-    padding: 10px 20px;
-    width: 200px;
-    text-align: center;
-    border-radius: 6px;
-    text-decoration: none;
-}
-
-.subject-item:hover {
-    background: #0a5a52;
-}
-
-.add-subject-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 20px auto;
-    width: 300px;
-}
-
-.add-subject-form input,
-.add-subject-form select,
-.add-subject-form textarea,
-.add-subject-form button {
-    padding: 8px;
-    font-size: 16px;
-}
-
-.add-subject-form select {
-    background-color: white;
-    border: 2px solid #013d38;
-    border-radius: 6px;
-}
-
-.add-subject-form button {
-    background-color: #013d38;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.add-subject-form button:hover {
-    background-color: #0a5a52;
-    transform: translateY(-2px);
-}
-
-.subject-header h1 {
-    margin-bottom: 5px;
-    color: #013d38;
-}
-
-.subtitle {
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.content .task-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: auto;
-    background: transparent;
-    position: static;
-}
-
-.content .task-item {
-    background: #f4f4f4;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-}
-
-.task-item .priority {
-    font-size: 0.9em;
-    color: #666;
 }
