@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Edit Subject{% endblock %}
+
+{% block content %}
+
+<h1>Edit Subject</h1>
+<form method="POST" class="add-subject-form">
+    <label>Name</label>
+    <input type="text" name="name" value="{{ subject.name }}" required>
+
+    <label>Description</label>
+    <textarea name="description">{{ subject.description }}</textarea>
+
+    <label>Colour</label>
+    <input type="color" name="color" value="{{ subject.color }}" required>
+
+    <button type="submit">Save Changes</button>
+</form>
+{% endblock %}
