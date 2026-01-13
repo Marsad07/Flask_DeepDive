@@ -10,27 +10,28 @@
 <div class="subjects-container">
     {% if subjects %}
         {% for subject in subjects %}
-            <a href="/subjects/{{ subject.id }}" class="subject-card" style="border-left: 6px solid {{ subject.color }};">
-                <h2>{{ subject.name }}</h2>
-                {% if subject.description %}
-                    <p>{{ subject.description }}</p>
-                {% endif %}
-            </a>
+            <div class="subject-card" style="border-left: 6px solid {{ subject.color }};">
+
+                <a href="/subjects/{{ subject.id }}" class="subject-main">
+                    <h2>{{ subject.name }}</h2>
+                    {% if subject.description %}
+                        <p>{{ subject.description }}</p>
+                    {% endif %}
+                </a>
+
+                <a href="/subjects/{{ subject.id }}/edit" class="edit-btn">✏️</a>
+
+            </div>
         {% endfor %}
     {% else %}
         <p>You have no subjects yet.</p>
     {% endif %}
 </div>
-
 <style>
-.subjects-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-
 .subject-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 15px;
     background: #f7f7f7;
     border-radius: 6px;
@@ -42,6 +43,23 @@
 .subject-card:hover {
     background: #eaeaea;
 }
-</style>
 
+.subject-main {
+    text-decoration: none;
+    color: black;
+    flex-grow: 1;
+}
+
+.edit-btn {
+    font-size: 20px;
+    text-decoration: none;
+    margin-left: 15px;
+    color: #013d38;
+    transition: 0.2s;
+}
+
+.edit-btn:hover {
+    transform: scale(1.2);
+}
+</style>
 {% endblock %}

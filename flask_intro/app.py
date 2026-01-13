@@ -344,5 +344,28 @@ def inject_subjects():
 def add_subject_page():
     return render_template("add_subject_page.html")
 
+@app.route("/subjects/<int:id>/edit", methods=["GET", "POST"])
+def edit_subject(id):
+    user_id = session.get("user_id")
+    cursor = db3.cursor(dictionary=True)
+
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        color = request.form["color"]
+        cursor.execute("""
+            UPDATE subjects
+            SET name=%s, description=%s, color=%s
+            WHERE id=%s AND user_id=%s
+        """, (name, description, color, id, user_id))
+        db3.commit()
+        return redirect(f"/subjects")
+
+    cursor.execute("SELECT * FROM subjects WHERE id=%s AND user_id=%s", (id, user_id))
+    subject = cursor.fetchone()
+
+    return render_template("edit_subject.html", subject=subject)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

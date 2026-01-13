@@ -182,7 +182,7 @@ textarea:focus {
 .subject-item {
     background: #013d38;
     color: white;
-    padding: 12px 20px;
+    padding: ypx 20px;
     width: 220px;
     text-align: center;
     border-radius: 8px;
