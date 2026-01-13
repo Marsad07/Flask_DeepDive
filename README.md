@@ -23,3 +23,4 @@ Click the Git Tags to view the code for each day
 |14    | Created subject content page, added subject-specific task logic and improved subjects UI    | [day-14 ](https://github.com/Marsad07/Flask_DeepDive/commit/cae64cf89263450c6a52917e82958e5d7a3d12f0)|
 |15    | Added sidebar subjects submenu with back-button toggle and fix dropdown collapse behavior    | [day-15 ](https://github.com/Marsad07/Flask_DeepDive/commit/8683ae42e1509685488b5cec5e926556776e8af1)|
 |16    | Add subject-specific task tables with active/completed sections and completion handling    | [day-16 ](https://github.com/Marsad07/Flask_DeepDive/commit/42e45100427c548aed27c862ea474a84aee7e993)|
+|17    | Updated homepage to reflect new Study App branding and improved dashboard    | [day-17 ](https://github.com/Marsad07/Flask_DeepDive/commit/5d6e62b320f56425cb297b24836166ee030a56b4)|                                                                                                              
