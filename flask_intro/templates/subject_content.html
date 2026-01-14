@@ -5,7 +5,6 @@
 {% block content %}
 <div class="subject-header">
     <h1>{{ subject.name }}</h1>
-    <p class="subtitle">Tasks for {{ subject.name }}</p>
 </div>
 
 <h2>Active Tasks</h2>
@@ -68,4 +67,76 @@
     {% endfor %}
 </table>
 
+<h2>Progression</h2>
+
+<div class="progress-circle" style="--value: {{ progress }};">
+  <div class="inner">{{ progress }}%</div>
+</div>
+
+<div class="progress-breakdown">
+  <div class="metric">
+    ✔ Tasks completed: {{ completed_pct }}%
+  </div>
+  <div class="metric">
+    ⭐ Priority progress: {{ weighted_pct }}%
+  </div>
+  <div class="metric">
+    🎯 Study goal progress: {{ goal_pct }}%
+  </div>
+</div>
+
+<button onclick="toggleDetails()" class="details-btn">Full Details</button>
+
+<div id="details-panel" style="display:none;">
+  <p>High priority tasks left: {{ high_left }}</p>
+  <p>Study goal target: {{ study_goal }}</p>
+  <p>Suggested next task: {{ next_task }}</p>
+</div>
+<style>
+.progress-circle {
+    --size: 120px;
+    --thickness: 12px;
+    --value: 0;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: conic-gradient(
+        #4caf50 calc(var(--value) * 1%),
+        #ddd 0
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.progress-circle .inner {
+    width: calc(var(--size) - var(--thickness) * 2);
+    height: calc(var(--size) - var(--thickness) * 2);
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.details-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    background: #eee;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+<script>
+function toggleDetails() {
+    const box = document.getElementById("details-panel");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+</script>
 {% endblock %}
+

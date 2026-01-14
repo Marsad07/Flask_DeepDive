@@ -175,7 +175,7 @@ textarea:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
+    margin-top: 70px;
     gap: 10px;
 }
 
@@ -245,4 +245,19 @@ textarea:focus {
 
 .back-btn:hover {
     text-decoration: underline;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: column;
+}
+
+.help-link {
+    margin-top: auto;
+}
+
+.save-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }

@@ -5,8 +5,9 @@
 
 <h1>Your Subjects</h1>
 
-<a href="/add_subject_page" class="btn-primary">Add Subject</a>
-
+<a href="/add_subject_page" class="add-task-btn">Add Subject</a>
+<br><br>
+<br><br>
 <div class="subjects-container">
     {% if subjects %}
         {% for subject in subjects %}
@@ -18,8 +19,7 @@
                         <p>{{ subject.description }}</p>
                     {% endif %}
                 </a>
-
-                <a href="/subjects/{{ subject.id }}/edit" class="edit-btn">✏️</a>
+                <a href="{{ url_for('edit_subject', id=subject.id) }}" class="edit-btn">✏️</a>
 
             </div>
         {% endfor %}
@@ -38,6 +38,7 @@
     text-decoration: none;
     color: black;
     transition: 0.2s;
+    margin-bottom: 15px;
 }
 
 .subject-card:hover {
