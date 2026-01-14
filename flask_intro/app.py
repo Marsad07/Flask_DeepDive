@@ -1,3 +1,5 @@
+from asyncio import tasks
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
 import mysql.connector
@@ -216,7 +218,16 @@ def subject_page(subject_id):
                     "WHERE subject_id=%s AND user_id=%s", (subject_id, user_id))
     tasks = cursor2.fetchall()
 
-    return render_template("subject_content.html", subject=subject, tasks=tasks)
+    completed = sum(1 for task in tasks if task["status"] == "completed")
+    total = len(tasks)
+    progress = int((completed / total) * 100) if total > 0 else 0
+
+    return render_template(
+        "subject_content.html",
+        subject=subject,
+        tasks=tasks,
+        progress=progress
+    )
 
 @app.route("/add_subject", methods=["POST"])
 def add_subject():
@@ -365,6 +376,37 @@ def edit_subject(id):
     subject = cursor.fetchone()
 
     return render_template("edit_subject.html", subject=subject)
+
+@app.route("/edit_task/<int:id>", methods=["GET", "POST"])
+def edit_task(id):
+    user_id = session.get("user_id")
+
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM tasks_new WHERE id=%s AND user_id=%s", (id, user_id))
+    task = cursor.fetchone()
+
+    if not task:
+        return "Task not found"
+
+    if request.method == "POST":
+        title = request.form["title"]
+        priority = request.form["priority"]
+        due_date = request.form["due_date"]
+
+        cursor.execute("""
+            UPDATE tasks_new
+            SET task_name=%s, priority=%s, due_date=%s
+            WHERE id=%s AND user_id=%s
+        """, (title, priority, due_date, id, user_id))
+
+        db.commit()
+        return redirect(f"/subjects/{task['subject_id']}")
+
+    return render_template("edit_subject.html", task=task)
+
+@app.route("/help/")
+def help():
+    return render_template("help_page.html")
 
 
 if __name__ == "__main__":
