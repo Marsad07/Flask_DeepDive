@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Subject</h1>
+
+<form method="POST">
+    <label>Subject Name</label>
+    <input type="text" name="name" value="{{ subject.name }}" required>
+
+    <br>
+
+    <label>Description</label>
+    <input type="text" name="description" value="{{ subject.description or '' }}">
+
+    <br>
+
+    <label>Color</label>
+    <input type="color" name="color" value="{{ subject.color or '#013d38' }}">
+
+    <br>
+    <div class="save-btn">
+        <button type="submit" class="add-task-btn">Save</button>
+    </div>
+</form>
+{% endblock %}
