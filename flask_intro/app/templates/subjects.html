@@ -5,7 +5,7 @@
 
 <h1>Your Subjects</h1>
 
-<a href="/add_subject_page" class="add-task-btn">Add Subject</a>
+<a href="{{ url_for('subjects.add_subject_page') }}" class="add-task-btn">Add Subject</a>
 <br><br>
 <br><br>
 <div class="subjects-container">
@@ -13,13 +13,13 @@
         {% for subject in subjects %}
             <div class="subject-card" style="border-left: 6px solid {{ subject.color }};">
 
-                <a href="/subjects/{{ subject.id }}" class="subject-main">
+                <a href="{{ url_for('subjects.subject_page', subject_id=subject.id) }}" class="subject-main">
                     <h2>{{ subject.name }}</h2>
                     {% if subject.description %}
                         <p>{{ subject.description }}</p>
                     {% endif %}
                 </a>
-                <a href="{{ url_for('edit_subject', id=subject.id) }}" class="edit-btn">✏️</a>
+                <a href="{{ url_for('subjects.edit_subject', id=subject.id) }}" class="edit-btn">✏️</a>
 
             </div>
         {% endfor %}

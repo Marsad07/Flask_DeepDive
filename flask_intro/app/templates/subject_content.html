@@ -86,12 +86,17 @@
 </div>
 
 <button onclick="toggleDetails()" class="details-btn">Full Details</button>
-
+<h2>Notes</h2>
 <div id="details-panel" style="display:none;">
   <p>High priority tasks left: {{ high_left }}</p>
   <p>Study goal target: {{ study_goal }}</p>
   <p>Suggested next task: {{ next_task }}</p>
 </div>
+
+<h2>Notes</h2>
+<a href="/subjects/{{ subject.id }}/notes" class="notes-btn">Open Notepad</a>
+
+
 <style>
 .progress-circle {
     --size: 120px;

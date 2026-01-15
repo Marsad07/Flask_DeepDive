@@ -5,7 +5,7 @@
 <div style="margin-left:220px; padding-top:40px;">
     <h1>Update Your Details</h1>
 
-    <form method="POST" action="{{ url_for('update_details') }}">
+    <form method="POST" action="{{ url_for('auth.update_details') }}">
         <label>New Username:</label><br>
         <input type="text" name="username" value="{{user.user_name}}"><br><br>
 

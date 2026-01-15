@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Edit Task{% endblock %}
+
+{% block content %}
+<div style="margin-left: 220px; padding-top: 40px; position: relative;">
+    {% if task.subject_id %}
+        <a href="{{ url_for('subjects.subject_page', subject_id=task.subject_id) }}" class="back-btn">← Back</a>
+    {% else %}
+        <a href="{{ url_for('tasks.tasks_page') }}" class="back-btn">← Back to Tasks</a>
+    {% endif %}
+
+    <h1>Edit Task</h1>
+
+    <form method="POST" action="{{ url_for('tasks.edit_task', id=task.id) }}">
+        <label>Task Name:</label>
+        <input type="text" name="title" value="{{ task.task_name }}" required>
+        <br><br>
+
+        <label>Priority:</label>
+        <input type="text" name="priority" value="{{ task.priority or '' }}">
+        <br><br>
+
+        <label>Due Date:</label>
+        <input type="date" name="due_date" value="{{ task.due_date or '' }}">
+        <br><br>
+
+        <button type="submit" class="add-task-btn">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
