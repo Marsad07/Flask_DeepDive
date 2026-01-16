@@ -7,7 +7,7 @@
 
 <form action="{{ url_for('subjects.save_notes', subject_id=subject.id) }}" method="POST">
     <div id="editor"></div>
-    <input type="hidden" name="notes" id="notes-input">
+    <input type="hidden" name="notes" id="notes-input"><br>
     <button type="submit" class="save-btn">Save Notes</button>
 </form>
 
@@ -17,11 +17,29 @@
 <script>
 const quill = new Quill('#editor', { theme: 'snow' });
 
-// load existing notes
+
 quill.root.innerHTML = {{ (subject.notes or '')|tojson }};
 
 document.querySelector('form').onsubmit = function() {
   document.getElementById('notes-input').value = quill.root.innerHTML;
 };
+
+const tooltipMap = {
+  'ql-bold': 'Bold text',
+  'ql-italic': 'Italic text',
+  'ql-underline': 'Underline text',
+  'ql-strike': 'Strikethrough',
+  'ql-list': 'Create a list',
+  'ql-link': 'Insert a link',
+  'ql-code-block': 'Code block',
+  'ql-blockquote': 'Quote'
+};
+
+Object.entries(tooltipMap).forEach(([className, text]) => {
+  document.querySelectorAll(`.${className}`).forEach(btn => {
+    btn.setAttribute('title', text);
+  });
+});
+
 </script>
 {% endblock %}

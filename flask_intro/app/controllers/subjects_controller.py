@@ -110,18 +110,31 @@ def edit_subject(id):
 
     return render_template("edit_subject.html", subject=subject)
 
+def notes_page(subject_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("auth.login"))
+
+    cursor = db3.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM subjects WHERE id=%s AND user_id=%s", (subject_id, user_id))
+    subject = cursor.fetchone()
+
+    if not subject:
+        return "Subject not found", 404
+
+    return render_template("subject_notepad.html", subject=subject)
+
 def save_notes(subject_id):
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("auth.login"))
 
     notes = request.form.get("notes", "")
-
     cursor = db3.cursor()
     cursor.execute("""
-        UPDATE subjects
-        SET notes=%s
-        WHERE id=%s AND user_id=%s
+        UPDATE `task_manager`.`subjects`
+        SET `notes`=%s
+        WHERE `id`=%s AND `user_id`=%s
     """, (notes, subject_id, user_id))
     db3.commit()
 

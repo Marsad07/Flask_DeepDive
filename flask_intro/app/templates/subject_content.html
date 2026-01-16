@@ -25,12 +25,12 @@
         <td>{{ task.priority }}</td>
         <td>{{ task.due_date }}</td>
         <td>
-            <a href="/edit_task/{{ task.id }}">
+            <a href="{{ url_for('tasks.edit_task', id=task.id) }}">
                 <span class="edit-icon">✏️</span>
             </a>
         </td>
         <td>
-            <form action="/subjects/{{ subject.id }}/complete_task" method="POST">
+            <form action="{{ url_for('subjects.complete_task_subject', subject_id=subject.id) }}" method="POST">
                 <input type="hidden" name="task_id" value="{{ task.id }}">
                 <button type="submit" style="background:none;border:none;cursor:pointer;">✔</button>
             </form>
@@ -58,7 +58,7 @@
         <td>{{ task.priority }}</td>
         <td>✔</td>
         <td>
-            <form action="/subjects/{{ subject.id }}/delete_task" method="POST">
+            <form action="{{ url_for('subjects.delete_task_subject', subject_id=subject.id) }}" method="POST">
                 <input type="hidden" name="task_id" value="{{ task.id }}">
                 <button type="submit" style="background:none;border:none;cursor:pointer;">🗑️</button>
             </form>
@@ -86,7 +86,7 @@
 </div>
 
 <button onclick="toggleDetails()" class="details-btn">Full Details</button>
-<h2>Notes</h2>
+
 <div id="details-panel" style="display:none;">
   <p>High priority tasks left: {{ high_left }}</p>
   <p>Study goal target: {{ study_goal }}</p>
@@ -94,8 +94,7 @@
 </div>
 
 <h2>Notes</h2>
-<a href="/subjects/{{ subject.id }}/notes" class="notes-btn">Open Notepad</a>
-
+<a href="{{ url_for('subjects.notes_page', subject_id=subject.id) }}" class="notes-btn">Open Notepad</a>
 
 <style>
 .progress-circle {
@@ -137,6 +136,7 @@
     cursor: pointer;
 }
 </style>
+
 <script>
 function toggleDetails() {
     const box = document.getElementById("details-panel");
@@ -144,4 +144,3 @@ function toggleDetails() {
 }
 </script>
 {% endblock %}
-

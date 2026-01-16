@@ -2,7 +2,7 @@ from flask import Blueprint
 from app.controllers.subjects_controller import (
     subjects, subject_page, add_subject_page, add_subject,
     add_task_subject, complete_task_subject, delete_task_subject, edit_subject,
-    save_notes
+    notes_page, save_notes
 )
 
 subjects_bp = Blueprint("subjects", __name__)
@@ -19,4 +19,5 @@ subjects_bp.route("/subjects/<int:subject_id>/delete_task", methods=["POST"])(de
 
 subjects_bp.route("/subjects/<int:id>/edit", methods=["GET", "POST"])(edit_subject)
 
+subjects_bp.route("/subjects/<int:subject_id>/notes", methods=["GET"])(notes_page)
 subjects_bp.route("/subjects/<int:subject_id>/save_notes", methods=["POST"])(save_notes)

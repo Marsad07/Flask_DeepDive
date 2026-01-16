@@ -13,3 +13,4 @@ db3 = mysql.connector.connect(
     passwd="PYTHONCOURSE",
     database="task_manager"
 )
+db3.cursor().execute("USE task_manager")
