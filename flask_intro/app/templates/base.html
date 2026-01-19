@@ -103,6 +103,7 @@
                 <li><a href="{{ url_for('tasks.add_task_page') }}">➕ Add Task</a></li>
                 <li><a href="{{ url_for('auth.profile') }}">👤 Profile</a></li>
                 <li><a href="{{ url_for('general.pomodoro') }}">⏱️ Pomodoro</a></li>
+                <li><a href="{{ url_for('atlas.atlas_hub') }}">🤖 Atlas AI</a></li>
 
                 <li class="dropdown">
                     <div class="dropdown-header">
@@ -114,7 +115,8 @@
                         <li><a href="javascript:void(0)" onclick="toggleSubjects()">← Back</a></li>
 
                         {% for subject in sidebar_subjects %}
-                            <li><a href="{{ url_for('subjects.subject_page', subject_id=subject.id) }}">{{ subject.name }}</a></li>
+                            <li><a href="{{ url_for('subjects.subject_page', subject_id=subject.id) }}">
+                                {{ subject.name }}</a></li>
                         {% endfor %}
                     </ul>
                 </li>
