@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Atlas AI{% endblock %}
+
+{% block content %}
+<h1>Atlas AI</h1>
+<p>Select a subject:</p>
+
+<select onchange="if (this.value) window.location.href = this.value;">
+    <option value="">-- Choose a subject --</option>
+    {% for subject in subjects %}
+        <option value="{{ url_for('atlas.atlas_subject', subject_id=subject.id) }}">
+            {{ subject.name }}
+        </option>
+    {% endfor %}
+</select>
+{% endblock %}

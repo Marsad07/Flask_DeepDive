@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Atlas AI{% endblock %}
+
+{% block content %}
+<h1>Atlas AI</h1>
+
+<p>Select a subject from the Atlas hub.</p>
+
+{% if subject %}
+  <p><strong>Subject:</strong> {{ subject.name }}</p>
+
+  <h3>Suggested prompts</h3>
+  <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 12px;">
+      <button type="button" class="add-task-btn" onclick="setPrompt('Summarise my notes into bullet points.')">Summarise</button>
+      <button type="button" class="add-task-btn" onclick="setPrompt('Create 5 revision questions based only on my notes.')">Questions</button>
+      <button type="button" class="add-task-btn" onclick="setPrompt('Explain the key concepts simply using only my notes.')">Explain</button>
+      <button type="button" class="add-task-btn" onclick="setPrompt('Create a short revision checklist from my notes.')">Checklist</button>
+  </div>
+
+  <form method="POST" action="{{ url_for('atlas.atlas_generate', subject_id=subject.id) }}">
+      <label for="user_prompt"><strong>Your prompt</strong></label><br>
+      <textarea id="user_prompt" name="user_prompt" rows="4" style="width:100%; max-width:900px;"
+                placeholder="Type your own prompt or click a suggested one...">{{ user_prompt or '' }}</textarea>
+
+      <br><br>
+
+      <label>
+          <input type="checkbox" name="use_notes" value="1" checked>
+          Use my subject notes as context
+      </label>
+
+      <br><br>
+
+      <button type="submit" class="add-task-btn">Run Atlas</button>
+  </form>
+
+  {% if result %}
+      <hr>
+      <h3>Atlas Output</h3>
+      <div style="white-space: pre-wrap;">{{ result }}</div>
+  {% endif %}
+
+  <script>
+  function setPrompt(text) {
+      document.getElementById('user_prompt').value = text;
+      document.getElementById('user_prompt').focus();
+  }
+  </script>
+{% endif %}
+
+{% endblock %}
