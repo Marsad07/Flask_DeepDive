@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Atlas AI{% endblock %}
+
+{% block content %}
+<h1>Atlas AI</h1>
+
+<div class="atlas-layout">
+
+  <div class="atlas-sidebar">
+    <form method="POST" action="{{ url_for('atlas.chat_new') }}">
+      <button type="submit" class="add-task-btn atlas-newchat-btn">+ New chat</button>
+    </form>
+
+    <div class="atlas-chatlist">
+      {% for cid, c in chats.items() %}
+        <div class="atlas-chatrow {% if cid == current_chat_id %}active{% endif %}">
+
+          <form method="POST" action="{{ url_for('atlas.chat_switch', chat_id=cid) }}">
+            <button type="submit" class="atlas-chatpick">
+              {{ c.title }}
+            </button>
+          </form>
+
+          <button type="button"
+                  class="atlas-chatrename-btn"
+                  onclick="openRename('{{ cid }}', '{{ c.title|e }}')"
+                  aria-label="Rename chat">✎</button>
+
+          <form method="POST" action="{{ url_for('atlas.chat_delete', chat_id=cid) }}">
+            <button type="submit" class="atlas-chatdel" aria-label="Delete chat">×</button>
+          </form>
+
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="atlas-main">
+
+    <div id="chat-box" class="atlas-chatbox">
+      {% for msg in messages %}
+        <div class="atlas-msg">
+          <div class="atlas-role">{{ msg.role }}:</div>
+          <div class="atlas-content">{{ msg.content }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <form method="POST"
+          action="{{ url_for('atlas.chat_send') }}"
+          enctype="multipart/form-data"
+          class="atlas-form">
+
+      <div id="atlas-file-chip" class="atlas-filechip hidden">
+        <span id="atlas-file-name" class="atlas-filename"></span>
+        <button type="button" id="atlas-file-remove" class="atlas-fileremove" aria-label="Remove file">×</button>
+      </div>
+
+      <div class="atlas-inputrow">
+        <label class="atlas-attachbtn" title="Attach a file (.txt, .pdf, .docx, .jpg, .png)">
+          +
+          <input id="atlas-file" type="file" name="attachment" class="atlas-fileinput"
+                 accept=".txt,.pdf,.docx,.png,.jpg,.jpeg">
+        </label>
+
+        <textarea name="message" rows="2" class="atlas-textarea"
+                  placeholder="Message Atlas..."></textarea>
+
+        <button type="submit" class="atlas-sendbtn" title="Send">➤</button>
+      </div>
+
+      <div class="atlas-hint">Allowed: .txt .pdf .docx .png .jpg</div>
+    </form>
+
+  </div>
+</div>
+
+<form id="atlas-rename-form" method="POST" style="display:none;">
+  <input type="hidden" name="title" id="atlas-rename-title">
+</form>
+
+<script src="{{ url_for('static', filename='js/atlas_chat.js') }}"></script>
+<script>
+  // Auto-scroll chat to bottom
+  const box = document.getElementById("chat-box");
+  if (box) box.scrollTop = box.scrollHeight;
+
+  // Rename chat (posts to /atlas/chat/rename/<chat_id>)
+  function openRename(chatId, currentTitle) {
+    const title = prompt("Rename chat:", currentTitle);
+    if (!title) return;
+
+    const form = document.getElementById("atlas-rename-form");
+    const input = document.getElementById("atlas-rename-title");
+
+    input.value = title;
+    form.action = "/atlas/chat/rename/" + chatId;
+    form.submit();
+  }
+</script>
+{% endblock %}
