@@ -1,73 +1,111 @@
-from flask import render_template, session, redirect, url_for, request
-from flask_intro.app.database import db3
+from flask import render_template, request, redirect, url_for, session
+from app.services.atlas_ai_service import get_atlas_reply
+import uuid
 
-def atlas_hub():
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for("auth.login"))
+WELCOME = "Hi, I’m Atlas AI \nHow can I help you study today?"
 
-    cursor = db3.cursor(dictionary=True)
-    cursor.execute("SELECT id, name FROM subjects WHERE user_id=%s", (user_id,))
-    subjects = cursor.fetchall()
+def _init_chat_store():
+    if "atlas_chats" not in session or not isinstance(session["atlas_chats"], dict):
+        session["atlas_chats"] = {}
+    if "atlas_current_chat" not in session or session["atlas_current_chat"] not in session["atlas_chats"]:
+        chat_id = uuid.uuid4().hex[:8]
+        session["atlas_chats"][chat_id] = {
+            "title": "New chat",
+            "messages": [{"role": "Atlas", "content": WELCOME}]
+        }
+        session["atlas_current_chat"] = chat_id
+    session.modified = True
 
-    return render_template("atlas_hub.html", subjects=subjects)
+def _get_current():
+    _init_chat_store()
+    chat_id = session["atlas_current_chat"]
+    return chat_id, session["atlas_chats"][chat_id]
 
-def atlas_subject(subject_id):
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for("auth.login"))
-
-    cursor = db3.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT id, name, notes FROM subjects WHERE id=%s AND user_id=%s",
-        (subject_id, user_id)
+def chat_page():
+    chat_id, chat = _get_current()
+    chats = session["atlas_chats"]
+    return render_template(
+        "atlas_chat.html",
+        chats=chats,
+        current_chat_id=chat_id,
+        messages=chat["messages"]
     )
-    subject = cursor.fetchone()
 
-    if not subject:
-        return "Subject not found", 404
+def chat_new():
+    _init_chat_store()
+    chat_id = uuid.uuid4().hex[:8]
+    session["atlas_chats"][chat_id] = {
+        "title": "New chat",
+        "messages": [{"role": "Atlas", "content": WELCOME}]
+    }
+    session["atlas_current_chat"] = chat_id
+    session.modified = True
+    return redirect(url_for("atlas.chat_page"))
 
-    return render_template("atlas_page.html", subject=subject)
+def chat_switch(chat_id):
+    _init_chat_store()
+    if chat_id in session["atlas_chats"]:
+        session["atlas_current_chat"] = chat_id
+        session.modified = True
+    return redirect(url_for("atlas.chat_page"))
 
-def atlas_generate(subject_id):
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for("auth.login"))
+def chat_delete(chat_id):
+    _init_chat_store()
+    if chat_id in session["atlas_chats"]:
+        session["atlas_chats"].pop(chat_id, None)
+        if session.get("atlas_current_chat") == chat_id:
+            remaining = list(session["atlas_chats"].keys())
+            if remaining:
+                session["atlas_current_chat"] = remaining[0]
+            else:
+                session.pop("atlas_current_chat", None)
+        session.modified = True
+    return redirect(url_for("atlas.chat_page"))
 
-    cursor = db3.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT id, name, notes FROM subjects WHERE id=%s AND user_id=%s",
-        (subject_id, user_id)
-    )
-    subject = cursor.fetchone()
+def chat_send():
+    chat_id, chat = _get_current()
 
-    if not subject:
-        return "Subject not found", 404
+    user_text = (request.form.get("message") or "").strip()
+    uploaded = request.files.get("attachment")
 
-    user_prompt = (request.form.get("user_prompt") or "").strip()
-    use_notes = request.form.get("use_notes") == "1"
+    if not user_text and not (uploaded and uploaded.filename):
+        return redirect(url_for("atlas.chat_page"))
 
-    notes = (subject.get("notes") or "").strip()
+    if user_text:
+        chat["messages"].append({"role": "You", "content": user_text})
+        if chat.get("title") == "New chat":
+            chat["title"] = user_text[:24] + ("..." if len(user_text) > 24 else "")
 
-    if user_prompt == "":
-        result = "Please type a prompt or click a suggested prompt."
-        return render_template("atlas_page.html",
-                               subject=subject, result=result, user_prompt=user_prompt)
+    if uploaded and uploaded.filename:
+        filename = uploaded.filename
+        chat["messages"].append({"role": "Atlas", "content": f"📎 File selected: {filename}"})
 
-    context_preview = ""
-    if use_notes:
-        if notes == "":
-            context_preview = "\n\n[No notes found for this subject]"
+        if filename.lower().endswith(".txt"):
+            file_text = uploaded.read().decode("utf-8", errors="ignore").strip()
+            if file_text:
+                chat["messages"].append({"role": "You", "content": "[Uploaded notes]\n" + file_text})
         else:
-            context_preview = "\n\n[NOTES CONTEXT PREVIEW]\n" + notes[:500]
+            chat["messages"].append({"role": "Atlas", "content": "I can only read .txt files right now."})
+            session.modified = True
+            return redirect(url_for("atlas.chat_page"))
 
-    result = (
-        "MOCK ATLAS RESPONSE\n"
-        "-------------------\n"
-        f"Prompt: {user_prompt}"
-        f"{context_preview}\n\n"
-        "(Next step: replace this mock response with a real AI API call.)"
-    )
+    try:
+        history = chat["messages"][-12:]
+        reply = get_atlas_reply(history)
+    except Exception:
+        reply = "Atlas is temporarily unavailable. Please try again."
 
-    return render_template("atlas_page.html",
-                           subject=subject, result=result, user_prompt=user_prompt)
+    chat["messages"].append({"role": "Atlas", "content": reply})
+    session["atlas_chats"][chat_id] = chat
+    session.modified = True
+    return redirect(url_for("atlas.chat_page"))
+
+def chat_rename(chat_id):
+    _init_chat_store()
+    new_title = (request.form.get("title") or "").strip()
+
+    if chat_id in session["atlas_chats"] and new_title:
+        session["atlas_chats"][chat_id]["title"] = new_title[:40]
+        session.modified = True
+
+    return redirect(url_for("atlas.chat_page"))
