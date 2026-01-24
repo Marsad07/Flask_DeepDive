@@ -57,6 +57,7 @@ def _init_chat_store():
         session["atlas_chats"][chat_id] = {
             "title": "New chat",
             "messages": [{"role": "Atlas", "content": WELCOME}],
+            "notes_text": "",
         }
         session["atlas_current_chat"] = chat_id
 
@@ -76,12 +77,14 @@ def chat_page():
         current_chat_id=chat_id,
         messages=chat["messages"],
     )
+
 def chat_new():
     _init_chat_store()
     chat_id = uuid.uuid4().hex[:8]
     session["atlas_chats"][chat_id] = {
         "title": "New chat",
         "messages": [{"role": "Atlas", "content": WELCOME}],
+        "notes_text": "",
     }
     session["atlas_current_chat"] = chat_id
     session.modified = True
@@ -139,18 +142,16 @@ def chat_send():
                     ),
                 }
             )
+            session["atlas_chats"][chat_id] = chat
             session.modified = True
             return redirect(url_for("atlas.chat_page"))
 
         if ext == "txt":
             file_text = _read_txt(uploaded)
-
         elif ext == "docx":
             file_text = _read_docx(uploaded)
-
         elif ext in {"png", "jpg", "jpeg"}:
             file_text = _read_image(uploaded)
-
         else:
             file_text = _read_pdf(uploaded)
             if not file_text:
@@ -163,13 +164,31 @@ def chat_send():
                         ),
                     }
                 )
+                session["atlas_chats"][chat_id] = chat
                 session.modified = True
                 return redirect(url_for("atlas.chat_page"))
 
         if file_text:
+            chat["notes_text"] = file_text
+
             chat["messages"].append(
-                {"role": "You", "content": "[Uploaded notes]\n" + file_text}
+                {
+                    "role": "Atlas",
+                    "content": (
+                        "📄 I’ve loaded your notes.\n"
+                        "What would you like to do?\n\n"
+                        "• Summarise them\n"
+                        "• Explain a topic simply\n"
+                        "• Create quiz questions\n"
+                        "• Ask a specific question"
+                    ),
+                }
             )
+
+            if not user_text:
+                session["atlas_chats"][chat_id] = chat
+                session.modified = True
+                return redirect(url_for("atlas.chat_page"))
         else:
             chat["messages"].append(
                 {
@@ -180,8 +199,21 @@ def chat_send():
                     ),
                 }
             )
+
+            if not user_text:
+                session["atlas_chats"][chat_id] = chat
+                session.modified = True
+                return redirect(url_for("atlas.chat_page"))
+
     try:
         history = chat["messages"][-12:]
+        notes = (chat.get("notes_text") or "").strip()
+        if notes:
+            history = (
+                [{"role": "system",
+                  "content": "User's uploaded notes:\n" + notes}]
+                + history
+            )
         reply = get_atlas_reply(history)
     except Exception:
         reply = "Atlas is temporarily unavailable. Please try again."
