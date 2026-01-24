@@ -59,10 +59,18 @@
       <div class="atlas-inputrow">
         <label class="atlas-attachbtn" title="Attach a file (.txt, .pdf, .docx, .jpg, .png)">
           +
-          <input id="atlas-file" type="file" name="attachment" class="atlas-fileinput"
-                 accept=".txt,.pdf,.docx,.png,.jpg,.jpeg">
+          <input
+            id="atlas-file"
+            type="file"
+            name="attachment"
+            class="atlas-fileinput"
+            accept="text/plain,.txt,
+              application/pdf,.pdf,
+              application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,
+              image/*,.png,.jpg,.jpeg
+            "
+          >
         </label>
-
         <textarea name="message" rows="2" class="atlas-textarea"
                   placeholder="Message Atlas..."></textarea>
 

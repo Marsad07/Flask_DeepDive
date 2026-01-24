@@ -1,19 +1,65 @@
 from flask import render_template, request, redirect, url_for, session
 from app.services.atlas_ai_service import get_atlas_reply
+from PIL import Image
+import pytesseract
+from docx import Document
 import uuid
 
+pytesseract.pytesseract.tesseract_cmd = (
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+)
+
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None
+
 WELCOME = "Hi, I’m Atlas AI \nHow can I help you study today?"
+ALLOWED_EXTS = {"txt", "pdf", "docx", "png", "jpg", "jpeg"}
+
+def _ext(filename: str) -> str:
+    if "." not in filename:
+        return ""
+    return filename.rsplit(".", 1)[1].lower()
+
+def _read_txt(uploaded) -> str:
+    data = uploaded.read()
+    return data.decode("utf-8", errors="replace").strip()
+
+def _read_docx(uploaded) -> str:
+    doc = Document(uploaded)
+    lines = [p.text for p in doc.paragraphs if p.text]
+    return "\n".join(lines).strip()
+
+def _read_pdf(uploaded) -> str:
+    if PdfReader is None:
+        return ""
+    reader = PdfReader(uploaded)
+    parts = []
+    for page in reader.pages:
+        parts.append(page.extract_text() or "")
+    return "\n".join(parts).strip()
+
+def _read_image(uploaded) -> str:
+    img = Image.open(uploaded)
+    text = pytesseract.image_to_string(img)
+    return text.strip()
 
 def _init_chat_store():
     if "atlas_chats" not in session or not isinstance(session["atlas_chats"], dict):
         session["atlas_chats"] = {}
-    if "atlas_current_chat" not in session or session["atlas_current_chat"] not in session["atlas_chats"]:
+
+    if (
+        "atlas_current_chat" not in session
+        or session["atlas_current_chat"] not in session["atlas_chats"]
+    ):
         chat_id = uuid.uuid4().hex[:8]
         session["atlas_chats"][chat_id] = {
             "title": "New chat",
-            "messages": [{"role": "Atlas", "content": WELCOME}]
+            "messages": [{"role": "Atlas", "content": WELCOME}],
         }
         session["atlas_current_chat"] = chat_id
+
     session.modified = True
 
 def _get_current():
@@ -28,15 +74,14 @@ def chat_page():
         "atlas_chat.html",
         chats=chats,
         current_chat_id=chat_id,
-        messages=chat["messages"]
+        messages=chat["messages"],
     )
-
 def chat_new():
     _init_chat_store()
     chat_id = uuid.uuid4().hex[:8]
     session["atlas_chats"][chat_id] = {
         "title": "New chat",
-        "messages": [{"role": "Atlas", "content": WELCOME}]
+        "messages": [{"role": "Atlas", "content": WELCOME}],
     }
     session["atlas_current_chat"] = chat_id
     session.modified = True
@@ -74,21 +119,67 @@ def chat_send():
     if user_text:
         chat["messages"].append({"role": "You", "content": user_text})
         if chat.get("title") == "New chat":
-            chat["title"] = user_text[:24] + ("..." if len(user_text) > 24 else "")
+            short = user_text[:24]
+            chat["title"] = short + ("..." if len(user_text) > 24 else "")
 
     if uploaded and uploaded.filename:
         filename = uploaded.filename
-        chat["messages"].append({"role": "Atlas", "content": f"📎 File selected: {filename}"})
+        chat["messages"].append(
+            {"role": "Atlas", "content": f"📎 File selected: {filename}"}
+        )
+        ext = _ext(filename)
 
-        if filename.lower().endswith(".txt"):
-            file_text = uploaded.read().decode("utf-8", errors="ignore").strip()
-            if file_text:
-                chat["messages"].append({"role": "You", "content": "[Uploaded notes]\n" + file_text})
-        else:
-            chat["messages"].append({"role": "Atlas", "content": "I can only read .txt files right now."})
+        if ext not in ALLOWED_EXTS:
+            chat["messages"].append(
+                {
+                    "role": "Atlas",
+                    "content": (
+                        "I can read .txt, .pdf, .docx, and images "
+                        "(.png, .jpg, .jpeg)."
+                    ),
+                }
+            )
             session.modified = True
             return redirect(url_for("atlas.chat_page"))
 
+        if ext == "txt":
+            file_text = _read_txt(uploaded)
+
+        elif ext == "docx":
+            file_text = _read_docx(uploaded)
+
+        elif ext in {"png", "jpg", "jpeg"}:
+            file_text = _read_image(uploaded)
+
+        else:
+            file_text = _read_pdf(uploaded)
+            if not file_text:
+                chat["messages"].append(
+                    {
+                        "role": "Atlas",
+                        "content": (
+                            "PDF support requires pypdf. "
+                            "Run: pip install pypdf"
+                        ),
+                    }
+                )
+                session.modified = True
+                return redirect(url_for("atlas.chat_page"))
+
+        if file_text:
+            chat["messages"].append(
+                {"role": "You", "content": "[Uploaded notes]\n" + file_text}
+            )
+        else:
+            chat["messages"].append(
+                {
+                    "role": "Atlas",
+                    "content": (
+                        "I couldn’t extract any readable text "
+                        "from that file."
+                    ),
+                }
+            )
     try:
         history = chat["messages"][-12:]
         reply = get_atlas_reply(history)
