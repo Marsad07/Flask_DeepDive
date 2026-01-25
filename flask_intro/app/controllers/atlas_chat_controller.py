@@ -232,3 +232,4 @@ def chat_rename(chat_id):
         session.modified = True
 
     return redirect(url_for("atlas.chat_page"))
+

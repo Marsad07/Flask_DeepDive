@@ -697,3 +697,39 @@ body.atlas-busy .atlas-layout {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.atlas-hud-ring{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.atlas-hud-percent{
+  font-weight:700;
+  letter-spacing:0.06em;
+  font-size:18px;
+  color: rgba(235,255,255,0.92);
+  text-shadow: 0 0 10px rgba(0,255,255,0.18);
+}
+
+.atlas-hud-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#atlas-loading-pct,
+.atlas-hud-pct,
+.atlas-hud-percent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 20px;
+  color: #FFFDD0;
+  text-shadow: 0 0 14px rgba(0,128,128,0.55);
+}
