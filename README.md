@@ -30,3 +30,4 @@ Click the Git Tags to view the code for each day
 |21    | Introduced Atlas AI study assistant with subject-aware prompt workflow | [day-21 ](https://github.com/Marsad07/Flask_DeepDive/commit/9408bf8ce851d7eac5c90479be42331d07960be4)|    
 |22    | Improved  Atlas AI with feature enhancements and stability improvements| [day-22 ](https://github.com/Marsad07/Flask_DeepDive/commit/3400b65b616010a1a583154599d197613d6db8a8)|    
 |23    | Finished development of Atlas AI| [day-23 ](https://github.com/Marsad07/Flask_DeepDive/commit/3c8805699f4712fe2a3559d7f1a555af60af7a23)|                                                                                       
+|24    | Upgrade Atlas AI with chat history, file reading, and interactive UI| [day-24 ](https://github.com/Marsad07/Flask_DeepDive/commit/6068752facbf655acc47fe8a2116b986c1e19a51)|                         
