@@ -14,11 +14,8 @@
     <div class="atlas-chatlist">
       {% for cid, c in chats.items() %}
         <div class="atlas-chatrow {% if cid == current_chat_id %}active{% endif %}">
-
           <form method="POST" action="{{ url_for('atlas.chat_switch', chat_id=cid) }}">
-            <button type="submit" class="atlas-chatpick">
-              {{ c.title }}
-            </button>
+            <button type="submit" class="atlas-chatpick">{{ c.title }}</button>
           </form>
 
           <button type="button"
@@ -29,22 +26,21 @@
           <form method="POST" action="{{ url_for('atlas.chat_delete', chat_id=cid) }}">
             <button type="submit" class="atlas-chatdel" aria-label="Delete chat">×</button>
           </form>
-
         </div>
       {% endfor %}
     </div>
   </div>
 
   <div class="atlas-main">
-
     <div id="chat-box" class="atlas-chatbox">
       {% for msg in messages %}
         <div class="atlas-msg">
           <div class="atlas-role">{{ msg.role }}:</div>
-          <div class="atlas-content {% if msg.role == 'Atlas' %}atlas-typing-target{% endif %}">
+
+          {% set is_last_atlas = (loop.last and msg.role == 'Atlas') %}
+          <div class="atlas-content {% if is_last_atlas %}atlas-typing-target{% endif %}">
             {{ msg.content }}
           </div>
-
         </div>
       {% endfor %}
     </div>
@@ -67,20 +63,17 @@
             type="file"
             name="attachment"
             class="atlas-fileinput"
-            accept=".txt,.pdf,.docx,.png,.jpg,.jpeg,image/*,text/plain,
-            application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".txt,.pdf,.docx,.png,.jpg,.jpeg,image/*,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           >
         </label>
 
-        <textarea name="message" rows="2" class="atlas-textarea"
-                  placeholder="Message Atlas..."></textarea>
+        <textarea name="message" rows="2" class="atlas-textarea" placeholder="Message Atlas..."></textarea>
 
         <button type="submit" class="atlas-sendbtn" title="Send">➤</button>
       </div>
 
       <div class="atlas-hint">Allowed: .txt .pdf .docx .png .jpg</div>
     </form>
-
   </div>
 </div>
 
@@ -110,7 +103,10 @@
       </div>
     </div>
 
-    <div class="atlas-hud-ring"></div>
+    <div class="atlas-hud-ring">
+      <div class="atlas-hud-percent" id="atlas-loading-percent">0%</div>
+    </div>
+
     <div class="atlas-hud-bar"><div></div></div>
 
     <div class="atlas-hud-foot">
@@ -124,6 +120,7 @@
 <script src="{{ url_for('static', filename='js/atlas_chat.js') }}"></script>
 <script src="{{ url_for('static', filename='js/atlas_loading.js') }}"></script>
 <script src="{{ url_for('static', filename='js/atlas_typewriter.js') }}"></script>
+
 <script>
   const box = document.getElementById("chat-box");
   if (box) box.scrollTop = box.scrollHeight;
