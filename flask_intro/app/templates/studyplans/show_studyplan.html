@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ plan.title }}</h1>
+<a href="{{ url_for('studyplans.index') }}" class="back-btn">← Back to Plans</a>
+
+{% if items and items|length > 0 %}
+<div style="margin-top:20px; overflow-x:auto;">
+  <table style="width:90%; border-collapse:collapse; border:2.5px solid #01796f; background-color:#FFFDD0;">
+    <thead>
+      <tr>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white; width:100px;">Time</th>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Monday</th>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Tuesday</th>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Wednesday</th>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Thursday</th>
+        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Friday</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for hour in range(8, 19) %}
+      <tr>
+        <td style="border:2px solid #008080; padding:10px; font-weight:bold; background-color:#FFFDD0;">
+          {{ '%02d:00'|format(hour) }}
+        </td>
+
+        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+        <td style="border:2px solid #008080; padding:10px; vertical-align:top; background-color:#FFFDD0; min-height:60px;">
+          {% for item in items %}
+            {% if item.day_of_week == day and item.start_time[:2]|int == hour %}
+              <div style="padding:8px; background-color:#008080; color:white; border-radius:6px; margin-bottom:5px;">
+                <strong>{{ item.task_name }}</strong><br>
+                <small>{{ item.start_time }} - {{ item.end_time }}</small><br>
+                <small>Priority: {{ item.priority }}</small>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p style="margin-top:16px;">No tasks scheduled yet for this plan.</p>
+{% endif %}
+{% endblock %}

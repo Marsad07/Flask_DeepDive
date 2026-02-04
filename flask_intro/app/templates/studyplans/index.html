@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Study Plans{% endblock %}
+
+{% block content %}
+<h1>Study Plans</h1>
+
+<a href="{{ url_for('studyplans.create') }}" class="add-task-btn">
+  + Create study plan
+</a>
+
+{% if plans and plans|length > 0 %}
+<ul style="margin-top:16px;">
+  {% for p in plans %}
+    <li style="margin-bottom:10px;">
+      <a href="{{ url_for('studyplans.show', plan_id=p.id) }}">
+        {{ p.title }}
+      </a>
+      <form method="POST" action="{{ url_for('studyplans.delete', plan_id=p.id) }}" style="display:inline;">
+        <button type="submit" class="clear-btn">Delete</button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p style="margin-top:16px;">No study plans yet.</p>
+{% endif %}
+{% endblock %}
