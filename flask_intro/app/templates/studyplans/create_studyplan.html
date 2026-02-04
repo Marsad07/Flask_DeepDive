@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Create Study Plan{% endblock %}
+
+{% block content %}
+<h1>Create Study Plan</h1>
+
+<form method="POST">
+  <div style="margin-bottom:16px;">
+    <label for="title">Plan Title:</label>
+    <input type="text" id="title" name="title" placeholder="My Study Plan" style="width:100%;padding:8px;">
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <label>Select Tasks:</label>
+    {% if tasks %}
+      {% for task in tasks %}
+        <div style="margin:8px 0;">
+          <input type="checkbox" name="task_ids" value="{{ task.id }}" id="task_{{ task.id }}">
+          <label for="task_{{ task.id }}">
+            {{ task.task_name }} ({{ task.priority }})
+          </label>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No tasks available. Create some tasks first!</p>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="add-task-btn">Create Plan</button>
+  <a href="{{ url_for('studyplans.index') }}">Cancel</a>
+</form>
+{% endblock %}
