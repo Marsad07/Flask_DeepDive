@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<h1>Contact Us</h1>
+
+<form method="POST" action="{{ url_for('contact.send_email') }}">
+    <h3>Name</h3>
+    <input type="text" name="name" required>
+
+    <br>
+
+    <h3>Email</h3>
+    <input type="email" name="email" required>
+
+    <h3>Subject</h3>
+    <input type="text" name="subject" required>
+
+    <br>
+
+    <h3>Message</h3>
+    <textarea name="message" rows="8" required></textarea>
+
+    <br>
+
+    <button type="submit" class="add-task-btn">Send</button>
+
+</form>
+{% endblock %}

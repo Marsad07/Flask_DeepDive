@@ -11,6 +11,7 @@ def create_app():
     from app.views.context import inject_subjects
     from app.views.atlas import atlas_bp
     from app.views.studyplans import studyplans_bp
+    from app.views.contact import contact_bp
 
     app.register_blueprint(general_bp)
     app.register_blueprint(auth_bp)
@@ -19,5 +20,6 @@ def create_app():
     app.context_processor(inject_subjects)
     app.register_blueprint(atlas_bp)
     app.register_blueprint(studyplans_bp)
+    app.register_blueprint(contact_bp)
 
     return app
