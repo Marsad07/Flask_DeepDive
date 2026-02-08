@@ -15,48 +15,34 @@ def create_studyplan():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("auth.login"))
-    return render_template("studyplans/create_studyplan.html")
+    tasks = Task.query.filter_by(user_id=user_id).all()
+    return render_template("studyplans/create_studyplan.html", tasks=tasks)
 
 def store_plan():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("auth.login"))
 
-    name = (request.form.get("name") or "Study Plan").strip()
-
+    name = (request.form.get("title") or "Study Plan").strip()
     plan = StudyPlan(name=name, user_id=user_id)
     db.session.add(plan)
     db.session.commit()
 
-    return redirect(url_for("studyplans.generate_plan", plan_id=plan.id))
+    task_ids = request.form.getlist("task_ids")
+    days = request.form.getlist("days")
+    start_times = request.form.getlist("start_times")
+    end_times = request.form.getlist("end_times")
 
-def generate_plan(plan_id):
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for("auth.login"))
-
-    plan = StudyPlan.query.filter_by(id=plan_id, user_id=user_id).first()
-    if not plan:
-        return "Plan not found", 404
-
-    tasks = Task.query.filter_by(user_id=user_id).all()
-
-    StudyPlanItem.query.filter_by(plan_id=plan.id).delete()
-
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    day_index = 0
-
-    for task in tasks:
-        item = StudyPlanItem(
-            plan_id=plan.id,
-            day_of_week=days[day_index],
-            start_time="10:00",
-            end_time="11:00",
-            task_id=task.id
-        )
-        db.session.add(item)
-        day_index = (day_index + 1) % len(days)
-
+    for i in range(len(task_ids)):
+        if task_ids[i]:
+            item = StudyPlanItem(
+                plan_id=plan.id,
+                task_id=int(task_ids[i]),
+                day_of_week=days[i],
+                start_time=start_times[i],
+                end_time=end_times[i]
+            )
+            db.session.add(item)
     db.session.commit()
     return redirect(url_for("studyplans.show_studyplan", plan_id=plan.id))
 
