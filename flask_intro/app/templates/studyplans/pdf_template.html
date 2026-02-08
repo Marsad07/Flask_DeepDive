@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ plan['title'] }} - Study Plan</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFDD0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #008080;
+        }
+
+        .header h1 {
+            color: #013d38;
+            margin: 0 0 10px 0;
+        }
+
+        .header h2 {
+            color: #008080;
+            margin: 0;
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #008080 0%, #006666 100%);
+            background-color: #008080;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            border: 2px solid #008080;
+        }
+
+        td {
+            padding: 10px;
+            border: 2px solid #008080;
+            background-color: #FFFDD0;
+            vertical-align: top;
+        }
+
+        .task-box {
+            background-color: #008080;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .task-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .task-time {
+            font-size: 11px;
+        }
+
+        .task-priority {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Atlas Desk</h1>
+        <h2>{{ plan.title }}</h2>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:100px;">Time</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hour in range(8, 19) %}
+            <tr>
+                <td style="font-weight:bold; background-color:#FFFDD0;">
+                    {{ '%02d:00'|format(hour) }}
+                </td>
+
+                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                <td>
+                    {% for item in items %}
+                        {% if item.day_of_week == day and item.start_time[:2]|int == hour %}
+                            <div class="task-box">
+                                <div class="task-name">{{ item.task_name }}</div>
+                                <div class="task-time">{{ item.start_time }} - {{ item.end_time }}</div>
+                                <div class="task-priority">Priority: {{ item.priority }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

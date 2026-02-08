@@ -4,29 +4,87 @@
 {% block content %}
 <h1>Create Study Plan</h1>
 
-<form method="POST">
-  <div style="margin-bottom:16px;">
-    <label for="title">Plan Title:</label>
-    <input type="text" id="title" name="title" placeholder="My Study Plan" style="width:100%;padding:8px;">
-  </div>
+<form method="POST" action="{{ url_for('studyplans.create') }}" id="studyPlanForm">
+    <div style="margin-bottom:25px;">
+        <label for="title" style="font-weight:600; display:block; margin-bottom:8px;">Plan Title:</label>
+        <input type="text" id="title" name="title" placeholder="My Study Plan" required style="width:50%; padding:12px; border:2px solid #e0e0e0; border-radius:10px;">
+    </div>
 
-  <div style="margin-bottom:16px;">
-    <label>Select Tasks:</label>
-    {% if tasks %}
-      {% for task in tasks %}
-        <div style="margin:8px 0;">
-          <input type="checkbox" name="task_ids" value="{{ task.id }}" id="task_{{ task.id }}">
-          <label for="task_{{ task.id }}">
-            {{ task.task_name }} ({{ task.priority }})
-          </label>
-        </div>
-      {% endfor %}
-    {% else %}
-      <p>No tasks available. Create some tasks first!</p>
-    {% endif %}
-  </div>
+    <h3 style="margin-top:30px;">Add Tasks to Schedule:</h3>
 
-  <button type="submit" class="add-task-btn">Create Plan</button>
-  <a href="{{ url_for('studyplans.index') }}">Cancel</a>
+    <div id="taskSchedules"></div>
+
+    <button type="button" onclick="addTaskRow()" class="add-task-btn" style="margin-top:20px;">+ Add Task</button>
+    <br><br>
+    <button type="submit" class="add-task-btn">Create Study Plan</button>
+    <a href="{{ url_for('studyplans.index') }}" style="margin-left:15px;">Cancel</a>
 </form>
+<script>
+const tasks = {{ tasks|tojson|safe }};
+function addTaskRow() {
+    const container = document.getElementById('taskSchedules');
+    const row = document.createElement('div');
+    row.style.cssText = 'background:white; padding:20px; border-radius:12px; ' +
+                        'margin-bottom:15px; box-shadow:0 2px 8px rgba(0,0,0,0.08);';
+    let taskOptions = '<option value="">Select a task...</option>';
+    for (let i = 0; i < tasks.length; i++) {
+        taskOptions += '<option value="' + tasks[i].id + '">' +
+                       tasks[i].task_name + ' (' + tasks[i].priority + ')</option>';
+    }
+
+    row.innerHTML = `
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr;
+                    gap:15px; align-items:end;">
+            <div>
+                <label style="font-weight:600; display:block;
+                              margin-bottom:8px;">Task:</label>
+                <select name="task_ids" required
+                        style="width:100%; padding:10px;
+                               border:2px solid #e0e0e0; border-radius:8px;">
+                    ${taskOptions}
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:600; display:block;
+                              margin-bottom:8px;">Day:</label>
+                <select name="days" required
+                        style="width:100%; padding:10px;
+                               border:2px solid #e0e0e0; border-radius:8px;">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:600; display:block;
+                              margin-bottom:8px;">Start:</label>
+                <input type="time" name="start_times" required
+                       style="width:100%; padding:10px;
+                              border:2px solid #e0e0e0; border-radius:8px;">
+            </div>
+            <div>
+                <label style="font-weight:600; display:block;
+                              margin-bottom:8px;">End:</label>
+                <input type="time" name="end_times" required
+                       style="width:100%; padding:10px;
+                              border:2px solid #e0e0e0; border-radius:8px;">
+            </div>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()"
+                style="margin-top:10px; background:#ff4444; color:white;
+                       border:none; padding:8px 16px; border-radius:8px;
+                       cursor:pointer;">Remove</button>
+    `;
+    container.appendChild(row);
+}
+
+if (tasks && tasks.length > 0) {
+    addTaskRow();
+} else {
+    document.getElementById('taskSchedules').innerHTML =
+        '<p style="color:#999;">No tasks available. Please create some tasks first!</p>';
+}
+</script>
 {% endblock %}

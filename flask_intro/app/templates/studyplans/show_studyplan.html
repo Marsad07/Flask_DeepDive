@@ -10,7 +10,8 @@
   <table style="width:90%; border-collapse:collapse; border:2.5px solid #01796f; background-color:#FFFDD0;">
     <thead>
       <tr>
-        <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white; width:100px;">Time</th>
+        <th style="border:2px solid #008080; padding:10px;
+         background-color:#008080; color:white; width:100px;">Time</th>
         <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Monday</th>
         <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Tuesday</th>
         <th style="border:2px solid #008080; padding:10px; background-color:#008080; color:white;">Wednesday</th>
@@ -26,7 +27,8 @@
         </td>
 
         {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
-        <td style="border:2px solid #008080; padding:10px; vertical-align:top; background-color:#FFFDD0; min-height:60px;">
+        <td style="border:2px solid #008080; padding:10px; vertical-align:top;
+        background-color:#FFFDD0; min-height:60px;">
           {% for item in items %}
             {% if item.day_of_week == day and item.start_time[:2]|int == hour %}
               <div style="padding:8px; background-color:#008080; color:white; border-radius:6px; margin-bottom:5px;">
@@ -42,6 +44,13 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{{ url_for('studyplans.download_pdf', plan_id=plan['id']) }}"
+       class="add-task-btn"
+       style="text-decoration: none; display: inline-block;">
+        📥 Download PDF
+    </a>
 </div>
 {% else %}
 <p style="margin-top:16px;">No tasks scheduled yet for this plan.</p>
