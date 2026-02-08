@@ -33,3 +33,5 @@ Click the Git Tags to view the code for each day
 |24    | Upgrade Atlas AI with chat history, file reading, and interactive UI| [day-24 ](https://github.com/Marsad07/Flask_DeepDive/commit/6068752facbf655acc47fe8a2116b986c1e19a51)|                         
 |25    | Polished loading experience and UI animations| [day-25 ](https://github.com/Marsad07/Flask_DeepDive/commit/64ab81c641cb453d6055e0358b932182fc11e209)| 
 |26    | Implemented study plan generation feature in a timetable format with tasks| [day-26 ](https://github.com/Marsad07/Flask_DeepDive/commit/c09927630dbc4b86fb560f3153dc190ba6058d7d)| 
+|27    | Implemented contact feature with HTML email notifications| [day-27 ](https://github.com/Marsad07/Flask_DeepDive/commit/d85662f590c0e9936a72047fb0aa02fe483931b0)| 
+|28    | Altered styling and added a download as PDF feature for Study Plans| [day-28 ](https://github.com/Marsad07/Flask_DeepDive/commit/d114b379978e1f859e0ac2f55e8d7afafe8b450e)| 
