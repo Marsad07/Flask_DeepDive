@@ -15,8 +15,8 @@
       <a href="{{ url_for('studyplans.show', plan_id=p.id) }}">
         {{ p.title }}
       </a>
-      <form method="POST" action="{{ url_for('studyplans.delete', plan_id=p.id) }}" style="display:inline;">
-        <button type="submit" class="clear-btn">Delete</button>
+      <form method="POST" action="{{ url_for('studyplans.delete', plan_id=p.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this study plan? This cannot be undone.');">
+          <button type="submit" class="clear-btn">Delete</button>
       </form>
     </li>
   {% endfor %}
