@@ -35,3 +35,4 @@ Click the Git Tags to view the code for each day
 |26    | Implemented study plan generation feature in a timetable format with tasks| [day-26 ](https://github.com/Marsad07/Flask_DeepDive/commit/c09927630dbc4b86fb560f3153dc190ba6058d7d)| 
 |27    | Implemented contact feature with HTML email notifications| [day-27 ](https://github.com/Marsad07/Flask_DeepDive/commit/d85662f590c0e9936a72047fb0aa02fe483931b0)| 
 |28    | Altered styling and added a download as PDF feature for Study Plans| [day-28 ](https://github.com/Marsad07/Flask_DeepDive/commit/d114b379978e1f859e0ac2f55e8d7afafe8b450e)| 
+|29    | Final Polish: added delete confirmations and PDF export| [day-29 ](https://github.com/Marsad07/Flask_DeepDive/commit/46b99e6d8937fe9c6a3f9156643439322cd7bf8c)| 
