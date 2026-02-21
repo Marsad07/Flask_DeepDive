@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Menu</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+    h1{
+        text-align: center;
+    }
+
+</style>
+</head>
+<body>
+
+<ul>
+  <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
+    <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
+    <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
+    <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
+</ul>
+
+<h1>MENU</h1>
+<h2>Starters</h2>
+<ul>
+   <li>Starter 1:</li>
+    <p>Description of Starter 1</p>
+
+    <li>Starter 2:</li>
+    <p>Description of Starter 2</p>
+
+    <li>Starter 3:</li>
+    <p>Description of Starter 3</p>
+</ul>
+<br>
+
+<h2>Mains</h2>
+<ul>
+   <li>Main 1:</li>
+    <p>Description of Main 1</p>
+
+    <li>Main 2:</li>
+    <p>Description of Main 2</p>
+
+    <li>Main 3:</li>
+    <p>Description of Main 3</p>
+</ul>
+<br>
+<h2>Sides</h2>
+<ul>
+   <li>Side 1:</li>
+    <p>Description of Side 1</p>
+
+    <li>Side 2:</li>
+    <p>Description of Side 2</p>
+
+    <li>Side 3:</li>
+    <p>Description of Side 3</p>
+</ul>
+<br>
+<h2>Desserts</h2>
+<ul>
+   <li>Dessert 1:</li>
+    <p>Description of Dessert 1</p>
+
+    <li>Dessert 2:</li>
+    <p>Description of Dessert 2</p>
+
+    <li>Dessert 3:</li>
+    <p>Description of Dessert 3</p>
+</ul>
+<br>
+
+<h2>Drinks</h2>
+<ul>
+   <li>Drink 1:</li>
+    <p>Description of Drink 1</p>
+
+    <li>Drink 2:</li>
+    <p>Description of Drink 2</p>
+
+    <li>Drink 3:</li>
+    <p>Description of Drink 3</p>
+</ul>
+</body>
+</html>

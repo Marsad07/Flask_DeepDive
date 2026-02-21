@@ -2,7 +2,6 @@ from flask import Flask
 
 def create_app():
     app = Flask(__name__, template_folder="templates", static_folder="static")
-    app.secret_key = "ajd82h9d8ahd92h9ahd92h9ahd92h9ahd9"
 
     from app.views.general import general_bp
     from app.views.auth import auth_bp
