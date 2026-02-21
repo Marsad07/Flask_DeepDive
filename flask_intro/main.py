@@ -1,6 +1,6 @@
-from app import create_app
+from app2 import create_app
 
-app = create_app()
+app2 = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app2.run(debug=True)
