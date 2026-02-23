@@ -1,10 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  text-align: center;
+}
+
+ul.navbar {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  background-color: #2C2416;  /* Dark brown to match menu */
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);  /* Subtle shadow */
+}
+
+ul.navbar li a {
+  display: block;
+  color: #FFFEF2;  /* Cream color */
+  padding: 18px 28px;  /* More padding */
+  text-decoration: none;
+  font-family: Georgia, serif;  /* Match menu font */
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;  /* Uppercase like menu headings */
+  transition: all 0.3s ease;
+}
+
+ul.navbar li a:hover {
+  background-color: #8B0000;  /* Red accent like menu headings */
+  color: #FFD700;  /* Gold text on hover */
+}
+
+{% block styles %}{% endblock %}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
+{% block extra_css %}{% endblock %}
 </head>
 <body>
+
+{% block header %}
+<br><br>
+{% endblock %}
+
+<h2>Restaurant Name / Logo</h2>
+
+<ul class="navbar">
+  <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
+  <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
+  <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
+  <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
+  <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
+</ul>
+
+{% block content %}{% endblock %}
 
 </body>
 </html>

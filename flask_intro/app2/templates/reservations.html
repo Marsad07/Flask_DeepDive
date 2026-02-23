@@ -1,10 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+<div class="menu-container">
+    <h1>RESERVE A TABLE</h1>
+    <h3>Join us here at [restaurant name] for an unforgettable experience</h3>
+
+    <form method="POST">
+        <label for="fullname">Full Name</label>
+        <input type="text" id="fullname" name="fullname" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phoneNum">Phone Number</label>
+        <input type="text" id="phoneNum" name="phoneNum" pattern="[0-9]{10,}" required>
+
+        <label for="resv_date">Date of Reservation</label>
+        <input type="date" id="resv_date" name="resv_date" min="{{ today }}" required>
+
+        <label for="resv_time">Time of Reservation</label>
+        <select id="resv_time" name="resv_time" required>
+            <option value="">Select a time...</option>
+            <option value="17:00">5:00 PM</option>
+            <option value="17:30">5:30 PM</option>
+            <option value="18:00">6:00 PM</option>
+            <option value="18:30">6:30 PM</option>
+            <option value="19:00">7:00 PM</option>
+            <option value="19:30">7:30 PM</option>
+            <option value="20:00">8:00 PM</option>
+            <option value="20:30">8:30 PM</option>
+            <option value="21:00">9:00 PM</option>
+        </select>
+
+        <label for="guests_num">Number of Guests</label>
+        <select id="guests_num" name="guests_num" required>
+            <option value="">Select number...</option>
+            <option value="2">2 Guests</option>
+            <option value="4">4 Guests</option>
+            <option value="6">6 Guests</option>
+            <option value="8">8 Guests</option>
+        </select>
+
+        <label>Select Your Table</label>
+        <div class="restaurant-layout">
+            <div class="window-wall">
+                <div class="table-item table-2" data-table="1" data-seats="2">
+                    <div class="table-circle">1</div>
+                    <div class="table-info">2 seats<br>Window</div>
+                </div>
+                <div class="table-item table-2" data-table="2" data-seats="2">
+                    <div class="table-circle">2</div>
+                    <div class="table-info">2 seats<br>Window</div>
+                </div>
+                <div class="table-item table-2" data-table="3" data-seats="2">
+                    <div class="table-circle">3</div>
+                    <div class="table-info">2 seats<br>Window</div>
+                </div>
+            </div>
+
+            <div class="center-area">
+                <div class="table-item table-4" data-table="4" data-seats="4">
+                    <div class="table-square">4</div>
+                    <div class="table-info">4 seats<br>Center</div>
+                </div>
+                <div class="table-item table-6" data-table="5" data-seats="6">
+                    <div class="table-rect">5</div>
+                    <div class="table-info">6 seats<br>Center</div>
+                </div>
+                <div class="table-item table-4" data-table="6" data-seats="4">
+                    <div class="table-square">6</div>
+                    <div class="table-info">4 seats<br>Center</div>
+                </div>
+            </div>
+
+            <div class="booth-area">
+                <div class="table-item table-4" data-table="7" data-seats="4">
+                    <div class="table-booth">7</div>
+                    <div class="table-info">4 seats<br>Booth</div>
+                </div>
+                <div class="table-item table-8" data-table="8" data-seats="8">
+                    <div class="table-large">8</div>
+                    <div class="table-info">8 seats<br>Private</div>
+                </div>
+                <div class="table-item table-4" data-table="9" data-seats="4">
+                    <div class="table-booth">9</div>
+                    <div class="table-info">4 seats<br>Booth</div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="table_num" name="table_num" required>
+        <p id="table-error" style="color: #8B0000; display: none; margin-top: 10px;">Please select a table</p>
+
+        <label for="special_requests">Special Requests (Optional)</label>
+        <textarea id="special_requests" name="special_requests" rows="4"
+                  placeholder="Dietary restrictions, celebrations..."></textarea>
+
+        <input type="submit" value="CONFIRM RESERVATION">
+    </form>
+</div>
+
+<script>
+const tables = document.querySelectorAll('.table-item');
+const tableInput = document.getElementById('table_num');
+const guestsSelect = document.getElementById('guests_num');
+const tableError = document.getElementById('table-error');
+
+guestsSelect.addEventListener('change', function() {
+    const guests = parseInt(this.value);
+    tables.forEach(table => {
+        const seats = parseInt(table.dataset.seats);
+        if (seats >= guests) {
+            table.classList.remove('unavailable');
+        } else {
+            table.classList.add('unavailable');
+            table.classList.remove('selected');
+        }
+    });
+    tableInput.value = '';
+});
+
+tables.forEach(table => {
+    table.addEventListener('click', function() {
+        if (this.classList.contains('unavailable')) return;
+
+        // Remove previous selection
+        tables.forEach(t => t.classList.remove('selected'));
+
+        // Add selection
+        this.classList.add('selected');
+        tableInput.value = this.dataset.table;
+        tableError.style.display = 'none';
+    });
+});
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (!tableInput.value) {
+        e.preventDefault();
+        tableError.style.display = 'block';
+        tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+</script>
+
+{% endblock %}

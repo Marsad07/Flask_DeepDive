@@ -1,0 +1,287 @@
+.menu-container {
+    max-width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 60px 100px;
+    background: #FFFEF2;
+    font-family: Georgia, serif;
+    box-sizing: border-box;
+}
+
+.menu-container h1 {
+    text-align: center;
+    font-size: 48px;
+    color: #2C2416;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    border-bottom: 3px solid #8B4513;
+    padding-bottom: 20px;
+}
+
+.menu-container h2 {
+    text-align: center;
+    font-size: 32px;
+    color: #8B0000;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.menu-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.menu-container li {
+    font-size: 20px;
+    color: #2C2416;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px dotted #D4AF37;
+    padding-bottom: 5px;
+}
+
+.menu-container p {
+    font-size: 16px;
+    color: #5C4033;
+    font-style: italic;
+    margin: 5px 0 25px 20px;
+    line-height: 1.6;
+}
+
+.menu-container h3 {
+    text-align: center;
+    font-size: 20px;
+    color: #5C4033;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.menu-container form {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.menu-container form label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #2C2416;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-family: Georgia, serif;
+}
+
+.menu-container form input[type="text"],
+.menu-container form input[type="email"],
+.menu-container form input[type="date"],
+.menu-container form input[type="time"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #D4AF37;
+    border-radius: 8px;
+    font-family: Georgia, serif;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.menu-container form input:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+.menu-container form input[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    margin-top: 30px;
+    background-color: #8B0000;
+    color: #FFD700;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: Georgia, serif;
+    transition: all 0.3s ease;
+}
+
+.menu-container form input[type="submit"]:hover {
+    background-color: #660000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
+}
+
+.menu-container form select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #D4AF37;
+    border-radius: 8px;
+    font-family: Georgia, serif;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    background-color: white;
+    cursor: pointer;
+}
+
+.menu-container form select:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+.menu-container form textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #D4AF37;
+    border-radius: 8px;
+    font-family: Georgia, serif;
+    box-sizing: border-box;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.menu-container form textarea:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.menu-container h2,
+.menu-container ul {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.menu-container h2.visible,
+.menu-container ul.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.restaurant-layout {
+    background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
+    border: 3px solid #8B4513;
+    border-radius: 12px;
+    padding: 40px 20px;
+    margin: 30px 0;
+    min-height: 400px;
+}
+
+.window-wall, .center-area, .booth-area {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px 0;
+    gap: 20px;
+}
+
+.table-item {
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.table-item:hover {
+    transform: translateY(-5px);
+}
+
+.table-item.unavailable {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.table-item.unavailable:hover {
+    transform: none;
+}
+
+.table-item.selected {
+    background: rgba(139, 0, 0, 0.1);
+}
+
+.table-circle, .table-square, .table-rect, .table-booth, .table-large {
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    background: #8B4513;
+    transition: all 0.3s ease;
+}
+
+.table-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.table-square {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+}
+
+.table-rect {
+    width: 90px;
+    height: 60px;
+    border-radius: 8px;
+}
+
+.table-booth {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    background: #660000;
+}
+
+.table-large {
+    width: 100px;
+    height: 80px;
+    border-radius: 8px;
+    background: #8B0000;
+}
+
+.table-item:hover .table-circle,
+.table-item:hover .table-square,
+.table-item:hover .table-rect,
+.table-item:hover .table-booth,
+.table-item:hover .table-large {
+    background: #8B0000;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+}
+
+.table-item.selected .table-circle,
+.table-item.selected .table-square,
+.table-item.selected .table-rect,
+.table-item.selected .table-booth,
+.table-item.selected .table-large {
+    background: #8B0000;
+    box-shadow: 0 0 0 4px #FFD700;
+}
+
+.table-info {
+    font-size: 12px;
+    color: #5C4033;
+    font-weight: bold;
+}
