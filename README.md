@@ -1,7 +1,7 @@
 # Flask_DeepDive
 Flask_DeepDive is my showcase project where you can see my Flask Project. It contains main applications that brings pieces from other small flask apps together into a structured, professional project.
 
-Here is a breakdown of my progress, day by day.
+Here is a breakdown of my progress for my StudyApp, day by day.
 Click the Git Tags to view the code for each day
 
 ## Contents ## 
