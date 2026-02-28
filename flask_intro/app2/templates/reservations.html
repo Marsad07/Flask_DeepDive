@@ -128,10 +128,7 @@ tables.forEach(table => {
     table.addEventListener('click', function() {
         if (this.classList.contains('unavailable')) return;
 
-        // Remove previous selection
         tables.forEach(t => t.classList.remove('selected'));
-
-        // Add selection
         this.classList.add('selected');
         tableInput.value = this.dataset.table;
         tableError.style.display = 'none';
