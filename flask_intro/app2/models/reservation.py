@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash
 from datetime import date
 
+
 def reservations_page():
     if request.method == "POST":
         name = request.form.get("fullname")
@@ -14,7 +15,6 @@ def reservations_page():
 
         if not all([name, email, phone, resv_date, resv_time, guests]):
             return "All fields required!", 400
-
 
         return f"Reservation confirmed for {name} on {resv_date} at {resv_time} for {guests} guests!"
 

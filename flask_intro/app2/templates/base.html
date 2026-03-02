@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-body {
-  margin: 0;
-  padding: 0;
-}
+    <style>
+        body {
+          margin: 0;
+          padding: 0;
+        }
 
-h2 {
-  text-align: center;
-}
+        h2 {
+          text-align: center;
+        }
 
-ul.navbar {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  background-color: #2C2416;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
+        ul.navbar {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          background-color: #2C2416;
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
 
-ul.navbar li a {
-  display: block;
-  color: #FFFEF2;
-  padding: 18px 28px;
-  text-decoration: none;
-  font-family: Georgia, serif;
-  font-size: 18px;
-  letter-spacing: 1px;
-  text-transform: uppercase; 
-  transition: all 0.3s ease;
-}
+        ul.navbar li a {
+          display: block;
+          color: #FFFEF2;
+          padding: 18px 28px;
+          text-decoration: none;
+          font-family: Georgia, serif;
+          font-size: 18px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+        }
 
-ul.navbar li a:hover {
-  background-color: #8B0000; 
-  color: #FFD700; 
-}
+        ul.navbar li a:hover {
+          background-color: #8B0000;
+          color: #FFD700;
+        }
 
-{% block styles %}{% endblock %}
-</style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
-{% block extra_css %}{% endblock %}
+        {% block styles %}{% endblock %}
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -53,11 +53,11 @@ ul.navbar li a:hover {
 <h2>Restaurant Name / Logo</h2>
 
 <ul class="navbar">
-  <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
-  <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
-  <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
-  <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
-  <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
+    <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
+    <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
+    <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
+    <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
+    <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
 </ul>
 
 {% block content %}{% endblock %}
