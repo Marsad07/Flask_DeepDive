@@ -1,5 +1,6 @@
 from app.database import db
 
+
 def get_all_menu_items():
     return [
         {"name": "Starter 1", "description": "Description of Starter 1", "category": "Starters"},

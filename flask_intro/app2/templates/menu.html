@@ -13,7 +13,7 @@
     <h1>MENU</h1>
     <h2>Starters</h2>
     <ul>
-       <li>Starter 1</li>
+        <li>Starter 1</li>
         <p>Description of Starter 1</p>
 
         <li>Starter 2</li>
@@ -25,7 +25,7 @@
 
     <h2>Mains</h2>
     <ul>
-       <li>Main 1</li>
+        <li>Main 1</li>
         <p>Description of Main 1</p>
 
         <li>Main 2</li>
@@ -37,7 +37,7 @@
 
     <h2>Sides</h2>
     <ul>
-       <li>Side 1</li>
+        <li>Side 1</li>
         <p>Description of Side 1</p>
 
         <li>Side 2</li>
@@ -49,7 +49,7 @@
 
     <h2>Desserts</h2>
     <ul>
-       <li>Dessert 1</li>
+        <li>Dessert 1</li>
         <p>Description of Dessert 1</p>
 
         <li>Dessert 2</li>
@@ -61,7 +61,7 @@
 
     <h2>Drinks</h2>
     <ul>
-       <li>Drink 1</li>
+        <li>Drink 1</li>
         <p>Description of Drink 1</p>
 
         <li>Drink 2</li>
@@ -73,16 +73,16 @@
 </div>
 
 <script>
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.1 });
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
 
-document.querySelectorAll('.menu-container h2, .menu-container ul').forEach(el => {
-    observer.observe(el);
-});
+    document.querySelectorAll('.menu-container h2, .menu-container ul').forEach(el => {
+        observer.observe(el);
+    });
 </script>
 {% endblock %}

@@ -105,43 +105,55 @@
 </div>
 
 <script>
-const tables = document.querySelectorAll('.table-item');
-const tableInput = document.getElementById('table_num');
-const guestsSelect = document.getElementById('guests_num');
-const tableError = document.getElementById('table-error');
+    const tables = document.querySelectorAll('.table-item');
+    const tableInput = document.getElementById('table_num');
+    const guestsSelect = document.getElementById('guests_num');
+    const tableError = document.getElementById('table-error');
 
-guestsSelect.addEventListener('change', function() {
-    const guests = parseInt(this.value);
+    guestsSelect.addEventListener('change', function() {
+        const guests = parseInt(this.value);
+        tables.forEach(table => {
+            const seats = parseInt(table.dataset.seats);
+            if (seats >= guests) {
+                table.classList.remove('unavailable');
+            } else {
+                table.classList.add('unavailable');
+                table.classList.remove('selected');
+            }
+        });
+        tableInput.value = '';
+    });
+
     tables.forEach(table => {
-        const seats = parseInt(table.dataset.seats);
-        if (seats >= guests) {
-            table.classList.remove('unavailable');
-        } else {
-            table.classList.add('unavailable');
-            table.classList.remove('selected');
+        table.addEventListener('click', function() {
+            if (this.classList.contains('unavailable')) return;
+
+            tables.forEach(t => t.classList.remove('selected'));
+            this.classList.add('selected');
+            tableInput.value = this.dataset.table;
+            tableError.style.display = 'none';
+        });
+    });
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!tableInput.value) {
+            e.preventDefault();
+            tableError.style.display = 'block';
+            tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
-    tableInput.value = '';
-});
 
-tables.forEach(table => {
-    table.addEventListener('click', function() {
-        if (this.classList.contains('unavailable')) return;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
 
-        tables.forEach(t => t.classList.remove('selected'));
-        this.classList.add('selected');
-        tableInput.value = this.dataset.table;
-        tableError.style.display = 'none';
+    document.querySelectorAll('.menu-container h1, .menu-container h3,
+     .menu-container form, .menu-container label, .restaurant-layout').forEach(el => {
+        observer.observe(el);
     });
-});
-
-document.querySelector('form').addEventListener('submit', function(e) {
-    if (!tableInput.value) {
-        e.preventDefault();
-        tableError.style.display = 'block';
-        tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-});
 </script>
-
 {% endblock %}

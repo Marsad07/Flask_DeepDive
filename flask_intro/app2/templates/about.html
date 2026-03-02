@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>ABOUT US</h1>
+    <h2>OUR STORY</h2><br>
+
+    <h2 style="text-align: left;"> WHY WE STARTED</h2>
+    <p>Paragraph of restaurants story</p>
+
+    <h2 style="text-align: left;"> WHEN THE RESTAURANT OPENED</h2>
+    <p>Paragraph 2 of restaurants story</p>
+
+    <h2 style="text-align: left;">THE RESTAURANTS MISSION</h2>
+    <p>Paragraph 3 of restaurants story</p>
+</div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container ul').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+
+{% endblock %}
