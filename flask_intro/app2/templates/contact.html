@@ -1,10 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>CONTACT US</h1>
+    <h3 style="font-style: italic; color: #5C4033; margin-bottom: 50px;">We'd love to hear from you</h3>
+
+    <div class="two-column">
+        <div class="column-left">
+            <h2>GET IN TOUCH</h2>
+
+            <div class="contact-info-item">
+                <strong>📍 Address</strong>
+                123 Main Street<br>
+                City, State<br>
+                Post Code
+            </div>
+
+            <div class="contact-info-item">
+                <strong>📞 Phone</strong>
+                1234 56789 0123
+            </div>
+
+            <div class="contact-info-item">
+                <strong>✉️ Email</strong>
+                info@restaurant.com
+            </div>
+
+            <div class="contact-info-item">
+                <strong>🕐 Hours</strong>
+                Mon-Fri: 0:00 PM - 0:00 PM<br>
+                Sat-Sun: 0:00 PM - 0:00 PM
+            </div>
+        </div>
+
+        <!-- Right Column - Contact Form -->
+        <div class="column-right">
+            <h2>SEND US A MESSAGE</h2>
+            <form method="POST">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Your Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="6" required></textarea>
+
+                <input type="submit" value="SEND MESSAGE">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container h3,
+     .two-column, .contact-info-item').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+
+{% endblock %}
