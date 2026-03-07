@@ -42,6 +42,7 @@
         {% block styles %}{% endblock %}
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -61,6 +62,133 @@
 </ul>
 
 {% block content %}{% endblock %}
+
+<footer style="background: #2C2416; color: #FFFEF2; padding: 40px 20px; text-align: center;
+ margin-top: 60px; font-family: Georgia, serif;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+
+        <!-- Footer content-->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+
+            <!-- Location part -->
+            <div>
+                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">LOCATION</h3>
+                <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
+                    123 Main Street<br>
+                    City, State<br>
+                    Post Code
+                </p>
+            </div>
+
+            <!-- Hours part -->
+            <div>
+                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">HOURS</h3>
+                <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
+                    Mon-Fri: 5:00 PM - 10:00 PM<br>
+                    Sat-Sun: 12:00 PM - 11:00 PM
+                </p>
+            </div>
+
+            <!-- Column 3 - Quick Links for users to use  -->
+            <div>
+                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">QUICK LINKS</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{{ url_for('menu.show_menu') }}" style="color: #FFFEF2; text-decoration: none;
+                     font-size: 14px; transition: color 0.3s;">Menu</a>
+                    <a href="{{ url_for('reservations.reservations_page') }}" style="color: #FFFEF2;
+                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Book a Table</a>
+                    <a href="{{ url_for('general.about_page') }}" style="color: #FFFEF2;
+                     text-decoration: none; font-size: 14px; transition: color 0.3s;">About Us</a>
+                    <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
+                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Contact</a>
+                </div>
+            </div>
+
+            <!-- Newsletter part -->
+            <div>
+                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">NEWSLETTER</h3>
+                <p style="font-size: 13px; color: #FFFEF2; margin-bottom: 12px;">Stay updated with our latest offers!</p>
+                <form method="POST" action="{{ url_for('general.newsletter_signup') }}" style="display: flex;
+                 flex-direction: column; gap: 8px;">
+                    <input type="email" name="email" placeholder="Your email" required
+                           style="padding: 10px; border: none; border-radius: 6px; font-size: 13px;
+                            font-family: Georgia, serif;">
+                    <button type="submit"
+                            style="padding: 10px; background: #8B0000; color: #FFD700; border: none;
+                             border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
+                              font-family: Georgia, serif; transition: all 0.3s ease;">
+                        SUBSCRIBE
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 16px;">FOLLOW US</h3>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+
+
+                <a href="https://instagram.com/yourrestaurant" target="_blank"
+                   style="width: 50px; height: 50px; background: #8B0000;
+                          border: 2px solid #D4AF37; border-radius: 12px;
+                          display: flex; align-items: center; justify-content: center;
+                          transition: all 0.3s ease; text-decoration: none;"
+                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000'
+                   ; this.style.borderColor='#FFD700';"
+
+                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
+                    this.style.borderColor='#D4AF37';">
+                    <i class="fab fa-instagram" style="font-size: 24px; color: #FFD700;"></i>
+                </a>
+
+                <!-- TikTok Link-->
+                <a href="https://tiktok.com/@yourrestaurant" target="_blank"
+                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37; border-radius:
+                    12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+                     text-decoration: none;"
+
+                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
+                    this.style.borderColor='#FFD700';"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
+                   this.style.borderColor='#D4AF37';">
+                    <i class="fab fa-tiktok" style="font-size: 24px; color: #FFD700;"></i>
+                </a>
+
+                <!-- Facebook Link -->
+                <a href="https://facebook.com/yourrestaurant" target="_blank"
+                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37;
+                    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+                     transition: all 0.3s ease; text-decoration: none;"
+
+                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
+                    this.style.borderColor='#FFD700';"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
+                    this.style.borderColor='#D4AF37';">
+                    <i class="fab fa-facebook-f" style="font-size: 24px; color: #FFD700;"></i>
+                </a>
+
+                <!-- Twitter/X Link  -->
+                <a href="https://twitter.com/yourrestaurant" target="_blank"
+                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37;
+                    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+                     transition: all 0.3s ease; text-decoration: none;"
+
+                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
+                    this.style.borderColor='#FFD700';"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
+                    this.style.borderColor='#D4AF37';">
+                    <i class="fab fa-x-twitter" style="font-size: 24px; color: #FFD700;"></i>
+                </a>
+            </div>
+        </div>
+
+            <!-- Copyright Stuff for the header -->
+            <p style="font-size: 14px; color: #D4AF37; margin: 0;">
+                © 2026 [Restaurant Name]. All rights reserved.
+            </p>
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>
