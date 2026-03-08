@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container" style="text-align: center;">
+    <div style="font-size: 80px; color: #8B0000; margin-bottom: 20px;"></div>
+    <h1 style="color: #8B0000;">RESERVATION CONFIRMED</h1>
+    <p style="font-size: 20px; margin: 30px 0;">Thank you, {{ name }} for booking a table here at (restaurant name) </p>
+
+    <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px;
+     margin: 40px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <h2 style="color: #8B0000; font-size: 24px; margin-bottom: 20px;">Reservation Details</h2>
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Time:</strong> {{ time }}</p>
+        <p><strong>Guests:</strong> {{ guests }}</p>
+        <p><strong>Table:</strong> {{ table }}</p>
+        <p style="margin-top: 30px;
+         color: #5C4033; font-style: italic;">We've sent a confirmation email to {{ email }}</p>
+    </div>
+
+    <a href="{{ url_for('general.home_page') }}"
+       style="display: inline-block; background: #8B0000; color: #FFD700; padding: 15px 40px;
+              text-decoration: none; border-radius: 8px; margin-top: 20px; font-weight: bold;
+              text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;"
+       onmouseover="this.style.background='#660000';"
+       onmouseout="this.style.background='#8B0000';">
+        Back to Home
+    </a>
+</div>
+{% endblock %}

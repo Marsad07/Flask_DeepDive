@@ -151,9 +151,11 @@
         });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.menu-container h1, .menu-container h3,
-     .menu-container form, .menu-container label, .restaurant-layout').forEach(el => {
-        observer.observe(el);
+        ['.menu-container h1', '.menu-container h3', '.menu-container form',
+     '.menu-container label', '.restaurant-layout'].forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+            observer.observe(el);
+        });
     });
 </script>
 {% endblock %}
