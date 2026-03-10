@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>ADD MENU ITEM</h1>
+
+    <a href="{{ url_for('admin.manage_menu') }}"
+       style="display: inline-block; color: #8B0000; text-decoration: none; margin: 20px 0; font-weight: bold;">
+        ← Back to Menu Management
+    </a>
+
+    <form method="POST" style="max-width: 600px; margin: 40px auto;">
+        <label for="item_name">Item Name</label>
+        <input type="text" id="item_name" name="item_name" required>
+
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+            <option value="">Select category...</option>
+            <option value="Starters">Starters</option>
+            <option value="Mains">Mains</option>
+            <option value="Sides">Sides</option>
+            <option value="Desserts">Desserts</option>
+            <option value="Drinks">Drinks</option>
+        </select>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="price">Price (£)</label>
+        <input type="number" id="price" name="price" step="0.01" min="0" required>
+
+        <input type="submit" value="ADD ITEM">
+    </form>
+</div>
+{% endblock %}

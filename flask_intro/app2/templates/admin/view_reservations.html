@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>ALL RESERVATIONS</h1>
+    <a href="{{ url_for('admin.dashboard') }}"
+       style="display: inline-block; color: #8B0000; text-decoration: none; margin: 20px 0; font-weight: bold;">
+        ← Back to Dashboard
+    </a>
+
+    <div style="background: white; padding: 30px; border-radius: 12px;
+     box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+
+        {% if reservations %}
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #2C2416; color: #FFD700;">
+                        <th style="padding: 15px; text-align: left;">Customer</th>
+                        <th style="padding: 15px; text-align: left;">Date</th>
+                        <th style="padding: 15px; text-align: left;">Time</th>
+                        <th style="padding: 15px; text-align: center;">Guests</th>
+                        <th style="padding: 15px; text-align: center;">Table</th>
+                        <th style="padding: 15px; text-align: left;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                    <tr style="border-bottom: 1px solid #E8DFD0;">
+                        <td style="padding: 15px;">
+                            <strong>{{ reservation.customer_fullname }}</strong><br>
+                            <small style="color: #5C4033;">{{ reservation.customer_email }}</small>
+                        </td>
+                        <td style="padding: 15px;">{{ reservation.reservation_date }}</td>
+                        <td style="padding: 15px;">{{ reservation.reservation_time }}</td>
+                        <td style="padding: 15px; text-align: center;">{{ reservation.num_of_guests }}</td>
+                        <td style="padding: 15px; text-align: center;">{{ reservation.table_number }}</td>
+                        <td style="padding: 15px;">
+                            <span style="background: #8B0000; color:
+                             #FFD700; padding: 5px 10px; border-radius: 6px; font-size: 12px;">
+                                {{ reservation.reservation_status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="text-align: center; padding: 50px; color: #5C4033;">No reservations found.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container div, .menu-container a, .menu-container table').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content%}
+<div class="menu-container">
+    <h1>ADMIN LOGIN</h1>
+    <h3 style="font-style: italic; color: #5C4033'">Restaurant Management Portal</h3>
+
+    {%if error %}
+    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
+      border-radius: 8px; margin: 20px auto; max-width: 500px;">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <form method="POST" style="max-width: 400px; margin: 40px auto;">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required autofocus>
+
+         <label for="password">Password</label>
+        <input type="text" id="password" name="password" required autofocus>
+
+        <input type="submit" value="LOGIN">
+    </form>
+    <p style="text-align: center; margin-top: 30px; color: #5C4033; font-size: 14px;">
+        <a href="{{ url_for('general.home_page') }}"
+           style="color: #8B0000; text-decoration: none;">← Back to Main Site</a>
+    </p>
+</div>
+{% endblock %}
