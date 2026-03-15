@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, intial-scale=1.0">
     <style>
         body {
           margin: 0;
@@ -83,10 +84,18 @@
             <!-- Hours part -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">HOURS</h3>
-                <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
-                    Mon-Fri: 5:00 PM - 10:00 PM<br>
-                    Sat-Sun: 12:00 PM - 11:00 PM
-                </p>
+                {% for day_data in restaurant_hours %}
+                    {% if not day_data.is_closed %}
+                    <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px; margin: 2px 0;">
+                        {{ day_data.day_of_week[:3] }}:
+                        {{ (day_data.opening_time|string)[:5] }} - {{ (day_data.closing_time|string)[:5] }}
+                    </p>
+                    {% else %}
+                    <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px; margin: 2px 0;">
+                        {{ day_data.day_of_week[:3] }}: Closed
+                    </p>
+                    {% endif %}
+                {% endfor %}
             </div>
 
             <!-- Column 3 - Quick Links for users to use  -->
