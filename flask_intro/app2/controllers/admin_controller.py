@@ -168,3 +168,95 @@ def delete_menu_item(item_id):
     restaurant_db1.commit()
 
     return redirect(url_for('admin.manage_menu'))
+
+def update_hours():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+    cursor = restaurant_db1.cursor(dictionary=True)
+
+    if request.method == "POST":
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        for day in days:
+            day_lower = day.lower()
+            open_time = request.form.get(f"{day_lower}_open")
+            close_time = request.form.get(f"{day_lower}_close")
+            is_closed = 1 if request.form.get(f"{day_lower}_closed") else 0
+
+            cursor.execute(
+                "UPDATE restaurant_info SET opening_time=%s, closing_time=%s, is_closed=%s WHERE day_of_week=%s",
+                (open_time, close_time, is_closed, day_lower)
+            )
+            restaurant_db1.commit()
+            return redirect(url_for('admin.update_hours'))
+
+    if request.method == "GET":
+        cursor.execute("SELECT * FROM restaurant_info ORDER BY FIELD(day_of_week,"
+                       " 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+        hours = cursor.fetchall()
+
+        return render_template('admin/update_hours.html', hours=hours)
+
+def view_analytics():
+    # This checks if the user is logged in or not
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    cursor = restaurant_db1.cursor(dictionary=True)
+
+    # This gets the total number of reservations
+    cursor.execute("SELECT COUNT(*) FROM reservations_restaurant")
+    result = cursor.fetchone()
+    total_reservations = result['COUNT(*)']
+
+    # This gets the total reservations for this month
+    cursor.execute("SELECT COUNT(*) FROM reservations_restaurant WHERE MONTH(reservation_date) "
+                   "= MONTH(NOW())")
+    result = cursor.fetchone()
+    total_monthly_reservations = result['COUNT(*)']
+
+    # This gets the average number of guests per booking
+    cursor.execute("SELECT AVG(num_of_guests) FROM reservations_restaurant")
+    result = cursor.fetchone()
+    avg_guests = result['AVG(num_of_guests)']
+
+    # This gets the most popular table number
+    cursor.execute("SELECT table_number, COUNT(*) FROM reservations_restaurant "
+                   "GROUP BY table_number ORDER BY COUNT(*) DESC LIMIT 1 ")
+    result = cursor.fetchone()
+    popular_table = result['table_number']
+
+    # This gets booking counts grouped by day of week
+    cursor.execute("""
+        SELECT DAYNAME(reservation_date) as day, COUNT(*) as count 
+        FROM reservations_restaurant 
+        GROUP BY DAYNAME(reservation_date)
+        ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    """)
+    bookings_by_day = cursor.fetchall()
+
+    # This gets booking counts grouped by hour of day
+    cursor.execute("""
+        SELECT HOUR(reservation_time) AS hour, COUNT(*) as count 
+        FROM reservations_restaurant 
+        GROUP BY HOUR(reservation_time)
+        ORDER BY hour
+    """)
+    bookings_by_time = cursor.fetchall()
+
+    # This gets booking counts for the last 6 months
+    cursor.execute("""
+        SELECT MONTHNAME(reservation_date) AS month, COUNT(*) AS count 
+        FROM reservations_restaurant 
+        WHERE reservation_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY MONTH(reservation_date), YEAR(reservation_date), MONTHNAME(reservation_date)
+        ORDER BY YEAR(reservation_date), MONTH(reservation_date)
+    """)
+    monthly_trend = cursor.fetchall()
+    return render_template('admin/view_analytics.html',
+                           total_reservations=total_reservations,
+                           total_monthly_reservations=total_monthly_reservations,
+                           total_guests=avg_guests,
+                           popular_table=popular_table,
+                           bookings_by_day=bookings_by_day,
+                           bookings_by_time=bookings_by_time,
+                           monthly_trend=monthly_trend)

@@ -1,3 +1,5 @@
+/* Base stlying for desktop users */
+
 .menu-container {
     max-width: 100%;
     min-height: 100vh;
@@ -60,6 +62,7 @@
     margin-top: 10px;
 }
 
+/* Forms */
 .menu-container form {
     max-width: 600px;
     margin: 40px auto;
@@ -76,24 +79,27 @@
     color: #2C2416;
     margin-top: 20px;
     margin-bottom: 8px;
-    font-family: Georgia, serif;
 }
 
 .menu-container form input[type="text"],
 .menu-container form input[type="email"],
 .menu-container form input[type="date"],
-.menu-container form input[type="time"] {
+.menu-container form input[type="time"],
+.menu-container form select,
+.menu-container form textarea {
     width: 100%;
     padding: 12px;
     font-size: 16px;
     border: 2px solid #D4AF37;
     border-radius: 8px;
-    font-family: Georgia, serif;
     box-sizing: border-box;
     transition: all 0.3s ease;
+    font-family: Georgia, serif;
 }
 
-.menu-container form input:focus {
+.menu-container form input:focus,
+.menu-container form select:focus,
+.menu-container form textarea:focus {
     outline: none;
     border-color: #8B0000;
     box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
@@ -112,7 +118,6 @@
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-family: Georgia, serif;
     transition: all 0.3s ease;
 }
 
@@ -122,43 +127,7 @@
     box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
 }
 
-.menu-container form select {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #D4AF37;
-    border-radius: 8px;
-    font-family: Georgia, serif;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    background-color: white;
-    cursor: pointer;
-}
-
-.menu-container form select:focus {
-    outline: none;
-    border-color: #8B0000;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
-}
-
-.menu-container form textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #D4AF37;
-    border-radius: 8px;
-    font-family: Georgia, serif;
-    box-sizing: border-box;
-    resize: vertical;
-    transition: all 0.3s ease;
-}
-
-.menu-container form textarea:focus {
-    outline: none;
-    border-color: #8B0000;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
-}
-
+/* Animations */
 html {
     scroll-behavior: smooth;
 }
@@ -176,6 +145,7 @@ html {
     transform: translateY(0);
 }
 
+/* Restaurant Layout */
 .restaurant-layout {
     background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
     border: 3px solid #8B4513;
@@ -209,10 +179,6 @@ html {
     cursor: not-allowed;
 }
 
-.table-item.unavailable:hover {
-    transform: none;
-}
-
 .table-item.selected {
     background: rgba(139, 0, 0, 0.1);
 }
@@ -229,37 +195,11 @@ html {
     transition: all 0.3s ease;
 }
 
-.table-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-}
-
-.table-square {
-    width: 70px;
-    height: 70px;
-    border-radius: 8px;
-}
-
-.table-rect {
-    width: 90px;
-    height: 60px;
-    border-radius: 8px;
-}
-
-.table-booth {
-    width: 70px;
-    height: 70px;
-    border-radius: 8px;
-    background: #660000;
-}
-
-.table-large {
-    width: 100px;
-    height: 80px;
-    border-radius: 8px;
-    background: #8B0000;
-}
+.table-circle { width: 60px; height: 60px; border-radius: 50%; }
+.table-square { width: 70px; height: 70px; border-radius: 8px; }
+.table-rect   { width: 90px; height: 60px; border-radius: 8px; }
+.table-booth  { width: 70px; height: 70px; border-radius: 8px; background: #660000; }
+.table-large  { width: 100px; height: 80px; border-radius: 8px; background: #8B0000; }
 
 .table-item:hover .table-circle,
 .table-item:hover .table-square,
@@ -286,6 +226,7 @@ html {
     font-weight: bold;
 }
 
+/* Two-column layout */
 .two-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -307,7 +248,6 @@ html {
     padding-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-family: Georgia, serif;
 }
 
 .column-left p, .column-right p {
@@ -315,10 +255,10 @@ html {
     line-height: 1.8;
     color: #5C4033;
     margin-bottom: 30px;
-    font-family: Georgia, serif;
     font-size: 16px;
 }
 
+/* Contact info */
 .contact-info-item {
     margin: 25px 0;
     padding: 20px;
@@ -339,14 +279,96 @@ html {
     font-size: 20px;
     color: #2C2416;
     margin-bottom: 10px;
-    font-family: Georgia, serif;
     letter-spacing: 1px;
 }
 
-.contact-info-item p,
-.contact-info-item br + text {
-    font-family: Georgia, serif;
+.contact-info-item p {
     font-size: 16px;
     color: #5C4033;
     line-height: 1.6;
+}
+
+
+
+/* Styling for tablets */
+@media (max-width: 1024px) {
+    .menu-container {
+        padding: 40px 40px;
+    }
+
+    .menu-container h1 {
+        font-size: 40px;
+    }
+
+    .two-column {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+/* Styling for mobile */
+@media (max-width: 768px) {
+    .menu-container {
+        padding: 20px 15px;
+    }
+
+    .menu-container h1 {
+        font-size: 32px;
+    }
+
+    .menu-container h2 {
+        font-size: 24px;
+    }
+
+    .menu-container form {
+        padding: 20px;
+    }
+
+    .window-wall,
+    .center-area,
+    .booth-area {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .table-circle,
+    .table-square,
+    .table-rect,
+    .table-booth,
+    .table-large {
+        transform: scale(0.8);
+    }
+
+    .two-column {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+/* Styling for smaller phones */
+@media (max-width: 480px) {
+    .menu-container h1 {
+        font-size: 28px;
+    }
+
+    .menu-container h2 {
+        font-size: 20px;
+    }
+
+    .menu-container li {
+        font-size: 18px;
+    }
+
+    .menu-container p {
+        font-size: 14px;
+    }
+
+    .table-circle,
+    .table-square,
+    .table-rect,
+    .table-booth,
+    .table-large {
+        transform: scale(0.7);
+    }
 }

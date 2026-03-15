@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h1 style="flex: 1;">UPDATE HOURS</h1>
+        <a href="{{ url_for('admin.dashboard') }}"
+           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
+                  border-radius: 8px; font-weight: bold; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#660000';"
+           onmouseout="this.style.background='#8B0000';">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- This is the form to update restaurant hours -->
+    <form method="POST">
+        <h2 style="margin-top: 20px !important;" class="hours-heading">Opening Hours</h2>
+
+        <!-- This loops through each day of the week -->
+        {% for day_data in hours %}
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: bold;
+             display: block; margin-bottom: 10px; font-size: 18px;">{{ day_data.day_of_week }}</label>
+            <div style="margin-left: 20px;">
+                <label>Opening Time:</label>
+                <input type="time" name="{{ day_data.day_of_week.lower() }}_open" value="{{ day_data.opening_time }}">
+                <br><br>
+                <label>Closing Time:</label>
+                <input type="time" name="{{ day_data.day_of_week.lower() }}_close" value="{{ day_data.closing_time }}">
+                <br><br>
+                <label>
+                     <input type="checkbox" name="{{ day_data.day_of_week.lower() }}_closed"
+                            {% if day_data.is_closed %}checked{% endif %}> Closed this day
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- This section is for announcements -->
+        <h2 style="margin-top: 30px !important;
+         margin-bottom: 20px !important;" class="hours-heading">Announcements</h2>
+        <textarea name="announcement" rows="5" placeholder="Special hours, events, promotions..."></textarea>
+        <input type="submit" value="SAVE CHANGES">
+    </form>
+</div>
+
+<!-- This is for scroll animations -->
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.menu-container h1, .menu-container h2').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+{% endblock %}
