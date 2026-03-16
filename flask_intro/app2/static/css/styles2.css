@@ -327,8 +327,6 @@ html {
     .window-wall,
     .center-area,
     .booth-area {
-        flex-direction: column;
-        align-items: center;
         gap: 15px;
     }
 

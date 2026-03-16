@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, session
 from app2.database import restaurant_db1
+from werkzeug.security import check_password_hash
 
 def admin_login():
     if request.method == "POST":
@@ -12,7 +13,7 @@ def admin_login():
         admin = cursor.fetchone()
 
         # This verifies the password
-        if admin and admin['password_hash'] == password:
+        if admin and check_password_hash(admin['password_hash'], password):
             # This will be for successful login
             session['admin_id'] = admin['admin_id']
             session['admin_username'] = admin['admin_username']

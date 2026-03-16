@@ -18,27 +18,29 @@
                 City, State<br>
                 Post Code
             </div>
-
+            <br>
             <div class="contact-info-item">
                 <strong>📞 Phone</strong>
                 1234 56789 0123
             </div>
-
+            <br>
             <div class="contact-info-item">
                 <strong>✉️ Email</strong>
                 info@restaurant.com
-            </div>
-
-            <div class="contact-info-item">
-                <strong>🕐 Hours</strong>
-                Mon-Fri: 0:00 PM - 0:00 PM<br>
-                Sat-Sun: 0:00 PM - 0:00 PM
             </div>
         </div>
 
         <!-- Right Column - Contact Form -->
         <div class="column-right">
             <h2>SEND US A MESSAGE</h2>
+
+            {% if request.args.get('success') %}
+                <div style="background: #28a745; color: white;
+                 padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                    ✓ Thank you! Your message has been sent successfully.
+                </div>
+                {% endif %}
+
             <form method="POST" action="https://formsubmit.co/marsadc55@gmail.com">
                  <input type="hidden" name="_captcha" value="false">
                  <input type="hidden" name="_test" value="true">
@@ -53,6 +55,10 @@
                 <textarea id="message" name="message" rows="6" required></textarea>
 
                 <input type="submit" value="SEND MESSAGE">
+                <input type="hidden" name="_next"
+                       value="{{ url_for('general.contact_page', _external=True) }}?success=true">
+
+
             </form>
         </div>
     </div>

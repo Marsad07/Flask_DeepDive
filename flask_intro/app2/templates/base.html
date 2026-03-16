@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, intial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
           margin: 0;
@@ -12,6 +12,7 @@
           text-align: center;
         }
 
+        /* This is the navbar styling for desktop users */
         ul.navbar {
           list-style-type: none;
           margin: 0;
@@ -21,6 +22,7 @@
           justify-content: center;
           width: 100%;
           box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          animation: slideDown 0.5s ease forwards;
         }
 
         ul.navbar li a {
@@ -40,6 +42,99 @@
           color: #FFD700;
         }
 
+        /* Desktop navbar slide down animation */
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-100%);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* This is the hamburger menu button that appears on mobile */
+        .hamburger {
+          display: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 15px;
+          position: absolute;
+          right: 20px;
+          top: 10px;
+          z-index: 1000;
+        }
+
+        .hamburger span {
+          display: block;
+          width: 30px;
+          height: 3px;
+          background: #8B0000;
+          margin: 6px 0;
+          transition: 0.3s;
+        }
+
+        /* This makes the footer grid responsive */
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          gap: 30px;
+          margin-bottom: 30px;
+        }
+
+        /* This makes the navbar responsive for mobile devices */
+        @media (max-width: 768px) {
+          ul.navbar {
+            flex-direction: column;
+            display: none;
+            width: 100%;
+            animation: none;
+          }
+
+          ul.navbar.active {
+            display: flex;
+            animation: slideIn 0.3s ease forwards;
+          }
+
+          ul.navbar li {
+            width: 100%;
+            text-align: center;
+          }
+
+          ul.navbar li a {
+            padding: 15px;
+            border-bottom: 1px solid #1A1410;
+          }
+
+          .hamburger {
+            display: block;
+          }
+
+          h2 {
+            font-size: 24px;
+            padding-right: 60px;
+          }
+
+          .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+        }
+
+        /* This is for mobile menu slide animation */
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(100%);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
         {% block styles %}{% endblock %}
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
@@ -54,7 +149,15 @@
 
 <h2>Restaurant Name / Logo</h2>
 
-<ul class="navbar">
+<!-- This is the hamburger button for mobile menu -->
+<button class="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- This is the navigation bar -->
+<ul class="navbar" id="navbar">
     <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
     <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
     <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
@@ -64,14 +167,15 @@
 
 {% block content %}{% endblock %}
 
+<!-- This is the footer section -->
 <footer style="background: #2C2416; color: #FFFEF2; padding: 40px 20px; text-align: center;
  margin-top: 60px; font-family: Georgia, serif;">
     <div style="max-width: 1200px; margin: 0 auto;">
 
-        <!-- Footer content-->
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+        <!-- This creates the footer columns that stack on mobile -->
+        <div class="footer-grid">
 
-            <!-- Location part -->
+            <!-- Location section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">LOCATION</h3>
                 <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
@@ -81,7 +185,7 @@
                 </p>
             </div>
 
-            <!-- Hours part -->
+            <!-- Hours section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">HOURS</h3>
                 {% for day_data in restaurant_hours %}
@@ -98,7 +202,7 @@
                 {% endfor %}
             </div>
 
-            <!-- Column 3 - Quick Links for users to use  -->
+            <!-- Quick Links section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">QUICK LINKS</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -113,10 +217,11 @@
                 </div>
             </div>
 
-            <!-- Newsletter part -->
+            <!-- Newsletter section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">NEWSLETTER</h3>
-                <p style="font-size: 13px; color: #FFFEF2; margin-bottom: 12px;">Stay updated with our latest offers!</p>
+                <p style="font-size: 13px; color: #FFFEF2;
+                 margin-bottom: 12px;">Stay updated with our latest offers!</p>
                 <form method="POST" action="{{ url_for('general.newsletter_signup') }}" style="display: flex;
                  flex-direction: column; gap: 8px;">
                     <input type="email" name="email" placeholder="Your email" required
@@ -132,72 +237,96 @@
             </div>
         </div>
 
+        <!-- Social media section -->
         <div style="margin-bottom: 20px;">
             <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 16px;">FOLLOW US</h3>
-            <div style="display: flex; justify-content: center; gap: 20px;">
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
 
-
+                <!-- Instagram Link -->
                 <a href="https://instagram.com/yourrestaurant" target="_blank"
                    style="width: 50px; height: 50px; background: #8B0000;
                           border: 2px solid #D4AF37; border-radius: 12px;
                           display: flex; align-items: center; justify-content: center;
                           transition: all 0.3s ease; text-decoration: none;"
-                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000'
-                   ; this.style.borderColor='#FFD700';"
-
+                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
+                    this.style.borderColor='#FFD700';"
                    onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
                     this.style.borderColor='#D4AF37';">
                     <i class="fab fa-instagram" style="font-size: 24px; color: #FFD700;"></i>
                 </a>
 
-                <!-- TikTok Link-->
+                <!-- TikTok Link -->
                 <a href="https://tiktok.com/@yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37; border-radius:
-                    12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-                     text-decoration: none;"
-
-                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
-                    this.style.borderColor='#FFD700';"
+                   style="width: 50px; height: 50px; background: #8B0000;
+                    border: 2px solid #D4AF37; border-radius: 12px;
+                          display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+                           text-decoration: none;"
+                   onmouseover="this.style.transform='translateY(-5px)';
+                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
                    onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                   this.style.borderColor='#D4AF37';">
+                    this.style.borderColor='#D4AF37';">
                     <i class="fab fa-tiktok" style="font-size: 24px; color: #FFD700;"></i>
                 </a>
 
                 <!-- Facebook Link -->
                 <a href="https://facebook.com/yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37;
-                    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-                     transition: all 0.3s ease; text-decoration: none;"
-
-                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
-                    this.style.borderColor='#FFD700';"
+                   style="width: 50px; height: 50px; background: #8B0000;
+                    border: 2px solid #D4AF37; border-radius: 12px;
+                          display: flex; align-items: center; justify-content: center;
+                           transition: all 0.3s ease; text-decoration: none;"
+                   onmouseover="this.style.transform='translateY(-5px)';
+                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
                    onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
                     this.style.borderColor='#D4AF37';">
                     <i class="fab fa-facebook-f" style="font-size: 24px; color: #FFD700;"></i>
                 </a>
 
-                <!-- Twitter/X Link  -->
+                <!-- Twitter/X Link -->
                 <a href="https://twitter.com/yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000; border: 2px solid #D4AF37;
-                    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-                     transition: all 0.3s ease; text-decoration: none;"
-
-                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
-                    this.style.borderColor='#FFD700';"
-                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                    this.style.borderColor='#D4AF37';">
+                   style="width: 50px; height: 50px;
+                    background: #8B0000; border: 2px solid #D4AF37; border-radius: 12px;
+                          display: flex; align-items: center;
+                           justify-content: center; transition: all 0.3s ease; text-decoration: none;"
+                   onmouseover="this.style.transform='translateY(-5px)';
+                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
+                   onmouseout="this.style.transform='translateY(0)';
+                    this.style.background='#8B0000'; this.style.borderColor='#D4AF37';">
                     <i class="fab fa-x-twitter" style="font-size: 24px; color: #FFD700;"></i>
                 </a>
             </div>
         </div>
 
-            <!-- Copyright Stuff for the header -->
-            <p style="font-size: 14px; color: #D4AF37; margin: 0;">
-                © 2026 [Restaurant Name]. All rights reserved.
-            </p>
-        </div>
+        <!-- Copyright section -->
+        <p style="font-size: 14px; color: #D4AF37; margin: 0;">
+            © 2026 [Restaurant Name]. All rights reserved.
+        </p>
     </div>
 </footer>
+
+<!-- This script handles the mobile menu toggle -->
+<script>
+function toggleMenu() {
+    const navbar = document.getElementById('navbar');
+    navbar.classList.toggle('active');
+}
+
+// This closes the menu when a link is clicked on mobile
+document.querySelectorAll('.navbar a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            document.getElementById('navbar').classList.remove('active');
+        }
+    });
+});
+
+// This fixes navbar when resizing from mobile to desktop
+window.addEventListener('resize', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.innerWidth > 768) {
+        navbar.classList.remove('active');
+    }
+});
+</script>
 
 </body>
 </html>
