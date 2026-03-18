@@ -324,10 +324,22 @@ html {
         padding: 20px;
     }
 
+    .restaurant-layout {
+        padding: 20px 10px;
+    }
+
     .window-wall,
     .center-area,
     .booth-area {
-        gap: 15px;
+        gap: 5px;
+        justify-content: space-evenly;
+        flex-wrap: nowrap;
+    }
+
+    .table-item {
+        padding: 8px;
+        flex: 1;
+        max-width: 30%;
     }
 
     .table-circle,
@@ -335,7 +347,11 @@ html {
     .table-rect,
     .table-booth,
     .table-large {
-        transform: scale(0.8);
+        transform: scale(0.75);
+    }
+
+    .table-info {
+        font-size: 10px;
     }
 
     .two-column {

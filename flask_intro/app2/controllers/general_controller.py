@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for
-
+from app2.database import restaurant_db1
 
 def home_page():
     return render_template("homepage.html")
@@ -15,7 +15,15 @@ def contact_page():
 def newsletter_signup():
     if request.method == "POST":
         email = request.form.get("email")
-        # i am going to use am email service
-        # For now, this will just redirect back
-        return redirect(url_for("general.home_page"))
-    return redirect(url_for("general.home_page"))
+
+        cursor = restaurant_db1.cursor()
+        try:
+            cursor.execute("INSERT INTO newsletter_subs (customer_email) VALUES (%s)", (email,))
+            restaurant_db1.commit()
+            # Saves email
+            return redirect(url_for('general.home_page') + '?newsletter=success')
+        except:
+            # Condition to check is the email was already used or not
+            return redirect(url_for('general.home_page') + '?newsletter=exists')
+
+    return redirect(url_for('general.home_page'))

@@ -48,7 +48,8 @@ def dashboard():
     total_bookings = cursor.fetchone()['count']
 
     # This will get newsletter subscribers
-    newsletter_subs = 0
+    cursor.execute("SELECT COUNT(*) as count FROM newsletter_subs WHERE status = 'ACTIVE'")
+    newsletter_subs = cursor.fetchone()['count']
 
     # This will show / get the  most recent 5 reservations
     cursor.execute("""
@@ -185,10 +186,10 @@ def update_hours():
 
             cursor.execute(
                 "UPDATE restaurant_info SET opening_time=%s, closing_time=%s, is_closed=%s WHERE day_of_week=%s",
-                (open_time, close_time, is_closed, day_lower)
+                (open_time, close_time, is_closed, day)
             )
-            restaurant_db1.commit()
-            return redirect(url_for('admin.update_hours'))
+        restaurant_db1.commit()
+        return redirect(url_for('admin.update_hours'))
 
     if request.method == "GET":
         cursor.execute("SELECT * FROM restaurant_info ORDER BY FIELD(day_of_week,"
