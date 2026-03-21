@@ -116,8 +116,8 @@ def add_menu_item():
         cursor = restaurant_db1.cursor()
         cursor.execute(
             """INSERT INTO menu_items (item_name, category, description, price) 
-               VALUES (%s, %s, %s, %s)""",
-            (item_name, category, description, price)
+               VALUES (%s, %s, %s, %s, %s)""",
+            (item_name, category, description, price, 1)
         )
         restaurant_db1.commit()
 

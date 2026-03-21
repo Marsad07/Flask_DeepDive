@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>YOUR CART</h1>
+    {% if cart %}
+        <!-- This shows all items in cart -->
+        {% for item_id, item in cart.items() %}
+        <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 12px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex;
+                    justify-content: space-between; align-items: center; gap: 20px;">
+
+            <!-- This is the item details -->
+            <div style="flex: 1; min-width: 0;">
+                <h3 style="margin: 0 0 8px 0; color: #2C2416; font-size: 20px; font-weight: bold;">
+                    {{ item.name }}
+                </h3>
+                <p style="margin: 0; color: #5C4033; font-size: 15px;">
+                    £{{ "%.2f"|format(item.price) }} × {{ item.quantity }}
+                </p>
+            </div>
+
+            <!-- This is the subtotal and remove button -->
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <p style="margin: 0; color: #8B0000; font-weight: bold;
+                 font-size: 22px; min-width: 80px; text-align: right;">
+                    £{{ "%.2f"|format(item.price * item.quantity) }}
+                </p>
+                <form method="POST" action="{{ url_for('cart.remove_from_cart', item_id=item_id) }}" style="margin: 0;">
+                    <button type="submit"
+                            style="background: #dc3545; color: white; padding: 6px 12px;
+                                   border: none; border-radius: 6px; cursor: pointer; font-size: 13px;
+                                   white-space: nowrap; transition: background 0.3s ease;"
+                            onmouseover="this.style.background='#c82333'"
+                            onmouseout="this.style.background='#dc3545'">
+                        Remove
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- This is the total section -->
+        <div style="background: #8B0000; padding: 30px; margin: 30px 0;
+                    border-radius: 12px; text-align: center; border: 3px solid #D4AF37;">
+            <p style="color: #FFD700 !important; font-size: 32px; font-weight: bold; margin: 0 !important;">
+                TOTAL: £{{ "%.2f"|format(total) }}
+            </p>
+        </div>
+
+        <!-- This is the action buttons -->
+        <div style="display: flex; gap: 15px; justify-content: center; margin: 30px 0; flex-wrap: wrap;">
+            <a href="{{ url_for('cart.order_now_menu') }}"
+               style="background: #D4AF37; color: white; padding: 15px 35px;
+                      text-decoration: none; border-radius: 8px; font-weight: bold;
+                      transition: all 0.3s ease; font-size: 15px;"
+               onmouseover="this.style.background='#B8941F'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.background='#D4AF37'; this.style.transform='translateY(0)'">
+                ← Continue Shopping
+            </a>
+            <a href="#"
+               style="background: #8B0000; color: #FFD700; padding: 15px 35px;
+                      text-decoration: none; border-radius: 8px; font-weight: bold;
+                      transition: all 0.3s ease; font-size: 15px;"
+               onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
+                Proceed to Checkout →
+            </a>
+        </div>
+
+    {% else %}
+        <!-- This shows when cart is empty -->
+        <div style="text-align: center; padding: 60px 20px;">
+            <h2 style="color: #5C4033; margin-bottom: 20px; font-size: 28px;">Your cart is empty!</h2>
+            <a href="{{ url_for('cart.order_now_menu') }}"
+               style="background: #8B0000; color: #FFD700; padding: 15px 35px;
+                      text-decoration: none; border-radius: 8px; font-weight: bold;
+                      display: inline-block; transition: all 0.3s ease;"
+               onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
+                Browse Menu
+            </a>
+        </div>
+    {% endif %}
+</div>
+<!-- This adds mobile responsive styling -->
+<style>
+@media (max-width: 768px) {
+    .menu-container > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .menu-container > div > div:last-child {
+        width: 100%;
+        justify-content: space-between !important;
+        margin-top: 15px;
+    }
+}
+</style>
+{% endblock %}

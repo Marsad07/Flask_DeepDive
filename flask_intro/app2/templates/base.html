@@ -163,6 +163,7 @@
     <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
     <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
     <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
+    <li><a href="{{ url_for('cart.order_now_menu') }}">Order Now</a></li>
 </ul>
 
 {% block content %}{% endblock %}
@@ -214,6 +215,8 @@
                      text-decoration: none; font-size: 14px; transition: color 0.3s;">About Us</a>
                     <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
                      text-decoration: none; font-size: 14px; transition: color 0.3s;">Contact</a>
+                    <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
+                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Order Now</a>
                 </div>
             </div>
 
