@@ -1,10 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>REGISTER</h1>
+
+    {% if error %}
+    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
+      border-radius: 8px; margin: 20px auto; max-width: 500px;">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <form method="POST" style="max-width: 500px; margin: 40px auto;">
+        <label for="customer_fullname">Full Name</label>
+        <input type="text" id="customer_fullname" name="customer_fullname" required autofocus>
+
+        <label for="customer_email">Email</label>
+        <input type="email" id="customer_email" name="customer_email" required>
+
+        <label for="customer_phonenum">Phone Number</label>
+        <input type="tel" id="customer_phonenum" name="customer_phonenum" pattern="[0-9]{10,}" required>
+
+        <label for="customer_password">Password</label>
+        <input type="password" id="customer_password" name="customer_password" required minlength="6">
+
+        <input type="submit" value="CREATE ACCOUNT">
+    </form>
+
+    <p style="text-align: center; margin-top: 20px; color: #5C4033;">
+        Already have an account?
+        <a href="{{ url_for('customer_auth.login') }}"
+           style="color: #8B0000; text-decoration: none; font-weight: bold;">Login here</a>
+    </p>
+
+</div>
+{% endblock %}

@@ -83,6 +83,8 @@
 
 .menu-container form input[type="text"],
 .menu-container form input[type="email"],
+.menu-container form input[type="password"],
+.menu-container form input[type="tel"],
 .menu-container form input[type="date"],
 .menu-container form input[type="time"],
 .menu-container form select,
@@ -104,6 +106,8 @@
     border-color: #8B0000;
     box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
 }
+
+
 
 .menu-container form input[type="submit"] {
     width: 100%;
@@ -385,4 +389,35 @@ html {
     .table-large {
         transform: scale(0.7);
     }
+}
+
+/* Dropdown menu */
+.navbar .dropdown {
+    position: relative;
+}
+
+.navbar .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #2C2416;
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    top: 100%;
+    right: 0;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.navbar .dropdown-menu li {
+    padding: 8px 20px;
+}
+
+.navbar .dropdown-menu li a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar .dropdown.open .dropdown-menu {
+    display: block;
 }

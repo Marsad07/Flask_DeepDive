@@ -1,10 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>LOGIN</h1>
+
+    {% if error %}
+    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
+      border-radius: 8px; margin: 20px auto; max-width: 500px;">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <form method="POST" style="max-width: 500px; margin: 40px auto;">
+        <label for="customer_email">Email Address</label>
+        <input type="email" id="customer_email" name="customer_email" required autofocus>
+
+        <label for="customer_password">Password</label>
+        <input type="password" id="customer_password" name="customer_password" required>
+
+        <input type="submit" value="LOGIN">
+    </form>
+
+    <p style="text-align: center; margin-top: 20px; color: #5C4033;">
+        Don't have an account?
+        <a href="{{ url_for('customer_auth.register') }}"
+           style="color: #8B0000; text-decoration: none; font-weight: bold;">Create one here</a>
+    </p>
+
+    <p style="text-align: center; margin-top: 15px; color: #5C4033; font-size: 14px;">
+        <a href="{{ url_for('general.home_page') }}"
+           style="color: #8B0000; text-decoration: none;">← Back to Main Site</a>
+    </p>
+</div>
+{% endblock %}
