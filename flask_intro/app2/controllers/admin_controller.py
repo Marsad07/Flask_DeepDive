@@ -262,3 +262,72 @@ def view_analytics():
                            bookings_by_day=bookings_by_day,
                            bookings_by_time=bookings_by_time,
                            monthly_trend=monthly_trend)
+
+def view_all_orders():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+    cursor = restaurant_db1.cursor(dictionary=True)
+    filter_type = request.args.get('filter')
+    base_query = """
+            SELECT co.*, ca.customer_fullname, ca.customer_email
+            FROM customer_orders co
+            LEFT JOIN customer_accounts ca ON co.customer_id = ca.customer_id
+        """
+    params = []
+    if filter_type == "today":
+        base_query += " WHERE co.order_date = CURDATE()"
+    elif filter_type == "delivery":
+        base_query += " WHERE co.order_type = 'delivery'"
+    elif filter_type in ["pending", "preparing", "ready", "completed", "cancelled"]:
+        base_query += " WHERE co.order_status = %s"
+        params.append(filter_type)
+    base_query += " ORDER BY co.order_date DESC, co.order_time DESC"
+
+    cursor.execute(base_query, params)
+    orders = cursor.fetchall()
+    return render_template('admin/view_all_orders.html', orders=orders)
+
+def view_customer_order(order_id):
+    cursor = restaurant_db1.cursor(dictionary=True)
+    # Gets the order
+    cursor.execute("""
+        SELECT *
+        FROM customer_orders
+        WHERE order_id = %s
+    """, (order_id,))
+    order = cursor.fetchone()
+
+    if not order:
+        return "Order not found", 404
+
+    # This gets customer or guest info
+    customer = None
+    if order.get("customer_id"):
+        cursor.execute("""
+            SELECT customer_fullname, customer_email
+            FROM customer_accounts
+            WHERE customer_id = %s
+        """, (order["customer_id"],))
+        customer = cursor.fetchone()
+    else:
+        customer = {
+            "customer_fullname": order.get("guest_fullname"),
+            "customer_email": order.get("guest_email")
+        }
+
+    # This gets items in this order
+    cursor.execute("""
+        SELECT oi.quantity,
+               oi.item_name,
+               oi.item_price
+        FROM order_items oi
+        WHERE oi.order_id = %s
+    """, (order_id,))
+    items = cursor.fetchall()
+
+    return render_template(
+        'admin/view_customer_order.html',
+        order=order,
+        customer=customer,
+        items=items
+    )

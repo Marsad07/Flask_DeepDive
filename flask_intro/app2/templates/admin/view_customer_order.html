@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+
+    <h1 style="margin-bottom: 10px;">
+        {{ customer.customer_fullname }}'s Order
+    </h1>
+
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+
+        <div style="margin-bottom: 20px;">
+            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p><strong>Order Type:</strong> {{ order.order_type|capitalize }}</p>
+            <p><strong>Status:</strong> {{ order.order_status|capitalize }}</p>
+            <p><strong>Date:</strong> {{ order.order_date }} {{ order.order_time }}</p>
+        </div>
+
+        <hr style="margin: 20px 0;">
+
+        <h2 style="margin-bottom: 15px;">Items Ordered</h2>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #2C2416; color: #FFD700;">
+                    <th style="padding: 12px; text-align: left;">Item</th>
+                    <th style="padding: 12px; text-align: left;">Qty</th>
+                    <th style="padding: 12px; text-align: left;">Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                <tr style="border-bottom: 1px solid #E8DFD0;">
+                    <td style="padding: 12px;">{{ item.item_name }}</td>
+                    <td style="padding: 12px;">{{ item.quantity }}</td>
+                    <td style="padding: 12px;">£{{ "%.2f"|format(item.item_price) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 25px; padding: 15px; background: #F8F4EC; border-radius: 8px;
+                    font-size: 22px; font-weight: bold; text-align: right; color: #2C2416;">
+            TOTAL: £{{ "%.2f"|format(order.total_price) }}
+        </div>
+
+        <a href="{{ url_for('admin.view_all_orders') }}"
+           style="display: inline-block; margin-top: 20px; color: #8B0000;
+                  font-weight: bold; text-decoration: none;">
+            ← Back to Orders
+        </a>
+
+    </div>
+</div>
+{% endblock %}

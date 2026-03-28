@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>ALL TAKEAWAY ORDERS</h1>
+
+    <a href="{{ url_for('admin.dashboard') }}"
+       style="display: inline-block; color: #8B0000; text-decoration: none; margin: 20px 0; font-weight: bold;">
+        ← Back to Dashboard
+    </a>
+
+    <div style="background: white; padding: 30px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+        {% if orders %}
+            <!-- This is the filter dropdown -->
+            <form method="get" style="margin-bottom: 20px;">
+                <select name="filter" onchange="this.form.submit()"
+                        style="padding: 10px; border-radius: 6px; border: 2px solid #D4AF37; width: 100%; max-width: 250px;">
+                    <option value="">All Orders</option>
+                    <option value="today">Today</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="collection">Collection</option>
+                    <option value="pending">Pending</option>
+                    <option value="preparing">Preparing</option>
+                    <option value="ready">Ready</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </form>
+            <!-- This is the desktop table view -->
+            <div class="desktop-table">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #2C2416; color: #FFD700;">
+                            <th style="padding: 15px; text-align: left;">Order ID</th>
+                            <th style="padding: 15px; text-align: left;">Customer</th>
+                            <th style="padding: 15px; text-align: left;">Type</th>
+                            <th style="padding: 15px; text-align: left;">Total</th>
+                            <th style="padding: 15px; text-align: left;">Status</th>
+                            <th style="padding: 15px; text-align: left;">Date</th>
+                            <th style="padding: 15px; text-align: left;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr style="border-bottom: 1px solid #E8DFD0;">
+                            <td style="padding: 15px;">#{{ order.order_id }}</td>
+                            <td style="padding: 15px;">
+                                {% if order.customer_fullname %}
+                                    <strong>{{ order.customer_fullname }}</strong><br>
+                                    <small style="color: #5C4033;">{{ order.customer_email }}</small>
+                                {% else %}
+                                    <strong>{{ order.guest_fullname }}</strong><br>
+                                    <small style="color: #5C4033;">{{ order.guest_email }}</small>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 15px; text-transform: capitalize;">
+                                {% if order.order_type == 'collection' %}🏪{% else %}🚗{% endif %}
+                                {{ order.order_type }}
+                            </td>
+                            <td style="padding: 15px; font-weight: bold; color: #8B0000;">
+                                £{{ "%.2f"|format(order.total_price) }}
+                            </td>
+                            <td style="padding: 15px;">
+                                <span style="background:
+                                    {% if order.order_status == 'completed' %}#28a745
+                                    {% elif order.order_status == 'preparing' %}#ffc107
+                                    {% elif order.order_status == 'ready' %}#17a2b8
+                                    {% elif order.order_status == 'cancelled' %}#dc3545
+                                    {% else %}#6c757d{% endif %};
+                                    color: white; padding: 6px 12px; border-radius: 6px;
+                                    font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                                    {{ order.order_status }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px;">
+                                {{ order.order_date.strftime('%d/%m/%Y') }}<br>
+                                <small style="color: #5C4033;">{{ order.order_time }}</small>
+                            </td>
+                            <td style="padding: 15px;">
+                                <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
+                                   style="background: #8B0000; color: #FFD700; padding: 8px 16px;
+                                          text-decoration: none; border-radius: 6px; font-size: 13px;
+                                          font-weight: bold; display: inline-block; transition: all 0.3s ease;"
+                                   onmouseover="this.style.background='#660000'"
+                                   onmouseout="this.style.background='#8B0000'">
+                                    View Order
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- This is the mobile card view -->
+            <div class="mobile-cards">
+                {% for order in orders %}
+                <div style="background: #F5F0E8; padding: 20px; border-radius: 12px; margin-bottom: 15px;
+                            border-left: 5px solid #8B0000;">
+                    <div style="display: flex; justify-content: space-between;
+                     align-items: start; margin-bottom: 15px;">
+                        <div>
+                            <p style="margin: 0; font-weight: bold; font-size: 18px; color: #2C2416;">
+                                Order #{{ order.order_id }}
+                            </p>
+                            <p style="margin: 5px 0 0 0; color: #5C4033; font-size: 14px;">
+                                {{ order.order_date.strftime('%d/%m/%Y') }} • {{ order.order_time }}
+                            </p>
+                        </div>
+                        <span style="background:
+                            {% if order.order_status == 'completed' %}#28a745
+                            {% elif order.order_status == 'preparing' %}#ffc107
+                            {% elif order.order_status == 'ready' %}#17a2b8
+                            {% elif order.order_status == 'cancelled' %}#dc3545
+                            {% else %}#6c757d{% endif %};
+                            color: white; padding: 5px 10px; border-radius: 6px;
+                            font-size: 11px; font-weight: bold; text-transform: uppercase;">
+                            {{ order.order_status }}
+                        </span>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Customer:</p>
+                        <p style="margin: 0; font-weight: bold; color: #2C2416;">
+                            {% if order.customer_fullname %}
+                                {{ order.customer_fullname }}
+                            {% else %}
+                                {{ order.guest_fullname }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+                        <div>
+                            <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Type:</p>
+                            <p style="margin: 0; font-weight: bold; color: #2C2416; text-transform: capitalize;">
+                                {% if order.order_type == 'collection' %}🏪{% else %}🚗{% endif %}
+                                {{ order.order_type }}
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Total:</p>
+                            <p style="margin: 0; font-weight: bold; color: #8B0000; font-size: 20px;">
+                                £{{ "%.2f"|format(order.total_price) }}
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
+                       style="background: #8B0000; color: #FFD700; padding: 12px 0; width: 100%;
+                              text-decoration: none; border-radius: 8px; font-weight: bold;
+                              display: block; text-align: center; margin-top: 15px; transition: all 0.3s ease;"
+                       onmouseover="this.style.background='#660000'"
+                       onmouseout="this.style.background='#8B0000'">
+                        View Order Details
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; padding: 50px; color: #5C4033; font-size: 18px;">
+                No takeaway orders found.
+            </p>
+        {% endif %}
+    </div>
+</div>
+<!-- This makes it responsive for all devices -->
+<style>
+.mobile-cards {
+    display: none;
+}
+
+.desktop-table {
+    display: block;
+}
+
+/* This is for mobile devices */
+@media (max-width: 768px) {
+    .desktop-table {
+        display: none;
+    }
+
+    .mobile-cards {
+        display: block;
+    }
+
+    .menu-container {
+        padding: 20px 10px !important;
+    }
+
+    .menu-container h1 {
+        font-size: 28px !important;
+    }
+}
+</style>
+{% endblock %}
