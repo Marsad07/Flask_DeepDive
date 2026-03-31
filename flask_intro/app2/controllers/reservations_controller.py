@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from app2.database import restaurant_db1
+from app2.database import get_db
 from datetime import date
 today = date.today().isoformat()
 
@@ -15,7 +15,7 @@ def reservations_page():
         table = request.form.get("table_num")
         special_requests = request.form.get("special_requests")
 
-        cursor = restaurant_db1.cursor()
+        cursor = get_db().cursor()
 
         # This query checks if the tables already booked
         cursor.execute("""
@@ -40,7 +40,7 @@ def reservations_page():
              reservation_time, num_of_guests, table_number, special_requests) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
                        (name, email, phone, resv_date, resv_time, guests, table, special_requests))
-        restaurant_db1.commit()
+        get_db().commit()
         return render_template("reservation_success.html", name=name, email=email,
                                date=resv_date, time=resv_time, guests=guests, table=table)
 

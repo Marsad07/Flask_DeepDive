@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session
-from app2.database import restaurant_db1
+from app2.database import get_db
 from werkzeug.security import check_password_hash
 
 def admin_login():
@@ -8,7 +8,7 @@ def admin_login():
         password = request.form['password']
 
         # This checks for the users credentials
-        cursor = restaurant_db1.cursor(dictionary=True)
+        cursor = get_db().cursor(dictionary=True)
         cursor.execute("SELECT * FROM admin_restaurant WHERE admin_username = %s", (username,)        )
         admin = cursor.fetchone()
 
@@ -24,7 +24,7 @@ def admin_login():
                 "UPDATE admin_restaurant SET last_login = NOW() WHERE admin_id = %s",
                 (admin['admin_id'],)
             )
-            restaurant_db1.commit()
+            get_db().commit()
             return redirect(url_for('admin.dashboard'))
         else:
             # This is for if the login failed
@@ -36,7 +36,7 @@ def dashboard():
     # This checks if the user is logged in or not
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
 
     # This will get the books from today / current day
     cursor.execute("SELECT COUNT(*) as count FROM reservations_restaurant "
@@ -77,7 +77,7 @@ def view_reservations():
         return redirect(url_for('admin.admin_login'))
 
     # This will get all reservations from the database
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM reservations_restaurant 
         ORDER BY reservation_date DESC, reservation_time DESC
@@ -93,7 +93,7 @@ def manage_menu():
         return redirect(url_for('admin.admin_login'))
 
     # This will get all menu items from the database
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute("SELECT * FROM menu_items ORDER BY category, item_name")
     menu_items = cursor.fetchall()
 
@@ -113,13 +113,13 @@ def add_menu_item():
         price = request.form.get("price")
 
         # This inserts the new menu item into database
-        cursor = restaurant_db1.cursor()
+        cursor = get_db().cursor()
         cursor.execute(
             """INSERT INTO menu_items (item_name, category, description, price) 
                VALUES (%s, %s, %s, %s, %s)""",
             (item_name, category, description, price, 1)
         )
-        restaurant_db1.commit()
+        get_db().commit()
 
         return redirect(url_for('admin.manage_menu'))
 
@@ -131,7 +131,7 @@ def edit_menu_item(item_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
 
     if request.method == "POST":
         # This gets the form data
@@ -148,7 +148,7 @@ def edit_menu_item(item_id):
                WHERE item_id=%s""",
             (item_name, category, description, price, is_available, item_id)
         )
-        restaurant_db1.commit()
+        get_db().commit()
 
         return redirect(url_for('admin.manage_menu'))
 
@@ -165,16 +165,16 @@ def delete_menu_item(item_id):
         return redirect(url_for('admin.admin_login'))
 
     # This deletes the menu item from database
-    cursor = restaurant_db1.cursor()
+    cursor = get_db().cursor()
     cursor.execute("DELETE FROM menu_items WHERE item_id = %s", (item_id,))
-    restaurant_db1.commit()
+    get_db().commit()
 
     return redirect(url_for('admin.manage_menu'))
 
 def update_hours():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
 
     if request.method == "POST":
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -188,7 +188,7 @@ def update_hours():
                 "UPDATE restaurant_info SET opening_time=%s, closing_time=%s, is_closed=%s WHERE day_of_week=%s",
                 (open_time, close_time, is_closed, day)
             )
-        restaurant_db1.commit()
+        get_db().commit()
         return redirect(url_for('admin.update_hours'))
 
     if request.method == "GET":
@@ -203,7 +203,7 @@ def view_analytics():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
 
     # This gets the total number of reservations
     cursor.execute("SELECT COUNT(*) FROM reservations_restaurant")
@@ -266,7 +266,7 @@ def view_analytics():
 def view_all_orders():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
     filter_type = request.args.get('filter')
     base_query = """
             SELECT co.*, ca.customer_fullname, ca.customer_email
@@ -288,7 +288,7 @@ def view_all_orders():
     return render_template('admin/view_all_orders.html', orders=orders)
 
 def view_customer_order(order_id):
-    cursor = restaurant_db1.cursor(dictionary=True)
+    cursor = get_db().cursor(dictionary=True)
     # Gets the order
     cursor.execute("""
         SELECT *

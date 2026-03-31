@@ -23,6 +23,9 @@
           width: 100%;
           box-shadow: 0 2px 8px rgba(0,0,0,0.2);
           animation: slideDown 0.5s ease forwards;
+          overflow: visible;
+          position: relative;
+          z-index: 998;
         }
 
         ul.navbar li a {
@@ -133,6 +136,7 @@
             opacity: 1;
             transform: translateX(0);
           }
+
         }
 
         {% block styles %}{% endblock %}
@@ -317,18 +321,32 @@
         </p>
     </div>
 </footer>
-
-<!-- This script handles the mobile menu toggle -->
 <script>
+// This handles the mobile menu toggle
 function toggleMenu() {
     const navbar = document.getElementById('navbar');
     navbar.classList.toggle('active');
 }
 
-// This closes the menu when a link is clicked on mobile
+// This handles the account dropdown toggle
+document.querySelector('.dropdown > a').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.parentElement.classList.toggle('open');
+});
+
+// This closes dropdown when clicking anywhere else on the page
+document.addEventListener('click', function(e) {
+    const dropdown = document.querySelector('.dropdown');
+    if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+    }
+});
+
+// This closes the menu when a non-dropdown link is clicked on mobile
 document.querySelectorAll('.navbar a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
+    link.addEventListener('click', function() {
+        if (window.innerWidth <= 768 && !this.closest('.dropdown')) {
             document.getElementById('navbar').classList.remove('active');
         }
     });
@@ -340,11 +358,6 @@ window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
         navbar.classList.remove('active');
     }
-});
-
-document.querySelector('.dropdown > a').addEventListener('click', function(e) {
-    e.preventDefault();
-    this.parentElement.classList.toggle('open');
 });
 </script>
 </body>

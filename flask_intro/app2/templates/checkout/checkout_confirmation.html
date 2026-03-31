@@ -161,6 +161,14 @@
                onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
                 Back to Home
             </a>
+            <a href="{{ url_for('orders.track_order', order_number=order_number) }}"
+               style="background: #D4AF37; color: white; padding: 15px 35px;
+                      text-decoration: none; border-radius: 8px; font-weight: bold;
+                      transition: all 0.3s ease; font-size: 15px;"
+               onmouseover="this.style.background='#B8941F'; this.style.transform='translateY(-2px)'"
+               onmouseout="this.style.background='#D4AF37'; this.style.transform='translateY(0)'">
+                Track Order
+            </a>
         </div>
     </div>
 </div>

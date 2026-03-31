@@ -1,10 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+<div class="menu-container" style="max-width: 900px; margin: 0 auto;">
 
-</body>
-</html>
+    <h1 style="text-align:center; color:#8B0000; margin-bottom:30px;">
+        Your Order History
+    </h1>
+
+    {% if orders|length == 0 %}
+        <div style="background:#FFF8E7; padding:25px; border-left:5px solid #D4AF37; border-radius:8px;">
+            <p style="margin:0; font-size:18px; color:#5C4033;">
+                You haven't placed any orders yet.
+            </p>
+        </div>
+    {% else %}
+
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            {% for order in orders %}
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:10px;
+                box-shadow:0 2px 10px rgba(0,0,0,0.1);
+                border-left:5px solid #8B0000;
+            ">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <p style="margin:0; font-size:20px; font-weight:bold; color:#2C2416;">
+                            {{ order.order_number }}
+                        </p>
+                        <p style="margin:5px 0 0 0; color:#5C4033;">
+                            {{ order.created_at.strftime('%B %d, %Y — %I:%M %p') }}
+                        </p>
+                    </div>
+
+                    <a href="{{ url_for('orders.track_order', order_number=order.order_number) }}"
+                       style="background:#D4AF37; color:white; padding:10px 20px;
+                              text-decoration:none; border-radius:6px; font-weight:bold;
+                              transition:0.3s;">
+                        Track
+                    </a>
+                </div>
+
+                <div style="margin-top:15px; display:flex; gap:20px; flex-wrap:wrap;">
+                    <span style="background:#FFF3CD; padding:6px 12px; border-radius:20px; font-weight:bold;">
+                        {{ order.order_type|capitalize }}
+                    </span>
+
+                    <span style="background:#E0D8C8; padding:6px 12px; border-radius:20px; font-weight:bold;">
+                        £{{ "%.2f"|format(order.total_price) }}
+                    </span>
+
+                    <span style="
+                        background: {{ '#d4edda' if order.payment_status=='paid' else '#fff3cd' }};
+                        color: {{ '#155724' if order.payment_status=='paid' else '#856404' }};
+                        padding:6px 12px; border-radius:20px; font-weight:bold;
+                    ">
+                        Payment: {{ order.payment_status|capitalize }}
+                    </span>
+
+                    <span style="
+                        background: {{ '#e0d8c8' if order.order_status!='completed' else '#d4edda' }};
+                        padding:6px 12px; border-radius:20px; font-weight:bold;
+                    ">
+                        Order: {{ order.order_status|capitalize }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+</div>
+{% endblock %}

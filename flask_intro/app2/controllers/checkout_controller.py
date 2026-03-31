@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session
-from app2.database import restaurant_db1
+from app2.database import get_db
 from datetime import datetime, date
 
 def checkout_page():
@@ -10,7 +10,6 @@ def checkout_page():
 
     # This calculates total
     total = sum(item['price'] * item['quantity'] for item in cart.values())
-
     return render_template('checkout/checkout_page.html', cart=cart, total=total)
 
 def process_order():
@@ -21,6 +20,9 @@ def process_order():
     order_type = request.form.get('order_type')
     payment_method = request.form.get('payment_method')
     special_instructions = request.form.get('special_instructions')
+
+    # This gets customer_id from session if logged in
+    customer_id = session.get('customer_id', None)
 
     # This gets delivery address if delivery
     delivery_address = None
@@ -36,7 +38,8 @@ def process_order():
     total = sum(item['price'] * item['quantity'] for item in cart.values())
 
     # This generates order number (format: ORD-YYYYMMDD-XXX)
-    cursor = restaurant_db1.cursor(dictionary=True)
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     today_str = date.today().strftime('%Y%m%d')
 
     # This gets count of orders today to generate sequential number
@@ -47,15 +50,15 @@ def process_order():
     today_count = cursor.fetchone()['count'] + 1
     order_number = f"ORD-{today_str}-{today_count:03d}"
 
-    # This inserts order into customer_orders table
+    # This inserts order into customer_orders table (includes customer_id if logged in)
     cursor.execute("""
         INSERT INTO customer_orders 
-        (guest_fullname, guest_email, guest_phonenum, order_type, 
+        (customer_id, guest_fullname, guest_email, guest_phonenum, order_type, 
          guest_delivery_address, total_price, order_status, payment_status, 
          payment_method, special_instructions, order_date, order_time)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (
-        full_name, email, phone, order_type, delivery_address,
+        customer_id, full_name, email, phone, order_type, delivery_address,
         total, 'pending', 'pending', payment_method, special_instructions,
         date.today(), datetime.now().time()
     ))
@@ -74,7 +77,9 @@ def process_order():
         ))
 
     # This commits all changes to database
-    restaurant_db1.commit()
+    db.commit()
+    cursor.close()
+    db.close()
 
     # This clears the cart
     session['cart'] = {}
@@ -84,7 +89,8 @@ def process_order():
 
 def order_confirmation(order_number):
     # This gets order details from database
-    cursor = restaurant_db1.cursor(dictionary=True)
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM customer_orders 
         WHERE CONCAT('ORD-', DATE_FORMAT(created_at, '%Y%m%d'), '-', 
@@ -95,6 +101,8 @@ def order_confirmation(order_number):
     order = cursor.fetchone()
 
     if not order:
+        cursor.close()
+        db.close()
         return redirect(url_for('general.home_page'))
 
     # This gets order items
@@ -103,7 +111,8 @@ def order_confirmation(order_number):
         WHERE order_id = %s
     """, (order['order_id'],))
     order_items = cursor.fetchall()
-
+    cursor.close()
+    db.close()
     return render_template('checkout/checkout_confirmation.html',
                            order=order,
                            order_items=order_items,

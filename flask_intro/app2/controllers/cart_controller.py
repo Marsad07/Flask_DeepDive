@@ -1,16 +1,18 @@
 from flask import render_template, request, redirect, url_for, session
-from app2.database import restaurant_db1
+from app2.database import get_db
 
 def order_now_menu():
-    cursor = restaurant_db1.cursor(dictionary=True)
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM menu_items 
         WHERE is_available = TRUE 
         AND available_for_delivery = TRUE
     """)
     items = cursor.fetchall()
+    cursor.close()
+    db.close()
     return render_template("menu2.html", menu_items=items)
-
 
 def view_cart():
     # This gets cart from session
@@ -25,9 +27,12 @@ def add_to_cart(item_id):
     quantity = int(request.form.get("quantity"))
 
     # This fetches the item from the database
-    cursor = restaurant_db1.cursor(dictionary=True)
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM menu_items WHERE item_id = %s", (item_id,))
     item = cursor.fetchone()
+    cursor.close()
+    db.close()
 
     # This is for if the item is not found
     if not item:
@@ -61,10 +66,6 @@ def add_to_cart(item_id):
     session['cart_message'] = f"✓ {item['item_name']} added to cart!"
     return redirect(url_for('cart.order_now_menu'))
 
-
-#def update_cart():
-
-
 def remove_from_cart(item_id):
     cart = session.get('cart', {})
     item_key = str(item_id)
@@ -74,5 +75,3 @@ def remove_from_cart(item_id):
 
     session['cart'] = cart
     return redirect(url_for('cart.view_cart'))
-#def clear_cart():
-
