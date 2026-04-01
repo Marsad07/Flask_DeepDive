@@ -1,5 +1,7 @@
 from flask import render_template, request, session
 from app2.database import get_db
+from flask_socketio import join_room
+from app2 import socketio
 
 def track_order(order_number):
     db = get_db()
@@ -55,3 +57,7 @@ def track_order(order_number):
         order_number=order_number,
         verified=verified
     )
+@socketio.on('join_order')
+def handle_join(data):
+    order_id = data.get('order_id')
+    join_room(f'order_{order_id}')

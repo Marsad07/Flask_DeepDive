@@ -4,6 +4,8 @@
 <div class="menu-container">
     <h1>Track Your Order</h1>
     <h3>Order Reference: {{ order_number }}</h3>
+    <h3 id="timer-text">Estimated Time: 0 </h3>
+    <button id="btn-start">Start timer</button>
     <!-- This is the customer/guest verification form -->
     {% if not verified %}
     <form method="POST">
@@ -31,7 +33,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 50px;">
             {% for i in range(stages|length) %}
             <div style="text-align: center; flex: 1;">
-                <div style="
+                <div class="status-circle" style="
                     width: 60px; height: 60px;
                     border-radius: 50%;
                     margin: 0 auto 10px;
@@ -45,7 +47,7 @@
                     transition: all 0.3s ease;">
                     {{ stage_icons[i] }}
                 </div>
-                <small style="
+                <small class="status-label" style="
                     font-family: Georgia, serif;
                     font-size: 12px;
                     font-weight: bold;
@@ -56,7 +58,7 @@
                 </small>
             </div>
             {% if not loop.last %}
-            <div style="
+            <div class="status-line" style="
                 flex-grow: 1;
                 height: 3px;
                 margin-bottom: 30px;
@@ -90,7 +92,7 @@
             </p>
             <p style="margin: 5px 0;">
                 <span style="color: #2C2416; font-weight: bold;">Order Status:</span>
-                {{ order.order_status | capitalize }}
+                <span id="order-status-text">{{ order.order_status | capitalize }}</span>
             </p>
             <p style="margin: 5px 0;">
                 <span style="color: #2C2416; font-weight: bold;">Payment:</span>
@@ -135,7 +137,8 @@
                     border-bottom: 1px dotted #D4AF37;
                     padding: 10px 0;">
                     <span style="color: #2C2416 !important;">{{ item.item_name }} x{{ item.quantity }}</span>
-                    <span style="color: #2C2416 !important;">£{{ "%.2f" % (item.item_price|float * item.quantity|int) }}</span>
+                    <span style="color: #2C2416 !important;">
+                        £{{ "%.2f" % (item.item_price|float * item.quantity|int) }}</span>
                 </li>
                 {% endfor %}
                 <!-- This shows the total -->
@@ -174,6 +177,102 @@
             </a>
         </div>
     </div>
+
+    <!-- This loads the SocketIO client — inside verified block so order is never None -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const orderId = {{ order.order_id }};
+
+        // This joins the room for this specific order
+        socket.emit('join_order', { order_id: orderId });
+
+        // This listens for status updates from the server
+        socket.on('order_status_update', function(data) {
+            if (data.order_id == orderId) {
+                updateProgressBar(data.new_status);
+            }
+        });
+
+        // This updates the progress bar and status text without a page reload
+        function updateProgressBar(newStatus) {
+            const stages = ['pending', 'confirmed', 'preparing', 'ready', 'completed'];
+            const currentIndex = stages.indexOf(newStatus);
+
+            const circles = document.querySelectorAll('.status-circle');
+            const lines = document.querySelectorAll('.status-line');
+            const labels = document.querySelectorAll('.status-label');
+
+            circles.forEach((circle, i) => {
+                if (i <= currentIndex) {
+                    circle.style.backgroundColor = '#8B0000';
+                    circle.style.border = i === currentIndex ? '3px solid #D4AF37' : '3px solid transparent';
+                    circle.style.boxShadow = i === currentIndex ? '0 4px 15px rgba(139,0,0,0.3)' : 'none';
+                    labels[i].style.color = '#8B0000';
+                } else {
+                    circle.style.backgroundColor = '#e0d8c8';
+                    circle.style.border = '3px solid transparent';
+                    circle.style.boxShadow = 'none';
+                    labels[i].style.color = '#9e9e9e';
+                }
+            });
+
+            lines.forEach((line, i) => {
+                line.style.background = i < currentIndex ? '#8B0000' : '#e0d8c8';
+            });
+
+            // This updates the order status text in the summary card
+            const statusText = document.getElementById('order-status-text');
+            if (statusText) {
+                statusText.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+            }
+
+            showNotification(newStatus);
+        }
+
+        // This shows a toast notification when status changes
+        function showNotification(status) {
+            const messages = {
+                'confirmed': '✅ Your order has been confirmed!',
+                'preparing': '👨‍🍳 Your order is being prepared!',
+                'ready': '🍽️ Your order is ready for collection!',
+                'completed': '🎉 Order completed. Enjoy your meal!'
+            };
+            const msg = messages[status];
+            if (!msg) return;
+
+            const toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: #2C2416;
+                color: #FFD700;
+                padding: 16px 24px;
+                border-radius: 8px;
+                font-family: Georgia, serif;
+                font-size: 16px;
+                border-left: 4px solid #8B0000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 9999;
+            `;
+            document.body.appendChild(toast);
+
+            // This removes the toast after 4 seconds
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        const timerText = document.getElementById("timer-text");
+        const btnStart = document.getElementById("btn-start");
+
+        btnStart.addEventListener("click"m function() {
+            setInterval(function () {
+                console.log("hi");
+            }, 1000);
+        });
+
+    </script>
     {% endif %}
 </div>
 {% endblock %}
