@@ -4,8 +4,6 @@
 <div class="menu-container">
     <h1>Track Your Order</h1>
     <h3>Order Reference: {{ order_number }}</h3>
-    <h3 id="timer-text">Estimated Time: 0 </h3>
-    <button id="btn-start">Start timer</button>
     <!-- This is the customer/guest verification form -->
     {% if not verified %}
     <form method="POST">
@@ -94,6 +92,14 @@
                 <span style="color: #2C2416; font-weight: bold;">Order Status:</span>
                 <span id="order-status-text">{{ order.order_status | capitalize }}</span>
             </p>
+
+            {% if order.estimated_minutes %}
+            <p style="margin: 5px 0;">
+                <span style="color: #2C2416; font-weight: bold;">Estimated Time:</span>
+                <span id="countdown-display">{{ order.estimated_minutes }} minutes</span>
+            </p>
+            {% endif %}
+
             <p style="margin: 5px 0;">
                 <span style="color: #2C2416; font-weight: bold;">Payment:</span>
                 {{ order.payment_method | capitalize }} —
@@ -191,6 +197,9 @@
         socket.on('order_status_update', function(data) {
             if (data.order_id == orderId) {
                 updateProgressBar(data.new_status);
+                if (data.estimated_minutes) {
+                    startCountdown(parseInt(data.estimated_minutes)
+                }
             }
         });
 
@@ -263,15 +272,34 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
-        const timerText = document.getElementById("timer-text");
-        const btnStart = document.getElementById("btn-start");
+        // This starts the countdown timer
+        let countdownInterval = null;
 
-        btnStart.addEventListener("click"m function() {
-            setInterval(function () {
-                console.log("hi");
+        function startCountdown(minutes) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            let totalSeconds = minutes * 60;
+            const display = document.getElementById('countdown-display');
+            if (!display) return;
+
+            countdownInterval = setInterval(function() {
+                if (totalSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    display.textContent = 'Any moment now!';
+                    return;
+                }
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                display.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's remaining';
+                totalSeconds--;
             }, 1000);
-        });
+        }
 
+        // This starts automatically on page load if estimated time already exists
+        {% if order.estimated_minutes %}
+        startCountdown({{ order.estimated_minutes }});
+        {% endif %}
+    });
     </script>
     {% endif %}
 </div>

@@ -37,6 +37,9 @@
             <option value="0">Sold Out</option>
         </select>
 
+        <label for="prep_time">Prep Time (minutes)</label>
+        <input type="number" name="prep_time" id="prep_time" value="{{ item.prep_time }}" min="1" max="60" required>
+
         <input type="submit" value="UPDATE ITEM">
     </form>
 </div>

@@ -1,3 +1,4 @@
+import requests
 from flask import render_template, request, redirect, url_for, session
 from app2.database import get_db
 from werkzeug.security import check_password_hash
@@ -129,12 +130,13 @@ def edit_menu_item(item_id):
         description = request.form.get("description")
         price = request.form.get("price")
         is_available = request.form.get("is_available") == "1"
+        prep_time = request.form.get("prep_time")
 
         cursor.execute(
             """UPDATE menu_items 
-               SET item_name=%s, category=%s, description=%s, price=%s, is_available=%s 
+               SET item_name=%s, category=%s, description=%s, price=%s, is_available=%s, prep_time=%s 
                WHERE item_id=%s""",
-            (item_name, category, description, price, is_available, item_id)
+            (item_name, category, description, price, is_available, prep_time, item_id)
         )
         db.commit()
         cursor.close()
@@ -159,12 +161,38 @@ def delete_menu_item(item_id):
     db.close()
     return redirect(url_for('admin.manage_menu'))
 
+
 def update_hours():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
+
     db = get_db()
     cursor = db.cursor(dictionary=True)
+
     if request.method == "POST":
+        address = request.form.get('address')
+        lat, lng = None, None
+        if address:
+            try:
+                api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlhM2ZkYzcyOTQ4YzQ3YzE4N'
+                           'jlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
+                geocode_response = requests.get(
+                    'https://api.openrouteservice.org/geocode/search',
+                    params={'api_key': api_key, 'text': address, 'size': 1}
+                )
+                geocode_data = geocode_response.json()
+                if geocode_data['features']:
+                    coords = geocode_data['features'][0]['geometry']['coordinates']
+                    lng = coords[0]
+                    lat = coords[1]
+            except Exception as e:
+                print(f"Geocoding error: {e}")
+
+        cursor.execute(
+            "UPDATE restaurant_info SET address = %s, latitude = %s, longitude = %s",
+            (address, lat, lng)
+        )
+
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         for day in days:
             day_lower = day.lower()
@@ -316,13 +344,88 @@ def update_order_status(order_id):
     new_status = request.form.get('status')
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("UPDATE customer_orders SET order_status = %s WHERE order_id = %s",
-                   (new_status, order_id))
+    cursor.execute("SELECT * FROM customer_orders WHERE order_id = %s", (order_id,))
+    order = cursor.fetchone()
+    estimated_minutes = None
+
+    if order['order_type'] == 'collection':
+        cursor.execute("""
+            SELECT oi.quantity, mi.prep_time
+            FROM order_items oi
+            JOIN menu_items mi ON oi.item_name = mi.item_name
+            WHERE oi.order_id = %s
+        """, (order_id,))
+        items = cursor.fetchall()
+
+        total_prep = 10
+        for item in items:
+            total_prep += item['prep_time'] * item['quantity']
+        estimated_minutes = min(total_prep, 60)
+
+    elif order['order_type'] == 'delivery':
+        delivery_address = order.get('guest_delivery_address')
+        if delivery_address:
+            estimated_minutes = get_delivery_minutes(delivery_address)
+        else:
+            estimated_minutes = 30
+
+    cursor.execute(
+        "UPDATE customer_orders SET order_status = %s, estimated_minutes = %s WHERE order_id = %s",
+        (new_status, estimated_minutes, order_id)
+    )
     db.commit()
     cursor.close()
     db.close()
+
     socketio.emit('order_status_update', {
         'order_id': order_id,
-        'new_status': new_status
+        'new_status': new_status,
+        'estimated_minutes': estimated_minutes
     }, room=f'order_{order_id}')
     return redirect(url_for('admin.view_all_orders'))
+
+def get_delivery_minutes(delivery_address):
+    api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlhM2ZkYzcyOTQ4YzQ3YzE4'
+               'NjlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT latitude, longitude FROM restaurant_info WHERE latitude IS NOT NULL LIMIT 1")
+    restaurant = cursor.fetchone()
+    cursor.close()
+    db.close()
+
+    if not restaurant:
+        return 30
+
+    restaurant_lat = float(restaurant['latitude'])
+    restaurant_lng = float(restaurant['longitude'])
+
+    try:
+        geocode_response = requests.get(
+            'https://api.openrouteservice.org/geocode/search',
+            params={'api_key': api_key, 'text': delivery_address, 'size': 1}
+        )
+        geocode_data = geocode_response.json()
+
+        if not geocode_data['features']:
+            return 30
+
+        coords = geocode_data['features'][0]['geometry']['coordinates']
+        customer_lng = coords[0]
+        customer_lat = coords[1]
+
+        directions_response = requests.post(
+            'https://api.openrouteservice.org/v2/directions/driving-car',
+            json={'coordinates': [[restaurant_lng, restaurant_lat], [customer_lng, customer_lat]]},
+            headers={'Authorization': api_key}
+        )
+        directions_data = directions_response.json()
+
+        duration_seconds = directions_data['routes'][0]['summary']['duration']
+        duration_minutes = int(duration_seconds / 60)
+        return duration_minutes + 10
+
+    except Exception as e:
+        print(f"OpenRouteService error: {e}")
+        return 30

@@ -20,6 +20,61 @@
             <p><strong>Date:</strong> {{ order.order_date }} {{ order.order_time }}</p>
         </div>
 
+        <!-- This is the status update form for the admin -->
+        <div style="margin-bottom: 25px; padding: 20px; background: #F8F4EC;
+                    border-radius: 8px; border-left: 4px solid #8B0000;">
+            <h3 style="margin: 0 0 15px 0; color: #2C2416; font-family: Georgia, serif;">
+                Update Order Status
+            </h3>
+            <form action="{{ url_for('admin.update_order_status', order_id=order.order_id) }}" method="POST"
+                  style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <select name="status" style="
+                    padding: 10px 15px;
+                    border: 2px solid #D4AF37;
+                    border-radius: 6px;
+                    font-family: Georgia, serif;
+                    font-size: 15px;
+                    color: #2C2416;
+                    background: white;
+                    cursor: pointer;">
+                    {% set statuses = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] %}
+                    {% for s in statuses %}
+                        <option value="{{ s }}" {{ 'selected' if order.order_status == s }}>
+                            {{ s | capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <!-- This is the new estimated time input that helps customers understand how long their
+                 order will take to be prepared for them-->
+                <input type="number" name="estimated_mins" min="1" max="120"
+                       placeholder="Est. minutes"
+                       value="{{ order.estimated_minutes if order.estimated_minutes else '' }}"
+                       style="
+                        padding: 10px 15px;
+                        border 2px solid #D4AF37;
+                        border-radius: 6px
+                        font-family: Georgia, serif;
+                        font-size: 15px;
+                        color: #2C2416;
+                        width: 130px;">
+
+                <button type="submit" style="
+                    padding: 10px 25px;
+                    background-color: #8B0000;
+                    color: #FFD700;
+                    border: none;
+                    border-radius: 6px;
+                    font-family: Georgia, serif;
+                    font-size: 15px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    letter-spacing: 1px;">
+                    Update Status
+                </button>
+            </form>
+        </div>
+
         <hr style="margin: 20px 0;">
 
         <h2 style="margin-bottom: 15px;">Items Ordered</h2>

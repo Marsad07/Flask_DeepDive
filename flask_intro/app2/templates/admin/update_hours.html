@@ -16,8 +16,27 @@
         </a>
     </div>
 
-    <!-- This is the form to update restaurant hours -->
     <form method="POST">
+        <!-- This is the restaurant address section -->
+        <div style="margin-bottom: 30px; padding: 20px; background: #F8F4EC; border-radius: 8px;">
+            <h3 style="font-family: Georgia, serif; color: #2C2416;">Restaurant Address</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                Enter your full address including postcode. This is used to calculate delivery times.
+            </p>
+            <input type="text" name="address"
+                   value="{{ hours[0].address if hours[0].address else '' }}"
+                   placeholder="e.g. 123 Main Street, Manchester, M1 1AA"
+                   style="
+                       width: 100%;
+                       padding: 10px 15px;
+                       border: 2px solid #D4AF37;
+                       border-radius: 6px;
+                       font-family: Georgia, serif;
+                       font-size: 15px;
+                       color: #2C2416;
+                       box-sizing: border-box;">
+        </div>
+
         <h2 style="margin-top: 20px !important;" class="hours-heading">Opening Hours</h2>
 
         <!-- This loops through each day of the week -->
@@ -45,6 +64,7 @@
          margin-bottom: 20px !important;" class="hours-heading">Announcements</h2>
         <textarea name="announcement" rows="5" placeholder="Special hours, events, promotions..."></textarea>
         <input type="submit" value="SAVE CHANGES">
+
     </form>
 </div>
 

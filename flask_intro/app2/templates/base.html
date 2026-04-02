@@ -196,9 +196,15 @@
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">LOCATION</h3>
                 <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
-                    123 Main Street<br>
-                    City, State<br>
-                    Post Code
+                    {% if restaurant_address %}
+                        {% for part in restaurant_address.split(',') %}
+                            {{ part.strip() }}<br>
+                        {% endfor %}
+                    {% else %}
+                        123 Main Street<br>
+                        City<br>
+                        Post Code
+                    {% endif %}
                 </p>
             </div>
 
