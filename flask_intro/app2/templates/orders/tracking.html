@@ -19,12 +19,19 @@
         <input type="submit" value="Find My Order">
     </form>
     {% else %}
+    <p>Order type: {{ order.order_type }}</p>
+
 
     <!-- Here is all the indication that will be shown in the progress tracker -->
     {% set stages = ['pending', 'confirmed', 'preparing', 'ready', 'completed'] %}
     {% set stage_labels = ['Received', 'Confirmed', 'Preparing', 'Ready', 'Completed'] %}
     {% set stage_icons = ['📋', '✅', '👨‍🍳', '🍽️', '🎉'] %}
     {% set current_index = stages.index(order.order_status) if order.order_status in stages else 0 %}
+
+    <!-- Leaflet CSS for creating map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Leaflet JS for creating map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <div style="max-width: 800px; margin: 40px auto;">
         <!-- This is for showing the status timeline -->
@@ -128,6 +135,19 @@
             {% endif %}
         </div>
 
+        <!-- This is the map section that changes depending if the user
+         chose collection or delivery-->
+        <div class="contact-info-item" style="margin-top: 30px;">
+            <strong>
+                {% if order.order_type == 'delivery' %}
+                    Delivery Tracking
+                {% else %}
+                    Collection Address
+                {% endif %}
+            </strong>
+            <div id="order-map" style="height: 300px; border-radius: 8px; margin-top: 15px"></div>
+        </div>
+
         <!-- This is for showing the items in order -->
         <div class="contact-info-item">
             <strong>Your Items</strong>
@@ -198,7 +218,7 @@
             if (data.order_id == orderId) {
                 updateProgressBar(data.new_status);
                 if (data.estimated_minutes) {
-                    startCountdown(parseInt(data.estimated_minutes)
+                    startCountdown(parseInt(data.estimated_minutes));
                 }
             }
         });
@@ -295,11 +315,41 @@
             }, 1000);
         }
 
-        // This starts automatically on page load if estimated time already exists
-        {% if order.estimated_minutes %}
-        startCountdown({{ order.estimated_minutes }});
-        {% endif %}
-    });
+       function initMap(restaurantLat, restaurantLng, orderType) {
+    map = L.map('order-map').setView([restaurantLat, restaurantLng], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // This adds the restaurant pin
+    const restaurantPin = L.marker([restaurantLat, restaurantLng]).addTo(map);
+    restaurantPin.bindPopup('📍 Restaurant').openPopup();
+
+    // This draws the delivery route and customer pin if it's a delivery order
+    {% if order.order_type == 'delivery' and route_coords and customer_lat and customer_lng %}
+
+    // This draws the route line on the map
+    const routeCoords = {{ route_coords | tojson }};
+    L.polyline(routeCoords, {
+        color: '#8B0000',
+        weight: 4,
+        opacity: 0.8
+    }).addTo(map);
+
+    // This adds the customer pin
+    const customerPin = L.marker([{{ customer_lat }}, {{ customer_lng }}]).addTo(map);
+    customerPin.bindPopup('🏠 Delivery Address');
+
+    // This fits the map to show both pins and the full route
+    const bounds = L.latLngBounds(routeCoords);
+    map.fitBounds(bounds, { padding: [30, 30] });
+    {% endif %}
+    }
+
+    {% if restaurant and restaurant.latitude and restaurant.longitude %}
+    initMap({{ restaurant.latitude }}, {{ restaurant.longitude }}, '{{ order.order_type }}');
+    {% endif %}
     </script>
     {% endif %}
 </div>
