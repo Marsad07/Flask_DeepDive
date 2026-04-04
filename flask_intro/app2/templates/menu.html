@@ -13,7 +13,7 @@
     <ul>
         {% for item in menu_items if item.category == category %}
         <li>{{ item.item_name }}</li>
-        <p>{{ item.description }} - ${{ "%.2f"|format(item.price) }}</p>
+        <p>{{ item.description }} - £{{ "%.2f"|format(item.price) }}</p>
         {% endfor %}
     </ul>
     {% endfor %}
