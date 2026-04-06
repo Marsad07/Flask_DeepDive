@@ -5,9 +5,15 @@
 
 {% block content%}
 <div class="menu-container">
-    <h1>ADMIN LOGIN</h1>
+    <h1>STAFF LOGIN</h1>
     <h3 style="font-style: italic; color: #5C4033'">Restaurant Management Portal</h3>
-
+    <div class="form-box">
+    <div class="button-box">
+        <div id="btn"></div>
+        <button type="button" class="toggle-btn" onclick="leftClick()">Customer</button>
+        <button type="button" class="toggle-btn" onclick="rightClick()">Staff</button>
+    </div>
+    </div>
     {%if error %}
     <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
       border-radius: 8px; margin: 20px auto; max-width: 500px;">
@@ -29,4 +35,22 @@
            style="color: #8B0000; text-decoration: none;">← Back to Main Site</a>
     </p>
 </div>
+<script>
+    var btn = document.getElementById('btn')
+    btn.style.left = '110px';
+
+    function leftClick() {
+        btn.style.left = '0';
+        setTimeout(function() {
+            window.location.href = "{{ url_for('customer_auth.login') }}";
+        }, 500);
+    }
+
+    function rightClick() {
+        btn.style.left = '110px';
+        setTimeout(function() {
+            window.location.href = "{{ url_for('staff.staff_login') }}";
+        }, 500);
+    }
+</script>
 {% endblock %}

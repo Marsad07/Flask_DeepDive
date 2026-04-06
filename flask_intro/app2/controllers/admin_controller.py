@@ -30,8 +30,8 @@ def admin_login():
         else:
             cursor.close()
             db.close()
-            return render_template('admin/login.html', error="Incorrect username or password")
-    return render_template('admin/login.html')
+            return render_template('staff/login.html', error="Incorrect username or password")
+    return render_template('staff/login.html')
 
 def dashboard():
     if 'admin_id' not in session:
@@ -382,6 +382,11 @@ def update_order_status(order_id):
         'new_status': new_status,
         'estimated_minutes': estimated_minutes
     }, room=f'order_{order_id}')
+
+    socketio.emit('kitchen_update', {
+        'order_id': order_id,
+        'new_status': new_status
+    }, room='kitchen')
     return redirect(url_for('admin.view_all_orders'))
 
 def get_delivery_minutes(delivery_address):

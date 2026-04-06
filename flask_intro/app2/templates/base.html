@@ -174,6 +174,10 @@
         {% if session.get('customer_id') %}
             <li><a href="{{ url_for('customer_auth.customer_dashboard') }}">My Account</a></li>
             <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
+        {% elif session.get('staff_id') %}
+            <li><a href="{{ url_for('staff.kitchen_display') if session.get('staff_role') ==
+             'kitchen' else url_for('admin.dashboard') }}">My Dashboard</a></li>
+            <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
         {% else %}
             <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
             <li><a href="{{ url_for('customer_auth.register') }}">Register</a></li>

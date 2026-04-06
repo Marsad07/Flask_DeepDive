@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, session
 from app2.database import get_db
 from datetime import datetime, date
+from app2 import socketio
 
 def checkout_page():
     # This checks if cart is empty
@@ -82,6 +83,9 @@ def process_order():
     db.close()
 
     # This clears the cart
+    socketio.emit('new_order', {
+        'order_id': order_id
+    }, room='kitchen')
     session['cart'] = {}
 
     # This redirects to confirmation page with order number
