@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, url_for, session
 from app2.database import get_db
 from datetime import datetime, date
-from app2 import socketio
+from app2 import socketio, mail
+from flask_mailman import EmailMessage
 
 def checkout_page():
     # This checks if cart is empty
@@ -21,6 +22,7 @@ def process_order():
     order_type = request.form.get('order_type')
     payment_method = request.form.get('payment_method')
     special_instructions = request.form.get('special_instructions')
+
 
     # This gets customer_id from session if logged in
     customer_id = session.get('customer_id', None)
@@ -79,15 +81,157 @@ def process_order():
 
     # This commits all changes to database
     db.commit()
-    cursor.close()
-    db.close()
+    # This sends out a confirmation email after the order is confirmed
+    try:
+        html_body = f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body bgcolor="#F8F4EC" style="margin: 0; padding: 0;">
+                <table width="100%" bgcolor="#F8F4EC" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px;">
+                            <table width="600" cellpadding="0" cellspacing="0" border="0" 
+                                   style="max-width: 600px; width: 100%;">
+                                <!-- This is the Header -->
+                                <tr>
+                                    <td bgcolor="#2C2416" align="center" 
+                                        style="padding: 30px; border-radius: 12px 12px 0 0;">
+                                        <h1 style="color: #FFD700; margin: 0; font-size: 28px; 
+                                                   letter-spacing: 3px; font-family: Georgia, serif;">
+                                            RESTAURANT NAME
+                                        </h1>
+                                        <p style="color: #D4AF37; margin: 8px 0 0 0; font-size: 14px; 
+                                                  letter-spacing: 2px; font-family: Georgia, serif;">
+                                            ORDER CONFIRMATION
+                                        </p>
+                                    </td>
+                                </tr>
+                                <!-- This is the body -->
+                                <tr>
+                                    <td bgcolor="#FFFFFF" style="padding: 30px;">
+                                        <p style="color: #2C2416; font-size: 16px; 
+                                                  font-family: Georgia, serif; margin: 0 0 10px 0;">
+                                            Hi <strong>{full_name}</strong>,
+                                        </p>
+                                        <p style="color: #5C4033; font-size: 15px; line-height: 1.6; 
+                                                  font-family: Georgia, serif; margin: 0 0 20px 0;">
+                                            Thank you for your order! We've received it and will get started soon.
+                                        </p>
+                                        <!-- This is the order reference box -->
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0" 
+                                               style="margin: 0 0 20px 0;">
+                                            <tr>
+                                                <td bgcolor="#F8F4EC" 
+                                                    style="padding: 15px 20px; border-radius: 8px; 
+                                                           border-left: 4px solid #8B0000;">
+                                                    <p style="margin: 0; color: #5C4033; font-size: 13px; 
+                                                              font-family: Georgia, serif; letter-spacing: 1px;">
+                                                        ORDER REFERENCE
+                                                    </p>
+                                                    <p style="margin: 5px 0 0 0; color: #8B0000; font-size: 22px; 
+                                                              font-weight: bold; font-family: Georgia, serif;">
+                                                        {order_number}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- This is the order details table -->
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="padding: 10px 0; color: #5C4033; font-size: 14px; 
+                                                           font-family: Georgia, serif; 
+                                                           border-bottom: 1px solid #E8DFD0;">
+                                                    Order Type
+                                                </td>
+                                                <td align="right" 
+                                                    style="padding: 10px 0; color: #2C2416; font-weight: bold; 
+                                                           font-size: 14px; font-family: Georgia, serif; 
+                                                           border-bottom: 1px solid #E8DFD0;">
+                                                    {order_type.capitalize()}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 0; color: #5C4033; font-size: 14px; 
+                                                           font-family: Georgia, serif; 
+                                                           border-bottom: 1px solid #E8DFD0;">
+                                                    Payment
+                                                </td>
+                                                <td align="right" 
+                                                    style="padding: 10px 0; color: #2C2416; font-weight: bold; 
+                                                           font-size: 14px; font-family: Georgia, serif; 
+                                                           border-bottom: 1px solid #E8DFD0;">
+                                                    {payment_method.capitalize()}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 10px 0; color: #5C4033; font-size: 14px; 
+                                                           font-family: Georgia, serif;">
+                                                    Total
+                                                </td>
+                                                <td align="right" 
+                                                    style="padding: 10px 0; color: #8B0000; font-weight: bold; 
+                                                           font-size: 18px; font-family: Georgia, serif;">
+                                                    £{total:.2f}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- This is the track order button -->
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0" 
+                                               style="margin: 30px 0;">
+                                            <tr>
+                                                <td align="center">
+                                                    <a href="http://127.0.0.1:5000/orders/track/{order_number}"
+                                                       style="background-color: #8B0000; color: #FFD700; 
+                                                              padding: 14px 35px; text-decoration: none; 
+                                                              border-radius: 8px; font-size: 15px; 
+                                                              font-weight: bold; letter-spacing: 2px; 
+                                                              text-transform: uppercase; 
+                                                              font-family: Georgia, serif;
+                                                              display: inline-block;">
+                                                        TRACK YOUR ORDER
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p style="color: #5C4033; font-size: 14px; line-height: 1.6; 
+                                                  font-family: Georgia, serif; margin: 0;">
+                                            If you have any questions about your order please don't hesitate 
+                                            to contact us.
+                                        </p>
+                                    </td>
+                                </tr>
 
-    # This clears the cart
-    socketio.emit('new_order', {
-        'order_id': order_id
-    }, room='kitchen')
-    session['cart'] = {}
-
+                                <!-- This is the footer -->
+                                <tr>
+                                    <td bgcolor="#2C2416" align="center" 
+                                        style="padding: 20px; border-radius: 0 0 12px 12px;">
+                                        <p style="color: #D4AF37; margin: 0; font-size: 13px; 
+                                                  letter-spacing: 1px; font-family: Georgia, serif;">
+                                            © 2026 Restaurant Name. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+            '''
+        msg = EmailMessage(
+            subject=f'Order Confirmation - {order_number}',
+            body=html_body,
+            from_email=None,
+            to=[email]
+        )
+        msg.content_subtype = 'html'
+        msg.send()
+    except Exception as e:
+        print(f"Email Error: {e}")
     # This redirects to confirmation page with order number
     return redirect(url_for('checkout.order_confirmation', order_number=order_number))
 
