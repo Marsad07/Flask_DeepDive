@@ -27,7 +27,12 @@
 
         <label for="customer_password">Password</label>
         <input type="password" id="customer_password" name="customer_password" required>
-
+        <p style="text-align: center; margin-top: 15px; font-family: Georgia, serif; font-size: 14px;">
+            <a href="{{ url_for('customer_auth.forgot_password') }}"
+            style="color: #8B0000; text-decoration: none;">
+                Forgot your password?
+            </a>
+        </p>
         <input type="submit" value="LOGIN">
     </form>
 

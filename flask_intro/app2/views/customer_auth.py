@@ -1,7 +1,8 @@
 from flask import Blueprint
 from app2.controllers.customer_auth_controller import (customer_login, customer_register,
                                                         customer_logout, customer_dashboard,
-                                                       customer_profile_settings, update_profile, order_history)
+                                                       customer_profile_settings, update_profile, order_history,
+                                                       reset_password, forgot_password)
 
 customer_auth_bp = Blueprint("customer_auth", __name__, url_prefix="/auth")
 
@@ -10,5 +11,8 @@ customer_auth_bp.route("/register", methods=["GET", "POST"], endpoint="register"
 customer_auth_bp.route("/logout", endpoint="logout")(customer_logout)
 customer_auth_bp.route("/dashboard", endpoint="customer_dashboard")(customer_dashboard)
 customer_auth_bp.route("/profile", endpoint="customer_profile")(customer_profile_settings)
-customer_auth_bp.route("/profile/update", methods=["POST"], endpoint="update_profile")(customer_profile_settings)
+customer_auth_bp.route("/profile/update", methods=["POST"], endpoint="update_profile")(update_profile)
 customer_auth_bp.route("/orders", endpoint="order_history")(order_history)
+customer_auth_bp.route("/forgot-password", methods=["GET", "POST"], endpoint="forgot_password")(forgot_password)
+(customer_auth_bp.route("/reset-password/<token>", methods=["GET", "POST"],
+                        endpoint="reset_password")(reset_password))
