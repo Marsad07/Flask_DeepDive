@@ -4,19 +4,52 @@
 {% endblock %}
 
 {% block content %}
+
+<!-- This is the loading overlay shown during payment processing -->
+<div id="payment-loading" style="
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(44, 36, 22, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;">
+    <div style="
+        width: 60px; height: 60px;
+        border: 5px solid #D4AF37;
+        border-top-color: #8B0000;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 20px;">
+    </div>
+    <p style="color: #FFD700; font-family: Georgia, serif; font-size: 18px; letter-spacing: 2px;">
+        Processing Payment...
+    </p>
+</div>
+<style>
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+@media (max-width: 768px) {
+    .checkout-grid { grid-template-columns: 1fr !important; }
+    .checkout-grid > div:first-child { order: 2 !important; }
+    .checkout-grid > div:last-child { order: 1 !important; }
+}
+</style>
 <div class="menu-container">
     <h1>CHECKOUT</h1>
-
-    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div class="checkout-grid" style="max-width: 1200px; margin: 0 auto; display: grid;
+     grid-template-columns: 1fr 1fr; gap: 30px;">
 
         <!-- Left Side - Order Summary -->
         <div style="order: 2;">
             <div style="background: white; padding: 25px; border-radius: 12px;
-             box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 20px;">
-                <h2 style="margin-top: 0; font-size: 24px; border-bottom: 2px solid #D4AF37;
-                 padding-bottom: 15px;">Order Summary</h2>
-
-                <!-- This shows cart items -->
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 20px;">
+                <h2 style="margin-top: 0; font-size: 24px; border-bottom: 2px solid #D4AF37; padding-bottom: 15px;">
+                    Order Summary
+                </h2>
                 {% if cart %}
                     {% for item_id, item in cart.items() %}
                     <div style="display: flex; justify-content: space-between;
@@ -25,17 +58,15 @@
                             <p style="margin: 0; font-weight: bold; color: #2C2416;">{{ item.name }}</p>
                             <p style="margin: 5px 0 0 0; font-size: 14px; color: #5C4033;">Qty: {{ item.quantity }}</p>
                         </div>
-                        <p style="margin: 0; font-weight: bold;
-                         color: #8B0000;">£{{ "%.2f"|format(item.price * item.quantity) }}</p>
+                        <p style="margin: 0; font-weight: bold; color: #8B0000;">
+                            £{{ "%.2f"|format(item.price * item.quantity) }}</p>
                     </div>
                     {% endfor %}
-
-                    <!-- This is the total -->
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid #8B0000;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <p style="margin: 0; font-size: 24px; font-weight: bold; color: #2C2416;">Total</p>
-                            <p style="margin: 0; font-size: 28px; font-weight: bold;
-                             color: #8B0000;">£{{ "%.2f"|format(total) }}</p>
+                            <p style="margin: 0; font-size: 28px; font-weight: bold; color: #8B0000;">
+                                £{{ "%.2f"|format(total) }}</p>
                         </div>
                     </div>
                 {% endif %}
@@ -44,99 +75,87 @@
 
         <!-- Right Side - Checkout Form -->
         <div style="order: 1;">
-            <form method="POST" action="{{ url_for('checkout.process_order') }}" style="max-width: none; margin: 0;">
+            <form id="checkout-form" method="POST" action="{{ url_for('checkout.process_order') }}"
+                  style="max-width: none; margin: 0;">
 
-                <!-- This is customer information section -->
+                <!-- This is where the customer enters their contact Information -->
                 <div style="background: white; padding: 25px; border-radius: 12px;
                  box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Contact Information</h2>
-
                     <label>Full Name</label>
-                    <input type="text" name="full_name" required>
-
+                    <input type="text" name="full_name" id="full_name" required>
                     <label>Email</label>
-                    <input type="email" name="email" required>
-
+                    <input type="email" name="email" id="email" required>
                     <label>Phone Number</label>
                     <input type="tel" name="phone" pattern="[0-9]{10,}" required>
                 </div>
 
-                <!-- This is order type section -->
+                <!-- This is where the customer chooses order type -->
                 <div style="background: white; padding: 25px; border-radius: 12px;
                  box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Order Type</h2>
-
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <label style="cursor: pointer;">
                             <input type="radio" name="order_type" value="collection" checked onchange="toggleAddress()">
                             <div style="border: 2px solid #D4AF37; padding: 20px; border-radius: 8px;
-                             text-align: center; transition: all 0.3s ease;" class="order-type-option">
+                             text-align: center;" class="order-type-option">
                                 <p style="margin: 0; font-size: 18px; font-weight: bold;">🏪 Collection</p>
                             </div>
                         </label>
-
                         <label style="cursor: pointer;">
                             <input type="radio" name="order_type" value="delivery" onchange="toggleAddress()">
                             <div style="border: 2px solid #D4AF37; padding: 20px; border-radius: 8px;
-                             text-align: center; transition: all 0.3s ease;" class="order-type-option">
+                             text-align: center;" class="order-type-option">
                                 <p style="margin: 0; font-size: 18px; font-weight: bold;">🚗 Delivery</p>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- This is delivery address section (hidden by default) -->
+                <!-- This is where the customer enters delivery Address -->
                 <div id="delivery-address" style="display: none; background: white; padding: 25px;
                  border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Delivery Address</h2>
-
                     <label>Address Line 1</label>
                     <input type="text" name="address_line1" id="address1">
-
                     <label>Address Line 2</label>
                     <input type="text" name="address_line2">
-
                     <label>City</label>
                     <input type="text" name="city" id="city">
-
                     <label>Postcode</label>
                     <input type="text" name="postcode" id="postcode">
                 </div>
 
-                <!-- This is payment method section -->
+                <!-- This is the payment Method -->
                 <div style="background: white; padding: 25px; border-radius: 12px;
                  box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Payment Method</h2>
 
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #D4AF37;
-                         border-radius: 8px; cursor: pointer; transition: all 0.3s ease;" class="payment-option">
-                            <input type="radio" name="payment_method" value="cash" checked style="margin-right: 12px;">
+                         border-radius: 8px; cursor: pointer;" class="payment-option">
+                            <input type="radio" name="payment_method" value="cash" id="pay_cash"
+                                   checked style="margin-right: 12px;" onchange="togglePaymentSection()">
                             <span style="font-size: 16px; font-weight: bold;">💵 Cash on Collection/Delivery</span>
                         </label>
 
                         <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #D4AF37;
-                         border-radius: 8px; cursor: pointer; transition: all 0.3s ease;" class="payment-option">
-                            <input type="radio" name="payment_method" value="card" style="margin-right: 12px;">
-                            <span style="font-size: 16px; font-weight: bold;">💳 Card on Collection/Delivery</span>
+                         border-radius: 8px; cursor: pointer;" class="payment-option">
+                            <input type="radio" name="payment_method" value="card_online" id="pay_online"
+                                   style="margin-right: 12px;" onchange="togglePaymentSection()">
+                            <span style="font-size: 16px; font-weight: bold;">
+                                💳 Pay Online (Card / Apple Pay / Google Pay)</span>
                         </label>
-
-                        <button type="button" style="background: black;
-                         color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer;
-                          font-size: 16px; font-weight: bold; display: flex; align-items: center;
-                           justify-content: center; gap: 10px; transition: all 0.3s ease;"
-                                onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                            <span style="font-size: 20px;"></span> Pay with Apple Pay
-                        </button>
                     </div>
 
-                    <p style="margin-top: 15px; font-size: 13px; color: #5C4033; font-style: italic;">
-                        Note: Online payment coming soon! Pay when you collect or receive your order.
-                    </p>
+                    <!-- This is the stripe payment Element which shows card, Apple Pay, Google Pay -->
+                    <div id="stripe-section" style="display: none; margin-top: 20px;">
+                        <div id="payment-element" style="margin-bottom: 15px;"></div>
+                        <div id="payment-errors" style="color: #8B0000; font-size: 14px; margin-bottom: 10px;"></div>
+                    </div>
                 </div>
 
-                <!-- This is special instructions section -->
+                <!-- This is the special instructions part -->
                 <div style="background: white; padding: 25px; border-radius: 12px;
                  box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
                     <label>Special Instructions (Optional)</label>
@@ -144,73 +163,112 @@
                               placeholder="Any dietary requirements, delivery instructions, etc."></textarea>
                 </div>
 
-                <!-- This is submit button -->
-                <button type="submit" style="width: 100%; background: #8B0000; color: #FFD700; padding: 20px;
-                 border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
+                <!-- This is for the hidden field to store payment intent id -->
+                <input type="hidden" name="payment_intent_id" id="payment_intent_id">
+                <input type="hidden" name="payment_status" id="payment_status" value="pending">
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" style="width: 100%; background: #8B0000; color: #FFD700;
+                 padding: 20px; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
                   text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;"
-                        onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
-                        onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
+                    onmouseover="this.style.background='#660000'"
+                    onmouseout="this.style.background='#8B0000'">
                     Place Order
                 </button>
             </form>
         </div>
     </div>
 </div>
-<!-- This adds interactivity and mobile styling -->
+<!-- Stripe Javascript -->
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-function toggleAddress() {
-    const deliverySection = document.getElementById('delivery-address');
-    const isDelivery = document.querySelector('input[name="order_type"]:checked').value === 'delivery';
+    const stripe = Stripe('{{ stripe_public_key }}');
+    let elements = null;
+    let paymentElement = null;
+    let clientSecret = null;
 
-    deliverySection.style.display = isDelivery ? 'block' : 'none';
+    function toggleAddress() {
+        const deliverySection = document.getElementById('delivery-address');
+        const isDelivery = document.querySelector('input[name="order_type"]:checked').value === 'delivery';
+        deliverySection.style.display = isDelivery ? 'block' : 'none';
+        document.getElementById('address1').required = isDelivery;
+        document.getElementById('city').required = isDelivery;
+        document.getElementById('postcode').required = isDelivery;
+    }
 
-    // Make address fields required if delivery
-    document.getElementById('address1').required = isDelivery;
-    document.getElementById('city').required = isDelivery;
-    document.getElementById('postcode').required = isDelivery;
-}
+    async function togglePaymentSection() {
+        const isOnline = document.getElementById('pay_online').checked;
+        const stripeSection = document.getElementById('stripe-section');
+        stripeSection.style.display = isOnline ? 'block' : 'none';
 
-// Highlight selected options
-document.querySelectorAll('.order-type-option').forEach(option => {
-    option.closest('label').addEventListener('click', function() {
-        document.querySelectorAll('.order-type-option').forEach(opt => {
-            opt.style.background = 'white';
-            opt.style.borderColor = '#D4AF37';
-        });
-        this.querySelector('.order-type-option').style.background = '#FFF8E7';
-        this.querySelector('.order-type-option').style.borderColor = '#8B0000';
+        if (isOnline && !elements) {
+            // This creates a payment intent and loads the Stripe payment element
+            const response = await fetch('/checkout/create-payment-intent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            clientSecret = data.clientSecret;
+            document.getElementById('payment_intent_id').value = clientSecret;
+
+            elements = stripe.elements({ clientSecret });
+            paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+        }
+    }
+
+    // This handles form submission
+    document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+        const isOnline = document.getElementById('pay_online').checked;
+
+        if (isOnline) {
+            e.preventDefault();
+
+            // This shows the loading screen
+            const loader = document.getElementById('payment-loading');
+            loader.style.display = 'flex';
+
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: { return_url: window.location.origin },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                loader.style.display = 'none';
+                document.getElementById('payment-errors').textContent = error.message;
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                document.getElementById('payment_status').value = 'paid';
+                document.getElementById('payment_intent_id').value = paymentIntent.id;
+                // This submits the form after successful payment
+                this.submit();
+            }
+        } else {
+            document.getElementById('payment-loading').style.display = 'flex';
+        }
     });
-});
 
-document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', function() {
-        document.querySelectorAll('.payment-option').forEach(opt => {
-            opt.style.background = 'white';
-            opt.style.borderColor = '#D4AF37';
+    // This highlights selected payment options
+    document.querySelectorAll('.order-type-option').forEach(option => {
+        option.closest('label').addEventListener('click', function() {
+            document.querySelectorAll('.order-type-option').forEach(opt => {
+                opt.style.background = 'white';
+                opt.style.borderColor = '#D4AF37';
+            });
+            this.querySelector('.order-type-option').style.background = '#FFF8E7';
+            this.querySelector('.order-type-option').style.borderColor = '#8B0000';
         });
-        this.style.background = '#FFF8E7';
-        this.style.borderColor = '#8B0000';
     });
-});
+
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.style.background = 'white';
+                opt.style.borderColor = '#D4AF37';
+            });
+            this.style.background = '#FFF8E7';
+            this.style.borderColor = '#8B0000';
+        });
+    });
 </script>
-<style>
-/* This makes checkout mobile-friendly */
-@media (max-width: 768px) {
-    .menu-container > div {
-        grid-template-columns: 1fr !important;
-    }
-
-    .menu-container > div > div:first-child {
-        order: 2 !important;
-    }
-
-    .menu-container > div > div:last-child {
-        order: 1 !important;
-    }
-
-    .menu-container > div > div > div {
-        position: static !important;
-    }
-}
-</style>
 {% endblock %}
