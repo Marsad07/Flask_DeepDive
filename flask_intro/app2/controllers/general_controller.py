@@ -2,9 +2,16 @@ from flask import render_template, request, redirect, url_for
 from flask_mailman import EmailMessage
 from app2.database import get_db
 from app2 import mail
+from app2.models.image_model import get_image
+
 
 def home_page():
-    return render_template("homepage.html")
+    return render_template("homepage.html",
+                           hero=get_image("hero"),
+                           dish1=get_image("dish1"),
+                           dish2=get_image("dish2"),
+                           dish3=get_image("dish3"),
+    )
 
 def about_page():
     return render_template("about.html")

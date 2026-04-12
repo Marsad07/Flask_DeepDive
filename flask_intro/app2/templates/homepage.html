@@ -3,7 +3,7 @@
 
 <!-- This is the hero section with overlay -->
 <div style="position: relative; width: 100%; height: 600px; overflow: hidden;">
-    <img src="{{ url_for('static', filename='imgs/img1.jpg') }}"
+    <img src="{{ hero or url_for('static', filename='imgs/img1.jpg') }}"
          alt="Restaurant Hero"
          style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7);">
 
@@ -43,7 +43,6 @@
         </div>
     </div>
 </div>
-
 <!-- This is the about/story section -->
 <div style="padding: 80px 20px; background: linear-gradient(135deg, #FFFEF2 0%); text-align: center;">
     <h2 style="font-size: 48px; color: #8B0000; margin-bottom: 30px; letter-spacing: 2px;">Our Story</h2>
@@ -51,6 +50,7 @@
         (Restaurant Story)
     </p>
 </div>
+
 <div style="font-family: Georgia, serif;">
 <!-- This is the featured dishes section -->
 <div style="padding: 80px 20px; background: #FFFEF2 ;">
@@ -59,15 +59,19 @@
     </h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 30px; max-width: 1200px; margin: 0 auto;">
-
         <!-- Dish 1 -->
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
              onmouseover="this.style.transform='translateY(-10px)'"
              onmouseout="this.style.transform='translateY(0)'">
             <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
-                Add Dish Photo 1
+                        display: flex; align-items: center; justify-content: center; color: white;
+                        font-size: 18px; overflow: hidden;">
+                {% if dish1 %}
+                    <img src="{{ dish1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    Add Dish Photo 1
+                {% endif %}
             </div>
             <div style="padding: 25px; text-align: center;">
                 <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 1 Name</h3>
@@ -76,14 +80,20 @@
                 </p>
             </div>
         </div>
+
         <!-- Dish 2 -->
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
              onmouseover="this.style.transform='translateY(-10px)'"
              onmouseout="this.style.transform='translateY(0)'">
             <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
-                Add Dish Photo 2
+                        display: flex; align-items: center; justify-content: center; color: white;
+                        font-size: 18px; overflow: hidden;">
+                {% if dish2 %}
+                    <img src="{{ dish2 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    Add Dish Photo 2
+                {% endif %}
             </div>
             <div style="padding: 25px; text-align: center;">
                 <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 2 Name</h3>
@@ -92,122 +102,29 @@
                 </p>
             </div>
         </div>
+
         <!-- Dish 3 -->
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
              onmouseover="this.style.transform='translateY(-10px)'"
              onmouseout="this.style.transform='translateY(0)'">
             <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
-                Add Dish Photo 3
+                        display: flex; align-items: center; justify-content: center; color: white;
+                        font-size: 18px; overflow: hidden;">
+                {% if dish3 %}
+                    <img src="{{ dish3 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    Add Dish Photo 3
+                {% endif %}
             </div>
             <div style="padding: 25px; text-align: center;">
                 <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 3 Name</h3>
                 <p style="color: #5C4033; font-style: italic; margin: 0;">
-                    Dish 3 Name
+                    Dish 3 description
                 </p>
             </div>
         </div>
     </div>
-    <div style="text-align: center; margin-top: 50px;">
-        <a href="{{ url_for('menu.show_menu') }}"
-           style="background: #8B0000; color: #FFD700; padding: 15px 40px;
-                  text-decoration: none; border-radius: 8px; font-size: 18px;
-                  font-weight: bold; transition: all 0.3s ease; display: inline-block;"
-           onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
-           onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
-            View Full Menu →
-        </a>
-    </div>
-</div>
-
-<!-- This is for the reviews/testimonials section -->
-<div style="padding: 80px 20px; background: #2C2416; color: white; text-align: center;">
-    <h2 style="font-size: 48px; color: #FFD700; margin-bottom: 50px; letter-spacing: 2px;">
-        What Our Guests Say
-    </h2>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 30px; max-width: 1200px; margin: 0 auto;">
-        <!-- Review 1 -->
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 1 Description"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 1 Name</p>
-        </div>
-        <!-- Review 2 -->
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 2 Description"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 2 Name</p>
-        </div>
-        <!-- Review 3 -->
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 3 Description"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 4 Name</p>
-        </div>
-
-    </div>
-</div>
-
-<!-- This is the call-to-action section -->
-<div style="padding: 80px 20px; background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
-            text-align: center; color: white;">
-    <h2 style="font-size: 48px; margin-bottom: 20px; letter-spacing: 2px;">
-        Ready to Experience Excellence?
-    </h2>
-    <p style="font-size: 22px; margin-bottom: 40px; color: #FFD700;">
-        Book your table today or order takeaway for a taste of perfection at home
-    </p>
-
-    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-        <a href="{{ url_for('reservations.reservations_page') }}"
-           style="background: #FFD700; color: #2C2416; padding: 18px 45px;
-                  text-decoration: none; border-radius: 50px; font-size: 20px;
-                  font-weight: bold; text-transform: uppercase; letter-spacing: 2px;
-                  transition: all 0.3s ease;"
-           onmouseover="this.style.background='#D4AF37'"
-           onmouseout="this.style.background='#FFD700'">
-            Reserve Now
-        </a>
-        <a href="{{ url_for('cart.order_now_menu') }}"
-           style="background: rgba(255,255,255,0.2); color: white; padding: 18px 45px;
-                  text-decoration: none; border-radius: 50px; font-size: 20px;
-                  font-weight: bold; text-transform: uppercase; letter-spacing: 2px;
-                  border: 3px solid white; backdrop-filter: blur(10px);
-                  transition: all 0.3s ease;"
-           onmouseover="this.style.background='rgba(255,255,255,0.3)'"
-           onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-            Order Takeaway
-        </a>
-    </div>
 </div>
 </div>
-<!-- Mobile responsive styling -->
-<style>
-@media (max-width: 768px) {
-    h1 {
-        font-size: 40px !important;
-    }
-    h2 {
-        font-size: 32px !important;
-    }
-    p {
-        font-size: 16px !important;
-    }
-    .hero-section h1 {
-        font-size: 36px !important;
-    }
-}
-</style>
 {% endblock %}

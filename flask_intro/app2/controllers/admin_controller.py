@@ -1,8 +1,9 @@
 import requests
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, Blueprint
 from app2.database import get_db
 from werkzeug.security import check_password_hash
 from app2 import socketio
+from app2.controllers.image_manager_controller import image_manager_controller
 
 def admin_login():
     if request.method == "POST":
@@ -434,3 +435,7 @@ def get_delivery_minutes(delivery_address):
     except Exception as e:
         print(f"OpenRouteService error: {e}")
         return 30
+
+def image_manager():
+    context = image_manager_controller()
+    return render_template("admin/image_manager.html", **context)
