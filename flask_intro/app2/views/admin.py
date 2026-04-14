@@ -2,7 +2,7 @@ from flask import Blueprint
 from app2.controllers.admin_controller import (admin_login, dashboard, logout, view_reservations, manage_menu,
                                                add_menu_item, edit_menu_item, delete_menu_item, update_hours,
                                                view_analytics, view_all_orders, view_customer_order,
-                                               update_order_status, manage_categories, delete_category)
+                                               update_order_status, manage_categories, delete_category, image_manager)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -21,3 +21,4 @@ admin_bp.route("/customer_order/<int:order_id>")(view_customer_order)
 admin_bp.route("/update_order_status/<int:order_id>", methods=["POST"])(update_order_status)
 admin_bp.route("/categories", methods=["GET", "POST"])(manage_categories)
 admin_bp.route("/categories/delete/<int:category_id>", methods=["POST"])(delete_category)
+admin_bp.route("/image_manager", methods=["GET", "POST"])(image_manager)

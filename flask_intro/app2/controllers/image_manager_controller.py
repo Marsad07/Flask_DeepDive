@@ -16,7 +16,7 @@ def image_manager_controller():
             file.save(save_path)
             set_image(image_key, f"/static/imgs/{filename}")
 
-        return redirect(url_for("image.image_manager"))
+        return redirect(url_for("admin.image_manager"))
 
     return {
         "hero": get_image("hero"),

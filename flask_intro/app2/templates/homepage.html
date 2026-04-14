@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
 <!-- This is the hero section with overlay -->
 <div style="position: relative; width: 100%; height: 600px; overflow: hidden;">
     <img src="{{ hero or url_for('static', filename='imgs/img1.jpg') }}"
@@ -43,6 +42,7 @@
         </div>
     </div>
 </div>
+
 <!-- This is the about/story section -->
 <div style="padding: 80px 20px; background: linear-gradient(135deg, #FFFEF2 0%); text-align: center;">
     <h2 style="font-size: 48px; color: #8B0000; margin-bottom: 30px; letter-spacing: 2px;">Our Story</h2>
@@ -53,7 +53,7 @@
 
 <div style="font-family: Georgia, serif;">
 <!-- This is the featured dishes section -->
-<div style="padding: 80px 20px; background: #FFFEF2 ;">
+<div style="padding: 80px 20px; background: #FFFEF2;">
     <h2 style="text-align: center; font-size: 48px; color: #8B0000; margin-bottom: 50px; letter-spacing: 2px;">
         Signature Dishes
     </h2>
@@ -80,7 +80,6 @@
                 </p>
             </div>
         </div>
-
         <!-- Dish 2 -->
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
@@ -102,7 +101,6 @@
                 </p>
             </div>
         </div>
-
         <!-- Dish 3 -->
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
@@ -126,5 +124,42 @@
         </div>
     </div>
 </div>
+</div>
+
+<!-- This is for the reviews/testimonials section -->
+<div style="padding: 80px 20px; background: #2C2416; color: white; text-align: center; margin-bottom: -62px;">
+    <h2 style="font-size: 48px; color: #FFD700; margin-bottom: 50px; letter-spacing: 2px;">
+        What Our Guests Say
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px; max-width: 1200px; margin: 0 auto;">
+        <!-- Review 1 -->
+        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
+                    backdrop-filter: blur(10px);">
+            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
+            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
+                "Reviewer 1 Description"
+            </p>
+            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 1 Name</p>
+        </div>
+        <!-- Review 2 -->
+        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
+                    backdrop-filter: blur(10px);">
+            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
+            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
+                "Reviewer 2 Description"
+            </p>
+            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 2 Name</p>
+        </div>
+        <!-- Review 3 -->
+        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
+                    backdrop-filter: blur(10px);">
+            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
+            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
+                "Reviewer 3 Description"
+            </p>
+            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 3 Name</p>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -10,7 +10,7 @@ mail = Mail()
 def create_app():
     app = Flask(__name__, template_folder="templates", static_folder="static")
 
-    app.secret_key = os.getenv("secret key", "dev-secret-key")
+    app.secret_key = os.getenv("sdjfh834hf8h3f8h3f8h3f8h3f", "dev-secret-key")
 
     socketio.init_app(app)
 

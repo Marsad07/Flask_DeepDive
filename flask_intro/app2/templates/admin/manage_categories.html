@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="menu-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h1>MANAGE CATEGORIES</h1>
+        <a href="{{ url_for('admin.manage_menu') }}"
+           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
+                  border-radius: 8px; font-weight: bold; font-family: Georgia, serif;">
+            ← Back to Menu
+        </a>
+    </div>
+
+    <!-- This is the form to add a new category -->
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;
+                border-left: 4px solid #8B0000;">
+        <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 20px 0;">
+            Add New Category
+        </h3>
+        <form method="POST" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1;">
+                <label style="font-family: Georgia, serif; color: #5C4033;
+                              font-size: 14px; display: block; margin-bottom: 8px;">
+                    Category Name
+                </label>
+                <input type="text" name="category_name" required
+                       placeholder="e.g. Starters, Mains, Desserts"
+                       style="width: 100%; padding: 10px 15px; border: 2px solid #D4AF37;
+                              border-radius: 6px; font-family: Georgia, serif; font-size: 15px;
+                              color: #2C2416; box-sizing: border-box;">
+            </div>
+            <button type="submit" style="padding: 10px 25px; background: #8B0000; color: #FFD700;
+                    border: none; border-radius: 6px; font-family: Georgia, serif; font-size: 15px;
+                    font-weight: bold; cursor: pointer; letter-spacing: 1px; white-space: nowrap;">
+                ADD CATEGORY
+            </button>
+        </form>
+    </div>
+
+    <!-- This shows all existing categories -->
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+        <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 20px 0;">
+            Existing Categories
+        </h3>
+
+        {% if categories %}
+            <table style="width: 100%; border-collapse: collapse; table-layout: fixed; overflow: hidden;">
+                <thead>
+                    <tr style="background: #2C2416; color: #FFD700;">
+                        <th style="padding: 12px 15px; text-align: left;
+                                   font-family: Georgia, serif; letter-spacing: 1px; width: 75%">
+                            Category Name
+                        </th>
+                        <th style="padding: 12px 15px; text-align: right;
+                                   font-family: Georgia, serif; letter-spacing: 1px; width: 25%;">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr style="border-bottom: 1px solid #E8DFD0;">
+                        <td style="padding: 15px; font-family: Georgia, serif;
+                                   color: #2C2416; font-size: 16px;">
+                            {{ cat.category_name }}
+                        </td>
+                        <td style="padding: 15px; text-align: right;">
+                            <!-- This deletes the category -->
+                            <form method="POST" class="inline-form"
+                                  action="{{ url_for('admin.delete_category', category_id=cat.category_id) }}"
+                                  style="display: inline; margin: 0; padding: 0; background: none; box-shadow: none;"
+                                  onsubmit="return confirm('Are you sure you want to delete {{ cat.category_name }}? \
+                                  This cannot be undone.')">
+                                <button type="submit" style="padding: 8px 18px; background: #8B0000;
+                                        color: #FFD700; border: none; border-radius: 6px;
+                                        font-family: Georgia, serif; font-size: 13px;
+                                        font-weight: bold; cursor: pointer;">
+                                    DELETE
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="font-family: Georgia, serif; color: #9e9e9e; text-align: center; padding: 30px;">
+                No categories yet — add one above.
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

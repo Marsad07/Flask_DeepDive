@@ -1,5 +1,5 @@
 import requests
-from flask import render_template, request, redirect, url_for, session, Blueprint
+from flask import render_template, request, redirect, url_for, session, Blueprint, Response
 from app2.database import get_db
 from werkzeug.security import check_password_hash
 from app2 import socketio
@@ -440,6 +440,8 @@ def get_delivery_minutes(delivery_address):
 
 def image_manager():
     context = image_manager_controller()
+    if isinstance(context, Response):
+        return context
     return render_template("admin/image_manager.html", **context)
 
 def manage_categories():
