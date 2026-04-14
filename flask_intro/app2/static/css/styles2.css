@@ -467,6 +467,15 @@ html {
     transition: color 0.3s ease;
 }
 
+.inline-form {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
 #btn {
     position: absolute;
     top: 3px;

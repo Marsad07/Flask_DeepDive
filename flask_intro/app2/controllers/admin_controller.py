@@ -4,6 +4,7 @@ from app2.database import get_db
 from werkzeug.security import check_password_hash
 from app2 import socketio
 from app2.controllers.image_manager_controller import image_manager_controller
+from app2.models.category_model import add_category, get_category
 
 def admin_login():
     if request.method == "POST":
@@ -117,7 +118,8 @@ def add_menu_item():
         db.close()
 
         return redirect(url_for('admin.manage_menu'))
-    return render_template('admin/add_menu_item.html')
+    categories = get_category()
+    return render_template('admin/add_menu_item.html', categories=categories)
 
 def edit_menu_item(item_id):
     if 'admin_id' not in session:
@@ -148,8 +150,8 @@ def edit_menu_item(item_id):
     item = cursor.fetchone()
     cursor.close()
     db.close()
-
-    return render_template('admin/edit_menu_item.html', item=item)
+    categories = get_category()
+    return render_template('admin/edit_menu_item.html', item=item, categories=categories)
 
 def delete_menu_item(item_id):
     if 'admin_id' not in session:
@@ -439,3 +441,21 @@ def get_delivery_minutes(delivery_address):
 def image_manager():
     context = image_manager_controller()
     return render_template("admin/image_manager.html", **context)
+
+def manage_categories():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+    if request.method == 'POST':
+        name = request.form.get("category_name")
+        if name:
+            add_category(name)
+        return redirect(url_for('admin.manage_categories'))
+    categories = get_category()
+    return render_template('admin/manage_categories.html', categories=categories)
+
+def delete_category(category_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+    from app2.models.category_model import delete_category as del_cat
+    del_cat(category_id)
+    return redirect(url_for('admin.manage_categories'))

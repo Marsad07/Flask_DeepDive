@@ -16,14 +16,23 @@
         <label for="item_name">Item Name</label>
         <input type="text" id="item_name" name="item_name" value="{{ item.item_name }}" required>
 
-        <label for="category">Category</label>
-        <select id="category" name="category" required>
-            <option value="Starters">Starters</option>
-            <option value="Mains">Mains</option>
-            <option value="Sides">Sides</option>
-            <option value="Desserts">Desserts</option>
-            <option value="Drinks">Drinks</option>
-        </select>
+        <label style="display: block; font-size: 16px; font-weight: bold; color: #2C2416;
+                     margin-botton: 12px;">
+            Category
+        </label>
+        <div style=" display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+            {% for cat in categories %}
+            <button type="button"
+                    class="category-btn"
+                    data-category="{{ cat.category_name }}"
+                onclick="selectCategory('{{ cat.category_name }}', this)"
+                style="padding: 10px 20px; border: 2px solid #D4AF37; border-radius: 6px;
+                       background: white; color: #2C2416; font-family: Georgia, serif; font-size: 14; font-weight: bold;
+                       cursor: pointer; transition: all 0.3s ease;">
+                {{ cat.category_name }}
+            </button>
+            {% endfor %}
+        </div>
 
         <label for="description">Description</label>
         <textarea id="description" name="description" rows="4" required>{{ item.description }}</textarea>
@@ -43,5 +52,31 @@
         <input type="submit" value="UPDATE ITEM">
     </form>
 </div>
+<script>
+function selectCategory(name, btn) {
+    document.querySelectorAll('.category-btn').forEach(b => {
+        b.style.background = 'white';
+        b.style.color = '#2C2416';
+        b.style.borderColor = '#D4AF37';
+    });
 
+    btn.style.background = '#8B0000';
+    btn.style.color = '#FFD700';
+    btn.style.borderColor = '#8B0000';
+    document.getElementById('selected-category').value = name;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const current = document.getElementById('selected-category').value;
+    if (current) {
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            if (btn.dataset.category === current) {
+                btn.style.background = '#8B0000';
+                btn.style.color = '#FFD700';
+                btn.style.borderColor = '#8B0000';
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -22,6 +22,9 @@
     {% endif %}
 
     <form method="POST" action="{{ url_for('customer_auth.update_profile') }}"
+          onsubmit="return confirm('Do you want to confirm your changes? \
+          This cannot be undone.')">
+
           style="max-width: 600px; margin: 40px auto;">
         <h2 style="color: #8B0000; margin-bottom: 30px;">Account Information</h2>
 
