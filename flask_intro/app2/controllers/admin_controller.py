@@ -1,10 +1,16 @@
 import requests
-from flask import render_template, request, redirect, url_for, session, Blueprint, Response
+from flask import render_template, request, redirect, url_for, session, Blueprint, Response, current_app
 from app2.database import get_db
 from werkzeug.security import check_password_hash
 from app2 import socketio
 from app2.controllers.image_manager_controller import image_manager_controller
 from app2.models.category_model import add_category, get_category
+import os
+from werkzeug.utils import secure_filename
+from app2.models.homepage_model import (get_branding, update_branding, get_all_reviews,
+                                         update_review, add_review, delete_review,
+                                         get_dishes, update_dish)
+
 
 def admin_login():
     if request.method == "POST":
@@ -461,3 +467,76 @@ def delete_category(category_id):
     from app2.models.category_model import delete_category as del_cat
     del_cat(category_id)
     return redirect(url_for('admin.manage_categories'))
+
+def manage_homepage():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    branding = get_branding()
+    reviews = get_all_reviews()
+    dishes = get_dishes()
+
+    return render_template('admin/manage_homepage.html',
+                           branding=branding,
+                           reviews=reviews,
+                           dishes=dishes)
+
+def update_branding_settings():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    use_logo = request.form.get('use_logo') == 'true'
+    restaurant_name = request.form.get('restaurant_name')
+    restaurant_motto = request.form.get('restaurant_motto')
+    logo_path = get_branding().get('logo_path')
+
+    file = request.files.get('logo_file')
+    if file and file.filename:
+        filename = secure_filename(file.filename)
+        upload_folder = os.path.join(current_app.root_path, 'static', 'imgs')
+        file.save(os.path.join(upload_folder, filename))
+        logo_path = f"/static/imgs/{filename}"
+
+    update_branding(use_logo, logo_path, restaurant_name, restaurant_motto)
+    return redirect(url_for('admin.manage_homepage'))
+
+def update_review_item():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    review_id = request.form.get('review_id')
+    reviewer_name = request.form.get('reviewer_name')
+    review_text = request.form.get('review_text')
+    rating = request.form.get('rating')
+    is_visible = request.form.get('is_visible') == '1'
+
+    update_review(review_id, reviewer_name, review_text, rating, is_visible)
+    return redirect(url_for('admin.manage_homepage'))
+
+def add_review_item():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    reviewer_name = request.form.get('reviewer_name')
+    review_text = request.form.get('review_text')
+    rating = request.form.get('rating', 5)
+
+    add_review(reviewer_name, review_text, rating)
+    return redirect(url_for('admin.manage_homepage'))
+
+def delete_review_item(review_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+    delete_review(review_id)
+    return redirect(url_for('admin.manage_homepage'))
+
+def update_dish_item():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    dish_key = request.form.get('dish_key')
+    dish_name = request.form.get('dish_name')
+    dish_description = request.form.get('dish_description')
+
+    update_dish(dish_key, dish_name, dish_description)
+    return redirect(url_for('admin.manage_homepage'))

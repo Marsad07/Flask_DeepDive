@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% block header %}{% endblock %}
+
 {% block content %}
 <!-- This is the hero section with overlay -->
 <div style="position: relative; width: 100%; height: 600px; overflow: hidden;">
@@ -8,14 +10,23 @@
 
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
                 text-align: center; color: white; width: 90%; max-width: 800px;">
-        <h1 style="font-size: 64px; font-weight: bold; margin-bottom: 20px;
-                   text-shadow: 2px 2px 10px rgba(0,0,0,0.7); letter-spacing: 3px;">
-            (Restaurant Name)
-        </h1>
+
+        <!-- This shows logo or text depending on branding settings -->
+        {% if branding.use_logo and branding.logo_path %}
+            <img src="{{ branding.logo_path }}" alt="Restaurant Logo"
+                 style="max-height: 120px; margin-bottom: 20px;">
+        {% else %}
+            <h1 style="font-size: 64px; font-weight: bold; margin-bottom: 20px;
+                       text-shadow: 2px 2px 10px rgba(0,0,0,0.7); letter-spacing: 3px;">
+                {{ branding.restaurant_name }}
+            </h1>
+        {% endif %}
+
         <p style="font-size: 28px; margin-bottom: 40px; font-style: italic;
                   text-shadow: 2px 2px 8px rgba(0,0,0,0.7);">
-            (Restaurant Motto)
+            {{ branding.restaurant_motto }}
         </p>
+
         <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
             <a href="{{ url_for('cart.order_now_menu') }}"
                style="background: #8B0000; color: #FFD700; padding: 18px 45px;
@@ -28,7 +39,6 @@
                 this.style.boxShadow='0 4px 15px rgba(139,0,0,0.4)'">
                 🛒 Order Takeaway
             </a>
-
             <a href="{{ url_for('reservations.reservations_page') }}"
                style="background: rgba(255,255,255,0.2); color: white; padding: 18px 45px;
                       text-decoration: none; border-radius: 50px; font-size: 20px;
@@ -52,6 +62,7 @@
 </div>
 
 <div style="font-family: Georgia, serif;">
+
 <!-- This is the featured dishes section -->
 <div style="padding: 80px 20px; background: #FFFEF2;">
     <h2 style="text-align: center; font-size: 48px; color: #8B0000; margin-bottom: 50px; letter-spacing: 2px;">
@@ -59,7 +70,7 @@
     </h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 30px; max-width: 1200px; margin: 0 auto;">
-        <!-- Dish 1 -->
+        {% for dish in dishes %}
         <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
              onmouseover="this.style.transform='translateY(-10px)'"
@@ -67,99 +78,46 @@
             <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
                         display: flex; align-items: center; justify-content: center; color: white;
                         font-size: 18px; overflow: hidden;">
-                {% if dish1 %}
+                {% set dish_img = dish.dish_key %}
+                {% if dish_img == 'dish1' and dish1 %}
                     <img src="{{ dish1 }}" style="width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                    Add Dish Photo 1
-                {% endif %}
-            </div>
-            <div style="padding: 25px; text-align: center;">
-                <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 1 Name</h3>
-                <p style="color: #5C4033; font-style: italic; margin: 0;">
-                    Dish 1 description
-                </p>
-            </div>
-        </div>
-        <!-- Dish 2 -->
-        <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
-             onmouseover="this.style.transform='translateY(-10px)'"
-             onmouseout="this.style.transform='translateY(0)'">
-            <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white;
-                        font-size: 18px; overflow: hidden;">
-                {% if dish2 %}
+                {% elif dish_img == 'dish2' and dish2 %}
                     <img src="{{ dish2 }}" style="width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                    Add Dish Photo 2
-                {% endif %}
-            </div>
-            <div style="padding: 25px; text-align: center;">
-                <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 2 Name</h3>
-                <p style="color: #5C4033; font-style: italic; margin: 0;">
-                    Dish 2 description
-                </p>
-            </div>
-        </div>
-        <!-- Dish 3 -->
-        <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
-             onmouseover="this.style.transform='translateY(-10px)'"
-             onmouseout="this.style.transform='translateY(0)'">
-            <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white;
-                        font-size: 18px; overflow: hidden;">
-                {% if dish3 %}
+                {% elif dish_img == 'dish3' and dish3 %}
                     <img src="{{ dish3 }}" style="width: 100%; height: 100%; object-fit: cover;">
                 {% else %}
-                    Add Dish Photo 3
+                    Add Dish Photo
                 {% endif %}
             </div>
             <div style="padding: 25px; text-align: center;">
-                <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">Dish 3 Name</h3>
-                <p style="color: #5C4033; font-style: italic; margin: 0;">
-                    Dish 3 description
-                </p>
+                <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">{{ dish.dish_name }}</h3>
+                <p style="color: #5C4033; font-style: italic; margin: 0;">{{ dish.dish_description }}</p>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 </div>
 
 <!-- This is for the reviews/testimonials section -->
-<div style="padding: 80px 20px; background: #2C2416; color: white; text-align: center; margin-bottom: -62px;">
+<div style="padding: 80px 20px; background: #2C2416; color: white; text-align: center; margin-bottom: -8px;">
     <h2 style="font-size: 48px; color: #FFD700; margin-bottom: 50px; letter-spacing: 2px;">
         What Our Guests Say
     </h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 30px; max-width: 1200px; margin: 0 auto;">
-        <!-- Review 1 -->
+                gap: 30px; max-width: 1200px; margin: 40px auto 0 auto;">
+        {% for review in reviews %}
         <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
                     backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
+            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">
+                {% for i in range(review.rating) %}★{% endfor %}
+            </div>
             <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 1 Description"
+                "{{ review.review_text }}"
             </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 1 Name</p>
+            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- {{ review.reviewer_name }}</p>
         </div>
-        <!-- Review 2 -->
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 2 Description"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 2 Name</p>
-        </div>
-        <!-- Review 3 -->
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">★★★★★</div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "Reviewer 3 Description"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- Reviewer 3 Name</p>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

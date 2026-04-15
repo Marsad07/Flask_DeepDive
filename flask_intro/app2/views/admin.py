@@ -2,7 +2,9 @@ from flask import Blueprint
 from app2.controllers.admin_controller import (admin_login, dashboard, logout, view_reservations, manage_menu,
                                                add_menu_item, edit_menu_item, delete_menu_item, update_hours,
                                                view_analytics, view_all_orders, view_customer_order,
-                                               update_order_status, manage_categories, delete_category, image_manager)
+                                               update_order_status, manage_categories, delete_category, image_manager,
+                                               manage_homepage, update_branding_settings, update_review_item,
+                                               add_review_item, delete_review_item, update_dish_item)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -22,3 +24,9 @@ admin_bp.route("/update_order_status/<int:order_id>", methods=["POST"])(update_o
 admin_bp.route("/categories", methods=["GET", "POST"])(manage_categories)
 admin_bp.route("/categories/delete/<int:category_id>", methods=["POST"])(delete_category)
 admin_bp.route("/image_manager", methods=["GET", "POST"])(image_manager)
+admin_bp.add_url_rule('/admin/manage-homepage', view_func=manage_homepage, methods=['GET'])
+admin_bp.add_url_rule('/admin/update-branding', view_func=update_branding_settings, methods=['POST'])
+admin_bp.add_url_rule('/admin/update-review', view_func=update_review_item, methods=['POST'])
+admin_bp.add_url_rule('/admin/add-review', view_func=add_review_item, methods=['POST'])
+admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_review_item, methods=['POST'])
+admin_bp.add_url_rule('/admin/update-dish', view_func=update_dish_item, methods=['POST'])

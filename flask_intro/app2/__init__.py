@@ -3,6 +3,7 @@ from app2.database import get_db
 from flask_socketio import SocketIO
 from flask_mailman import Mail
 import os
+from app2.models.homepage_model import get_branding, get_reviews, get_dishes
 
 socketio = SocketIO()
 mail = Mail()
@@ -37,9 +38,14 @@ def create_app():
         if hours and hours[0].get('address'):
             address = hours[0].get('address')
 
+        branding = get_branding()
+        reviews = get_reviews()
+        dishes = get_dishes()
+
         cursor.close()
         db.close()
-        return dict(restaurant_hours=hours, restaurant_address=address)
+        return dict(restaurant_hours=hours, restaurant_address=address, branding=branding, reviews=reviews,
+                    dishes=dishes)
 
     from app2.views.general import general_bp
     from app2.views.menu import menu_bp
