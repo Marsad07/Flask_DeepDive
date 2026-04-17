@@ -11,7 +11,6 @@ from app2.models.homepage_model import (get_branding, update_branding, get_all_r
                                          update_review, add_review, delete_review,
                                          get_dishes, update_dish)
 
-
 def admin_login():
     if request.method == "POST":
         username = request.form['username']
@@ -342,12 +341,21 @@ def view_customer_order(order_id):
         WHERE oi.order_id = %s
     """, (order_id,))
     items = cursor.fetchall()
+
+    cursor.execute("""
+          SELECT staff_id, staff_username, full_name
+          FROM staff_accounts
+          WHERE role = 'driver' AND is_active = 1
+      """)
+    drivers = cursor.fetchall()
+
     cursor.close()
     db.close()
     return render_template('admin/view_customer_order.html',
                            order=order,
                            customer=customer,
-                           items=items)
+                           items=items,
+                           drivers=drivers)
 
 def update_order_status(order_id):
     new_status = request.form.get('status')
@@ -540,3 +548,114 @@ def update_dish_item():
 
     update_dish(dish_key, dish_name, dish_description)
     return redirect(url_for('admin.manage_homepage'))
+
+def assign_driver(order_id):
+    driver_id = request.form.get("driver_id")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        UPDATE customer_orders
+        SET assigned_driver_id = %s
+        WHERE order_id = %s
+    """, (driver_id, order_id))
+
+    db.commit()
+    cursor.close()
+    db.close()
+    return redirect(url_for('admin.view_customer_order', order_id=order_id))
+
+def offer_driver(order_id):
+    driver_id = int(request.form.get("driver_id"))
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT driver_offer_id, driver_offer_status
+        FROM customer_orders
+        WHERE order_id = %s
+    """, (order_id,))
+    existing = cursor.fetchone()
+
+    if existing["driver_offer_id"] == driver_id:
+        status = existing["driver_offer_status"]
+        if status == "pending":
+            return """
+            <script>
+                window.onload = function() {
+                    window.parent.showDriverWarning(
+                    'This driver has already been offered this order and has not responded yet.');
+                }
+            </script>
+            """
+
+        if status == "declined":
+            return """
+            <script>
+                window.onload = function() {
+                    window.parent.showDriverWarning('This driver has already declined this order.');
+                }
+            </script>
+            """
+
+        if status == "accepted":
+            return """
+            <script>
+                window.onload = function() {
+                    window.parent.showDriverWarning('This driver has already accepted this order.');
+                }
+            </script>
+            """
+
+    # 🔥 FETCH ORDER INFO
+    cursor.execute("""
+        SELECT 
+            customer_id,
+            guest_fullname,
+            guest_delivery_address,
+            total_price
+        FROM customer_orders
+        WHERE order_id = %s
+    """, (order_id,))
+    order = cursor.fetchone()
+
+    # Determine customer name
+    customer_name = None
+    if order["customer_id"]:
+        cursor.execute("""
+            SELECT customer_fullname 
+            FROM customer_accounts 
+            WHERE customer_id = %s
+        """, (order["customer_id"],))
+        cust = cursor.fetchone()
+        if cust:
+            customer_name = cust["customer_fullname"]
+
+    if not customer_name:
+        customer_name = order["guest_fullname"]
+
+    address = order["guest_delivery_address"]
+    total_price = order["total_price"]
+
+    cursor.execute("""
+        UPDATE customer_orders
+        SET assigned_driver_id = NULL,
+            driver_offer_id = %s,
+            driver_offer_status = 'pending',
+            order_status = 'pending'
+        WHERE order_id = %s
+    """, (driver_id, order_id))
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    socketio.emit("driver_offer", {
+        "order_id": order_id,
+        "customer_name": customer_name,
+        "address": address,
+        "total_price": float(total_price),
+    }, room=f"driver_{driver_id}")
+
+    return redirect(url_for('admin.view_customer_order', order_id=order_id))

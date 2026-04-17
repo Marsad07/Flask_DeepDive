@@ -63,7 +63,7 @@
 }
 
 /* Forms */
-.menu-container form {
+.menu-container form:not(.inline-form) {
     max-width: 600px;
     margin: 40px auto;
     background: white;

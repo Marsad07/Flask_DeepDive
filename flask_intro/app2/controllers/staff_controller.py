@@ -68,7 +68,8 @@ def kitchen_display():
 
     cursor.close()
     db.close()
-    return render_template('staff/kitchen_display.html', orders=orders, staff_name=session.get('staff_name'))
+    return render_template('staff/kitchen_display.html', orders=orders,
+                           staff_name=session.get('staff_name'))
 
 def staff_logout():
     session.pop('staff_id', None)
@@ -98,3 +99,136 @@ def kitchen_update_order_status(order_id):
     }, room=f'order_{order_id}')
 
     return redirect(url_for('staff.kitchen_display'))
+
+def driver_orders():
+    if 'staff_id' not in session or session.get('staff_role') != 'driver':
+        return redirect(url_for('staff.staff_login'))
+
+    driver_id = session['staff_id']
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT is_available FROM staff_accounts WHERE staff_id = %s", (driver_id,))
+    driver = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT 
+            co.order_id,
+            co.order_status,
+            co.total_price,
+            co.special_instructions,
+            co.guest_fullname,
+            co.guest_phonenum,
+            co.guest_delivery_address,
+            ca.address_line1, ca.address_line2, ca.city, ca.postcode,
+            cust.customer_fullname,
+            cust.customer_phonenum AS cust_phonenum
+        FROM customer_orders co
+        LEFT JOIN customer_accounts cust ON co.customer_id = cust.customer_id
+        LEFT JOIN customer_addresses ca ON co.delivery_address_id = ca.address_id
+        WHERE co.assigned_driver_id = %s
+        AND co.order_status NOT IN ('completed', 'cancelled')
+        ORDER BY co.created_at ASC
+    """, (driver_id,))
+    raw_orders = cursor.fetchall()
+
+    orders = []
+    for order in raw_orders:
+        cursor.execute("""
+            SELECT oi.quantity, oi.item_name as name 
+            FROM order_items oi 
+            WHERE oi.order_id = %s
+        """, (order['order_id'],))
+        items = cursor.fetchall()
+        customer_name = order['customer_fullname'] or order['guest_fullname'] or 'Guest'
+        customer_phone = order['cust_phonenum'] or order['guest_phonenum'] or 'N/A'
+
+        if order['guest_delivery_address']:
+            address = order['guest_delivery_address']
+        elif order['address_line1']:
+            parts = [order['address_line1'], order['address_line2'],
+                     order['city'], order['postcode']]
+            address = ', '.join(p for p in parts if p)
+        else:
+            address = 'No address provided'
+
+        orders.append({
+            'order_id': order['order_id'],
+            'status': order['order_status'],
+            'total_price': order['total_price'],
+            'delivery_instructions': order['special_instructions'],
+            'customer_name': customer_name,
+            'customer_phonenum': customer_phone,
+            'customer_address': address,
+            'order_items': items
+        })
+    cursor.close()
+    db.close()
+    return render_template("staff/delivery_driver_display.html",
+                           staff_name=session.get('staff_name'),
+                           orders=orders,
+                           is_available=driver['is_available'],
+                           driver_id=driver_id)
+
+def toggle_driver_availability():
+    if 'staff_id' not in session or session.get('staff_role') != 'driver':
+        return redirect(url_for('staff.staff_login'))
+
+    driver_id = session['staff_id']
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT is_available FROM staff_accounts WHERE staff_id = %s", (driver_id,))
+    driver = cursor.fetchone()
+    new_status = not driver['is_available']
+
+    cursor.execute("UPDATE staff_accounts SET is_available = %s WHERE staff_id = %s",
+                   (new_status, driver_id))
+    db.commit()
+    cursor.close()
+    db.close()
+    return redirect(url_for('staff.driver_orders'))
+
+def update_delivery_status(order_id):
+    if 'staff_id' not in session or session.get('staff_role') != 'driver':
+        return redirect(url_for('staff.staff_login'))
+
+    driver_id = session['staff_id']
+    action = request.form.get('action', 'delivered')
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if action == 'pickup':
+        cursor.execute("""
+            UPDATE customer_orders SET order_status = 'out_for_delivery'
+            WHERE order_id = %s AND assigned_driver_id = %s
+        """, (order_id, driver_id))
+        db.commit()
+        cursor.close()
+        db.close()
+        return redirect(url_for('staff.driver_orders'))
+
+    cursor.execute("""
+        UPDATE customer_orders SET order_status = 'completed'
+        WHERE order_id = %s AND assigned_driver_id = %s
+    """, (order_id, driver_id))
+
+    cursor.execute("""
+        SELECT COUNT(*) as active_count FROM customer_orders
+        WHERE assigned_driver_id = %s 
+        AND order_status NOT IN ('completed', 'cancelled')
+    """, (driver_id,))
+    result = cursor.fetchone()
+
+    if result['active_count'] == 0:
+        cursor.execute("""
+            UPDATE staff_accounts SET is_available = TRUE 
+            WHERE staff_id = %s
+        """, (driver_id,))
+
+    db.commit()
+    cursor.close()
+    db.close()
+    return redirect(url_for('staff.driver_orders'))
+
+

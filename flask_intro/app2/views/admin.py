@@ -4,10 +4,11 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                view_analytics, view_all_orders, view_customer_order,
                                                update_order_status, manage_categories, delete_category, image_manager,
                                                manage_homepage, update_branding_settings, update_review_item,
-                                               add_review_item, delete_review_item, update_dish_item)
+                                               add_review_item, delete_review_item, update_dish_item, assign_driver,
+                                               offer_driver
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
-
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
 admin_bp.route("/dashboard")(dashboard)
 admin_bp.route("/logout")(logout)
@@ -30,3 +31,5 @@ admin_bp.add_url_rule('/admin/update-review', view_func=update_review_item, meth
 admin_bp.add_url_rule('/admin/add-review', view_func=add_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/update-dish', view_func=update_dish_item, methods=['POST'])
+admin_bp.route('/orders/<int:order_id>/assign_driver', methods=['POST'])(assign_driver)
+admin_bp.route('/orders/<int:order_id>/offer_driver', methods=['POST'])(offer_driver)

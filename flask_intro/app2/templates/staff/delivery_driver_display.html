@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="menu-container" style="margin: 0 auto;">
+    <h1 style="text-align:center; margin-top: 30px; color:#8B0000; font-family: Georgia, serif;">
+        Assigned Deliveries
+    </h1>
+    <div style="text-align: center; margin-top: 25px;">
+        <h3 style="margin-bottom: 10px; font-family: Georgia, serif;">Availability</h3>
+        <form method="POST" class="inline-form" action="{{ url_for('staff.toggle_driver_availability') }}">
+            {% if is_available %}
+                <div style="margin-bottom: 12px;">
+                    <span style="display: inline-block; background: #d4edda; color: #155724;
+                                 padding: 8px 22px; border-radius: 20px; font-weight: bold; font-size: 15px;">
+                        ✓ You are Available
+                    </span>
+                </div>
+                <button type="submit" style="background: #8B0000; color: white; padding: 10px 25px;
+                        border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                    Go Unavailable
+                </button>
+            {% else %}
+                <div style="margin-bottom: 12px;">
+                    <span style="display: inline-block; background: #f8d7da; color: #721c24;
+                                 padding: 8px 22px; border-radius: 20px; font-weight: bold; font-size: 15px;">
+                        ✗ You are Unavailable
+                    </span>
+                </div>
+                <button type="submit" style="background: #2C7A2C; color: white; padding: 10px 25px;
+                        border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                    Go Available
+                </button>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if orders|length == 0 %}
+        <p style="text-align:center; margin-top:40px; font-size:20px; color:#444;">
+            No delivery orders assigned to you at the moment.
+        </p>
+    {% else %}
+        <h2 style="margin-top: 40px; margin-bottom: 15px; color:#2C2416; font-family: Georgia, serif;">
+            Active Orders
+        </h2>
+
+        {% for order in orders %}
+        <div style="background: #fff; padding: 22px; margin-bottom: 25px;
+                    border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
+            <h2 style="color:#8B0000; margin-bottom:10px; font-family: Georgia, serif;">
+                Order #{{ order.order_id }}
+            </h2>
+
+            <p><strong>Order Num:</strong> {{ order.order_id }}</p>
+            <p><strong>Customer:</strong> {{ order.customer_name }}</p>
+            <p><strong>Address:</strong> {{ order.customer_address }}</p>
+            <p><strong>Phone:</strong> {{ order.customer_phonenum }}</p>
+
+            {% if order.delivery_instructions %}
+                <p><strong>Instructions:</strong> {{ order.delivery_instructions }}</p>
+            {% endif %}
+
+            <hr style="margin:15px 0;">
+
+            <h3 style="margin-bottom:10px; font-family: Georgia, serif;">Items</h3>
+            <ul style="padding-left: 20px; margin-bottom: 10px;">
+                {% for item in order.order_items %}
+                    <li style="margin-bottom: 4px;">{{ item.quantity }} × {{ item.name }}</li>
+                {% endfor %}
+            </ul>
+
+            <p style="margin-top:10px; font-size: 17px;">
+                <strong>Total:</strong> £{{ "%.2f"|format(order.total_price) }}
+            </p>
+
+            <p style="margin-top:5px;">
+                <strong>Status:</strong>
+                <span id="status-{{ order.order_id }}"
+                      style="font-weight: bold; color:
+                        {% if order.status == 'out_for_delivery' %}green
+                        {% elif order.status in ['ready', 'confirmed'] %}#D4AF37
+                        {% elif order.status == 'completed' %}green
+                        {% else %}#8B0000{% endif %};">
+                    {{ order.status | replace('_', ' ') | capitalize }}
+                </span>
+            </p>
+
+            <div style="margin-top: 15px; display: flex; flex-direction: column;
+                        gap: 10px; max-width: 280px;">
+
+                {% if order.status != 'out_for_delivery' %}
+                <form method="POST" class="inline-form"
+                      action="{{ url_for('staff.update_delivery_status', order_id=order.order_id) }}">
+                    <input type="hidden" name="action" value="pickup">
+                    <button type="submit" style="background: #D4AF37; color: #2C2416;
+                            padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
+                            font-size: 15px; font-weight: bold; width: 100%;">
+                        🚗 Mark as Out for Delivery
+                    </button>
+                </form>
+                {% endif %}
+
+                <form method="POST" class="inline-form"
+                      action="{{ url_for('staff.update_delivery_status', order_id=order.order_id) }}"
+                      onsubmit="return confirm('Mark this order as delivered?')">
+                    <input type="hidden" name="action" value="delivered">
+                    <button type="submit" style="background: #8B0000; color: white;
+                            padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
+                            font-size: 15px; font-weight: bold; width: 100%;">
+                        ✓ Mark as Delivered
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div id="offer-toast" style="
+        display:none;
+        position:fixed;
+        top:20px;
+        right:20px;
+        width:300px;
+        background:white;
+        border-left:6px solid #8B0000;
+        padding:18px 20px;
+        border-radius:10px;
+        box-shadow:0 6px 25px rgba(0,0,0,0.15);
+        z-index:9999;
+        animation: slideIn 0.35s ease-out;
+        font-family: Georgia, serif;">
+        <h3 style="margin:0 0 8px 0; color:#8B0000;">New Delivery Request</h3>
+        <p id="toast-customer" style="margin:4px 0;"></p>
+        <p id="toast-address" style="margin:4px 0;"></p>
+        <p id="toast-total" style="margin:4px 0; font-weight:bold;"></p>
+
+        <div style="margin-top:12px; display:flex; gap:10px;">
+            <button id="toast-accept" style="
+                flex:1;
+                background:#2C7A2C;
+                color:white;
+                padding:8px 12px;
+                border:none;
+                border-radius:6px;
+                cursor:pointer;
+                font-weight:bold;
+            ">Accept</button>
+
+            <button id="toast-decline" style="
+                flex:1;
+                background:#8B0000;
+                color:white;
+                padding:8px 12px;
+                border:none;
+                border-radius:6px;
+                cursor:pointer;
+                font-weight:bold;
+            ">Decline</button>
+        </div>
+    </div>
+
+    <audio id="offer-sound" src="{{ url_for('static', filename='sounds/sound2.mp3') }}" preload="auto"></audio>
+
+    <style>
+    @keyframes slideIn {
+        from { opacity:0; transform: translateX(40px); }
+        to { opacity:1; transform: translateX(0); }
+    }
+    </style>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+const socket = io();
+socket.emit("join_driver", { driver_id: {{ driver_id }} });
+socket.on("driver_offer", function(data) {
+    const sound = document.getElementById("offer-sound");
+    if (sound) {
+        sound.muted = false;
+        sound.volume = 1;
+        sound.currentTime = 0;
+
+        sound.play().catch(err => {
+            console.log("Autoplay blocked:", err);
+        });
+    }
+    currentOfferOrderId = data.order_id;
+
+    document.getElementById("toast-customer").textContent = "Customer: " + data.customer_name;
+    document.getElementById("toast-address").textContent = "Address: " + data.address;
+    document.getElementById("toast-total").textContent = "Total: £" + data.total_price;
+
+    const toast = document.getElementById("offer-toast");
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 10000);
+});
+
+{% for order in orders %}
+    socket.emit('join_order', { order_id: {{ order.order_id }} });
+{% endfor %}
+
+let currentOfferOrderId = null;
+
+document.getElementById("toast-accept").onclick = function() {
+    if (!currentOfferOrderId) return;
+    socket.emit("driver_response", { order_id: currentOfferOrderId, accepted: true });
+    document.getElementById("offer-toast").style.display = "none";
+};
+
+document.getElementById("toast-decline").onclick = function() {
+    if (!currentOfferOrderId) return;
+    socket.emit("driver_response", { order_id: currentOfferOrderId, accepted: false });
+    document.getElementById("offer-toast").style.display = "none";
+};
+</script>
+{% endblock %}

@@ -44,8 +44,13 @@ def create_app():
 
         cursor.close()
         db.close()
-        return dict(restaurant_hours=hours, restaurant_address=address, branding=branding, reviews=reviews,
-                    dishes=dishes)
+        return dict(
+            restaurant_hours=hours,
+            restaurant_address=address,
+            branding=branding,
+            reviews=reviews,
+            dishes=dishes
+        )
 
     from app2.views.general import general_bp
     from app2.views.menu import menu_bp
@@ -66,5 +71,68 @@ def create_app():
     app.register_blueprint(customer_auth_bp)
     app.register_blueprint(orders_bp)
     app.register_blueprint(staff_bp)
+
+    @socketio.on("join_admin")
+    def join_admin():
+        from flask_socketio import join_room
+        join_room("admin_room")
+
+    @socketio.on("join_driver")
+    def join_driver(data):
+        from flask_socketio import join_room
+        driver_id = data.get("driver_id")
+        if driver_id:
+            join_room(f"driver_{driver_id}")
+
+    @socketio.on("join_order")
+    def join_order(data):
+        from flask_socketio import join_room
+        order_id = data.get("order_id")
+        if order_id:
+            join_room(f"order_{order_id}")
+
+    socketio.on("driver_response")
+
+    @socketio.on("driver_response")
+    def driver_response(data):
+        from flask_socketio import emit
+        order_id = data["order_id"]
+        accepted = data["accepted"]
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT driver_offer_status
+            FROM customer_orders
+            WHERE order_id = %s
+        """, (order_id,))
+        existing = cursor.fetchone()
+
+        if existing["driver_offer_status"] in ("accepted", "declined"):
+            return  # ignore duplicates
+
+        if accepted:
+            cursor.execute("""
+                UPDATE customer_orders
+                SET assigned_driver_id = driver_offer_id,
+                    driver_offer_status = 'accepted'
+                WHERE order_id = %s
+            """, (order_id,))
+        else:
+            cursor.execute("""
+                UPDATE customer_orders
+                SET driver_offer_id = NULL,
+                    driver_offer_status = 'declined',
+                    order_status = 'pending'
+                WHERE order_id = %s
+            """, (order_id,))
+
+        db.commit()
+        cursor.close()
+        db.close()
+        emit("driver_response_update", {
+            "order_id": order_id,
+            "accepted": accepted
+        }, room="admin_room")
 
     return app
