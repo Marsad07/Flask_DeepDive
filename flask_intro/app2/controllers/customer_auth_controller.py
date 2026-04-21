@@ -1,11 +1,12 @@
 from flask import render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from app2.database import get_db
+from app2.database import get_db, staff_redirect
 from app2 import mail
 from flask_mailman import EmailMessage
 import secrets
 from datetime import datetime, timedelta
 
+@staff_redirect
 def customer_login():
     if request.method == "POST":
         customer_email = request.form['customer_email']
@@ -28,6 +29,7 @@ def customer_login():
 
     return render_template('auth/login.html')
 
+@staff_redirect
 def customer_register():
     if request.method == "POST":
         customer_fullname = request.form['customer_fullname']
@@ -69,6 +71,7 @@ def customer_logout():
     session.clear()
     return redirect(url_for('general.home_page'))
 
+@staff_redirect
 def customer_dashboard():
     if 'customer_id' not in session:
         return redirect(url_for('customer_auth.login'))
@@ -115,6 +118,7 @@ def customer_dashboard():
                            customer_fav_item=customer_fav_item,
                            recent_orders=recent_orders)
 
+@staff_redirect
 def customer_order_history():
     if 'customer_id' not in session:
         return redirect(url_for('customer_auth.login'))
@@ -148,6 +152,7 @@ def customer_profile_settings():
 
     return render_template('auth/customer_profile.html', customer=customer)
 
+@staff_redirect
 def update_profile():
     if 'customer_id' not in session:
         return redirect(url_for('customer_auth.login'))
@@ -199,6 +204,7 @@ def update_profile():
     db.close()
     return redirect(url_for('customer_auth.customer_profile_settings'))
 
+@staff_redirect
 def order_history():
     customer_id = session.get('customer_id')
     if not customer_id:
@@ -230,6 +236,7 @@ def order_history():
     db.close()
     return render_template("auth/order_history.html", orders=orders)
 
+@staff_redirect
 def forgot_password():
     if request.method == "POST":
         email = request.form.get('email')
@@ -336,6 +343,7 @@ def forgot_password():
 
     return render_template('auth/forgot_password.html', reset_sent=False)
 
+@staff_redirect
 def reset_password(token):
     db = get_db()
     cursor = db.cursor(dictionary=True)

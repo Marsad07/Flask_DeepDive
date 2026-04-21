@@ -136,7 +136,6 @@
             opacity: 1;
             transform: translateX(0);
           }
-
         }
 
         {% block styles %}{% endblock %}
@@ -159,43 +158,55 @@
     <span></span>
     <span></span>
 </button>
-
-<!-- This is the navigation bar -->
+<!-- This is the navigation bar — changes based on who is logged in -->
 <ul class="navbar" id="navbar">
-    <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
-    <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
-    <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
-    <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
-    <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
-    <li><a href="{{ url_for('cart.order_now_menu') }}">Order Now</a></li>
-    <li class="dropdown">
-    <a href="#">👥</a>
-    <ul class="dropdown-menu">
-        {% if session.get('customer_id') %}
-            <li><a href="{{ url_for('customer_auth.customer_dashboard') }}">My Account</a></li>
-            <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
-        {% elif session.get('staff_id') %}
-            <li><a href="{{ url_for('staff.kitchen_display') if session.get('staff_role') ==
-             'kitchen' else url_for('admin.dashboard') }}">My Dashboard</a></li>
-            <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
-        {% else %}
-            <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
-            <li><a href="{{ url_for('customer_auth.register') }}">Register</a></li>
-        {% endif %}
-    </ul>
-</li>
+    {% if session.get('staff_role') == 'kitchen' %}
+        <li><a href="{{ url_for('staff.kitchen_display') }}">Kitchen View</a></li>
+        <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
+
+    {% elif session.get('staff_role') == 'driver' %}
+        <li><a href="{{ url_for('staff.driver_orders') }}">My Deliveries</a></li>
+        <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
+
+    {% elif session.get('staff_role') == 'admin' %}
+        <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('admin.view_all_orders') }}">Orders</a></li>
+        <li><a href="{{ url_for('admin.manage_menu') }}">Menu</a></li>
+        <li><a href="{{ url_for('admin.view_reservations') }}">Reservations</a></li>
+        <li><a href="{{ url_for('admin.manage_drivers') }}">Drivers</a></li>
+        <li><a href="{{ url_for('admin.logout') }}">Logout</a></li>
+
+    {% else %}
+        <!-- This is the public navbar for customers and guests -->
+        <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
+        <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
+        <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
+        <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
+        <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
+        <li><a href="{{ url_for('cart.order_now_menu') }}">Order Now</a></li>
+        <li class="dropdown">
+            <a href="#">👥</a>
+            <ul class="dropdown-menu">
+                {% if session.get('customer_id') %}
+                    <li><a href="{{ url_for('customer_auth.customer_dashboard') }}">My Account</a></li>
+                    <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('customer_auth.register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </li>
+    {% endif %}
 </ul>
-
 {% block content %}{% endblock %}
-
 <!-- This is the footer section -->
 <footer style="background: #2C2416; color: #FFFEF2; padding: 40px 20px; text-align: center;
- margin-top: 60px; font-family: Georgia, serif;">
+               margin-top: 60px; font-family: Georgia, serif;">
     <div style="max-width: 1200px; margin: 0 auto;">
-
+        <!-- This hides the footer content for staff users -->
+        {% if not session.get('staff_role') %}
         <!-- This creates the footer columns that stack on mobile -->
         <div class="footer-grid">
-
             <!-- Location section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">LOCATION</h3>
@@ -211,7 +222,6 @@
                     {% endif %}
                 </p>
             </div>
-
             <!-- Hours section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">HOURS</h3>
@@ -228,44 +238,42 @@
                     {% endif %}
                 {% endfor %}
             </div>
-
             <!-- Quick Links section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">QUICK LINKS</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <a href="{{ url_for('menu.show_menu') }}" style="color: #FFFEF2; text-decoration: none;
-                     font-size: 14px; transition: color 0.3s;">Menu</a>
+                       font-size: 14px; transition: color 0.3s;">Menu</a>
                     <a href="{{ url_for('reservations.reservations_page') }}" style="color: #FFFEF2;
-                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Book a Table</a>
+                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Book a Table</a>
                     <a href="{{ url_for('general.about_page') }}" style="color: #FFFEF2;
-                     text-decoration: none; font-size: 14px; transition: color 0.3s;">About Us</a>
+                       text-decoration: none; font-size: 14px; transition: color 0.3s;">About Us</a>
                     <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
-                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Contact</a>
-                    <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
-                     text-decoration: none; font-size: 14px; transition: color 0.3s;">Order Now</a>
+                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Contact</a>
+                    <a href="{{ url_for('cart.order_now_menu') }}" style="color: #FFFEF2;
+                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Order Now</a>
                 </div>
             </div>
-
             <!-- Newsletter section -->
             <div>
                 <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">NEWSLETTER</h3>
-                <p style="font-size: 13px; color: #FFFEF2;
-                 margin-bottom: 12px;">Stay updated with our latest offers!</p>
-                <form method="POST" action="{{ url_for('general.newsletter_signup') }}" style="display: flex;
-                 flex-direction: column; gap: 8px;">
+                <p style="font-size: 13px; color: #FFFEF2; margin-bottom: 12px;">
+                    Stay updated with our latest offers!
+                </p>
+                <form method="POST" action="{{ url_for('general.newsletter_signup') }}"
+                      style="display: flex; flex-direction: column; gap: 8px;">
                     <input type="email" name="email" placeholder="Your email" required
                            style="padding: 10px; border: none; border-radius: 6px; font-size: 13px;
-                            font-family: Georgia, serif;">
+                                  font-family: Georgia, serif;">
                     <button type="submit"
                             style="padding: 10px; background: #8B0000; color: #FFD700; border: none;
-                             border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
-                              font-family: Georgia, serif; transition: all 0.3s ease;">
+                                   border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
+                                   font-family: Georgia, serif; transition: all 0.3s ease;">
                         SUBSCRIBE
                     </button>
                 </form>
             </div>
         </div>
-
         <!-- Social media section -->
         <div style="margin-bottom: 20px;">
             <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 16px;">FOLLOW US</h3>
@@ -287,7 +295,9 @@
                 {% endfor %}
             </div>
         </div>
-        <!-- Copyright section -->
+
+        {% endif %}
+        <!-- Copyright section, this always shows for everyone -->
         <p style="font-size: 14px; color: #D4AF37; margin: 0;">
             © 2026 {{ branding.restaurant_name }}. All rights reserved.
         </p>
@@ -299,22 +309,23 @@ function toggleMenu() {
     const navbar = document.getElementById('navbar');
     navbar.classList.toggle('active');
 }
+// This handles the account dropdown toggle — only runs if dropdown exists
+const dropdownLink = document.querySelector('.dropdown > a');
+if (dropdownLink) {
+    dropdownLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.parentElement.classList.toggle('open');
+    });
 
-// This handles the account dropdown toggle
-document.querySelector('.dropdown > a').addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.parentElement.classList.toggle('open');
-});
-
-// This closes dropdown when clicking anywhere else on the page
-document.addEventListener('click', function(e) {
-    const dropdown = document.querySelector('.dropdown');
-    if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('open');
-    }
-});
-
+    // This closes dropdown when clicking anywhere else on the page
+    document.addEventListener('click', function(e) {
+        const dropdown = document.querySelector('.dropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+}
 // This closes the menu when a non-dropdown link is clicked on mobile
 document.querySelectorAll('.navbar a').forEach(link => {
     link.addEventListener('click', function() {

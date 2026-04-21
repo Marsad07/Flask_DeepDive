@@ -5,8 +5,11 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                update_order_status, manage_categories, delete_category, image_manager,
                                                manage_homepage, update_branding_settings, update_review_item,
                                                add_review_item, delete_review_item, update_dish_item, assign_driver,
-                                               offer_driver, manage_contact, manage_social_links, add_social_link,
-                                               edit_social_link, delete_social_link)
+                                               offer_driver, manage_drivers, toggle_driver_active, manage_contact,
+                                               manage_social_links, add_social_link, edit_social_link,
+                                               delete_social_link, manage_about, update_about_section,
+                                               add_about_section, delete_about_section, manage_tables,
+                                               save_table_positions, add_table, delete_table, update_table)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
@@ -33,6 +36,9 @@ admin_bp.add_url_rule('/admin/update-review', view_func=update_review_item, meth
 admin_bp.add_url_rule('/admin/add-review', view_func=add_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/update-dish', view_func=update_dish_item, methods=['POST'])
+
+admin_bp.route('/drivers')(manage_drivers)
+admin_bp.route('/drivers/<int:staff_id>/toggle-active', methods=['POST'])(toggle_driver_active)
 admin_bp.route('/orders/<int:order_id>/assign_driver', methods=['POST'])(assign_driver)
 admin_bp.route('/orders/<int:order_id>/offer_driver', methods=['POST'])(offer_driver)
 admin_bp.route('/manage_contact', methods=['GET', 'POST'])(manage_contact)
@@ -41,3 +47,14 @@ admin_bp.route('/social-links', methods=['GET'])(manage_social_links)
 admin_bp.route('/social-links/add', methods=['POST'])(add_social_link)
 admin_bp.route('/social-links/edit/<int:link_id>', methods=['POST'])(edit_social_link)
 admin_bp.route('/social-links/delete/<int:link_id>', methods=['POST'])(delete_social_link)
+
+admin_bp.route('/manage-about', methods=['GET'])(manage_about)
+admin_bp.route('/about/update/<int:section_id>', methods=['POST'])(update_about_section)
+admin_bp.route('/about/add', methods=['POST'])(add_about_section)
+admin_bp.route('/about/delete/<int:section_id>', methods=['POST'])(delete_about_section)
+
+admin_bp.route('/tables', methods=['GET'])(manage_tables)
+admin_bp.route('/tables/save-positions', methods=['POST'])(save_table_positions)
+admin_bp.route('/tables/add', methods=['POST'])(add_table)
+admin_bp.route('/tables/delete/<int:table_id>', methods=['POST'])(delete_table)
+admin_bp.route('/tables/update/<int:table_id>', methods=['POST'])(update_table)

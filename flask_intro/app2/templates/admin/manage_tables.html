@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="menu-container">
+    <h1>MANAGE TABLES</h1>
+    <!-- Add new table -->
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
+        <h3 style="color: #2C2416; font-family: Georgia, serif; margin-bottom: 20px;">Add New Table</h3>
+        <form action="{{ url_for('admin.add_table') }}" method="POST" class="inline-form"
+              style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Table Number</label>
+                <input type="number" name="table_number" min="1"
+                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
+                              font-family: Georgia, serif; width: 100px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Seats</label>
+                <select name="seats" style="padding: 10px; border: 2px solid #D4AF37;
+                        border-radius: 6px; font-family: Georgia, serif;">
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Location</label>
+                <input type="text" name="location" placeholder="e.g. Window"
+                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
+                              font-family: Georgia, serif; width: 120px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Shape</label>
+                <select name="shape" style="padding: 10px; border: 2px solid #D4AF37;
+                        border-radius: 6px; font-family: Georgia, serif;">
+                    <option value="circle">Circle (2 seats)</option>
+                    <option value="square">Square (4 seats)</option>
+                    <option value="rect">Rectangle (6 seats)</option>
+                    <option value="booth">Booth</option>
+                    <option value="large">Large (8 seats)</option>
+                </select>
+            </div>
+            <button type="submit" style="padding: 10px 25px; background: #8B0000; color: #FFD700;
+                    border: none; border-radius: 6px; font-family: Georgia, serif;
+                    font-size: 15px; font-weight: bold; cursor: pointer;">
+                Add Table
+            </button>
+        </form>
+    </div>
+
+    <!-- This is for the drag and drop layout editor -->
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="color: #2C2416; font-family: Georgia, serif; margin: 0;">
+                Table Layout Editor
+            </h3>
+            <button onclick="savePositions()" style="padding: 10px 25px; background: #2C7A2C;
+                    color: white; border: none; border-radius: 6px; font-family: Georgia, serif;
+                    font-size: 14px; font-weight: bold; cursor: pointer;">
+                💾 Save Layout
+            </button>
+        </div>
+        <p style="color: #666; font-size: 13px; margin-bottom: 15px; font-family: Georgia, serif;">
+            Click and drag tables to reposition them. Click Save Layout when done.
+        </p>
+
+        <!-- Canvas -->
+        <div id="layout-canvas" style="position: relative; width: 100%; height: 550px;
+             background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
+             border: 3px solid #8B4513; border-radius: 12px; overflow: hidden;">
+
+            <!-- Room labels -->
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+                        color: #8B4513; font-family: Georgia, serif; font-size: 12px;
+                        font-weight: bold; letter-spacing: 2px; opacity: 0.5;">
+                WINDOW SIDE
+            </div>
+            <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+                        color: #8B4513; font-family: Georgia, serif; font-size: 12px;
+                        font-weight: bold; letter-spacing: 2px; opacity: 0.5;">
+                ENTRANCE
+            </div>
+
+            {% for table in tables %}
+            <div class="draggable-table"
+                 data-id="{{ table.table_id }}"
+                 data-table="{{ table.table_number }}"
+                 style="position: absolute; left: {{ table.pos_x }}px; top: {{ table.pos_y }}px;
+                        cursor: grab; text-align: center; user-select: none;
+                        {% if not table.is_active %}opacity: 0.4;{% endif %}">
+                <div class="table-{{ table.shape }}"
+                     style="margin: 0 auto 5px; display: flex; align-items: center;
+                            justify-content: center; font-size: 18px; font-weight: bold;
+                            color: white; background: #8B4513;">
+                    {{ table.table_number }}
+                </div>
+                <div style="font-size: 11px; color: #5C4033; font-family: Georgia, serif;
+                            font-weight: bold;">
+                    {{ table.seats }}s · {{ table.location }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <p id="save-status" style="text-align: center; margin-top: 10px; font-family: Georgia, serif;
+                                    color: green; display: none;">
+            ✓ Layout saved successfully
+        </p>
+    </div>
+
+    <!-- This shows the table list -->
+    <div style="background: white; padding: 25px; border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
+        <h3 style="color: #2C2416; font-family: Georgia, serif; margin-bottom: 20px;">All Tables</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #2C2416; color: #FFD700;">
+                    <th style="padding: 12px; text-align: left;">Table #</th>
+                    <th style="padding: 12px; text-align: left;">Seats</th>
+                    <th style="padding: 12px; text-align: left;">Location</th>
+                    <th style="padding: 12px; text-align: left;">Shape</th>
+                    <th style="padding: 12px; text-align: left;">Active</th>
+                    <th style="padding: 12px; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for table in tables %}
+                <tr style="border-bottom: 1px solid #E8DFD0;">
+                    <td style="padding: 12px;">{{ table.table_number }}</td>
+                    <td style="padding: 12px;">{{ table.seats }}</td>
+                    <td style="padding: 12px;">{{ table.location }}</td>
+                    <td style="padding: 12px;">{{ table.shape }}</td>
+                    <td style="padding: 12px;">
+                        {% if table.is_active %}
+                            <span style="color: green; font-weight: bold;">✓ Yes</span>
+                        {% else %}
+                            <span style="color: #999;">✗ No</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px;">
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="openEditTable({{ table.table_id }}, {{ table.seats }},
+                                            '{{ table.location }}', '{{ table.shape }}',
+                                            {{ 1 if table.is_active else 0 }})"
+                                    style="padding: 6px 14px; background: #D4AF37; color: #2C2416;
+                                           border: none; border-radius: 4px; cursor: pointer;
+                                           font-family: Georgia, serif; font-size: 13px; font-weight: bold;">
+                                Edit
+                            </button>
+                            <form id="delete-table-{{ table.table_id }}"
+                                  action="{{ url_for('admin.delete_table', table_id=table.table_id) }}"
+                                  method="POST" class="inline-form">
+                                <button type="button"
+                                        onclick="showDeleteTableConfirm({{ table.table_id }}, {{ table.table_number }})"
+                                        style="padding: 6px 14px; background: #8B0000; color: white;
+                                               border: none; border-radius: 4px; cursor: pointer;
+                                               font-family: Georgia, serif; font-size: 13px;">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}"
+       style="display: inline-block; margin-top: 10px; color: #8B0000;
+              font-weight: bold; text-decoration: none;">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<!-- This is for editing table -->
+<div id="edit-table-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
+     height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                width:90%; font-family:Georgia, serif; border-top:5px solid #8B0000;">
+        <h3 style="color:#2C2416; margin-bottom:20px;">Edit Table</h3>
+        <form id="edit-table-form" method="POST" class="inline-form">
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px;">Seats</label>
+                <select id="edit-seats" name="seats"
+                        style="width:100%; padding:10px; border:2px solid #D4AF37;
+                               border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px;">Location</label>
+                <input type="text" id="edit-location" name="location"
+                       style="width:100%; padding:10px; border:2px solid #D4AF37;
+                              border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px;">Shape</label>
+                <select id="edit-shape" name="shape"
+                        style="width:100%; padding:10px; border:2px solid #D4AF37;
+                               border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="rect">Rectangle</option>
+                    <option value="booth">Booth</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px;">Active</label>
+                <select id="edit-active" name="is_active"
+                        style="width:100%; padding:10px; border:2px solid #D4AF37;
+                               border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:15px; justify-content:flex-end; margin-top:20px;">
+                <button type="button" onclick="closeEditTable()"
+                        style="padding:10px 25px; background:white; color:#2C2416;
+                               border:2px solid #D4AF37; border-radius:8px;
+                               font-family:Georgia,serif; font-weight:bold; cursor:pointer;">
+                    Cancel
+                </button>
+                <button type="submit"
+                        style="padding:10px 25px; background:#8B0000; color:#FFD700;
+                               border:none; border-radius:8px; font-family:Georgia,serif;
+                               font-weight:bold; cursor:pointer;">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- This is for the delete confirmation-->
+<div id="delete-table-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
+     height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
+        <h3 style="color:#2C2416; font-size:22px; margin-bottom:15px;">Remove Table</h3>
+        <p id="delete-table-message" style="color:#5C4033; font-size:16px; margin-bottom:30px;"></p>
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button onclick="closeDeleteTableConfirm()"
+                style="padding:12px 30px; background:white; color:#2C2416;
+                       border:2px solid #D4AF37; border-radius:8px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer;">
+                Cancel
+            </button>
+            <button id="delete-table-confirm-btn"
+                style="padding:12px 30px; background:#8B0000; color:#FFD700;
+                       border:none; border-radius:8px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer;">
+                Yes, Remove
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+// Drag and drop
+const canvas = document.getElementById('layout-canvas');
+let dragging = null;
+let offsetX = 0;
+let offsetY = 0;
+
+document.querySelectorAll('.draggable-table').forEach(el => {
+    el.addEventListener('mousedown', function(e) {
+        dragging = this;
+        dragging.style.cursor = 'grabbing';
+        dragging.style.zIndex = 1000;
+        const rect = dragging.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        e.preventDefault();
+    });
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    let x = e.clientX - canvasRect.left - offsetX;
+    let y = e.clientY - canvasRect.top - offsetY;
+    // Keep within canvas bounds
+    x = Math.max(0, Math.min(x, canvasRect.width - 80));
+    y = Math.max(0, Math.min(y, canvasRect.height - 80));
+    dragging.style.left = x + 'px';
+    dragging.style.top = y + 'px';
+});
+
+document.addEventListener('mouseup', function() {
+    if (dragging) {
+        dragging.style.cursor = 'grab';
+        dragging.style.zIndex = '';
+        dragging = null;
+    }
+});
+
+// Save positions
+function savePositions() {
+    const tables = document.querySelectorAll('.draggable-table');
+    const positions = [];
+    tables.forEach(t => {
+        positions.push({
+            id: t.dataset.id,
+            x: parseInt(t.style.left),
+            y: parseInt(t.style.top)
+        });
+    });
+
+    fetch('{{ url_for("admin.save_table_positions") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ positions: positions })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const status = document.getElementById('save-status');
+            status.style.display = 'block';
+            setTimeout(() => { status.style.display = 'none'; }, 3000);
+        }
+    });
+}
+
+// Edit table modal
+function openEditTable(id, seats, location, shape, isActive) {
+    document.getElementById('edit-seats').value = seats;
+    document.getElementById('edit-location').value = location;
+    document.getElementById('edit-shape').value = shape;
+    document.getElementById('edit-active').value = isActive;
+    document.getElementById('edit-table-form').action = '/admin/tables/update/' + id;
+    document.getElementById('edit-table-modal').style.display = 'flex';
+}
+
+function closeEditTable() {
+    document.getElementById('edit-table-modal').style.display = 'none';
+}
+
+document.getElementById('edit-table-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditTable();
+});
+
+// Delete table modal
+function showDeleteTableConfirm(id, tableNum) {
+    document.getElementById('delete-table-message').textContent =
+        'Are you sure you want to remove Table ' + tableNum + '? This cannot be undone.';
+    document.getElementById('delete-table-confirm-btn').onclick = function() {
+        document.getElementById('delete-table-' + id).submit();
+    };
+    document.getElementById('delete-table-modal').style.display = 'flex';
+}
+
+function closeDeleteTableConfirm() {
+    document.getElementById('delete-table-modal').style.display = 'none';
+}
+
+document.getElementById('delete-table-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteTableConfirm();
+});
+</script>
+{% endblock %}

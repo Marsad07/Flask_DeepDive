@@ -3,7 +3,10 @@ from app2.database import get_db
 from flask_socketio import SocketIO
 from flask_mailman import Mail
 import os
+from dotenv import load_dotenv
 from app2.models.homepage_model import get_branding, get_reviews, get_dishes
+
+load_dotenv()
 
 socketio = SocketIO()
 mail = Mail()
@@ -21,6 +24,7 @@ def create_app():
     app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
     app.config["MAIL_USE_TLS"] = True
     app.config["MAIL_USE_SSL"] = False
+    app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
     mail.init_app(app)
 
     @app.context_processor
@@ -38,6 +42,13 @@ def create_app():
         if hours and hours[0].get('address'):
             address = hours[0].get('address')
 
+        cursor.execute("""
+                SELECT * FROM social_links 
+                WHERE is_active = TRUE 
+                ORDER BY display_order ASC
+            """)
+        social_links = cursor.fetchall()
+
         branding = get_branding()
         reviews = get_reviews()
         dishes = get_dishes()
@@ -46,6 +57,7 @@ def create_app():
         db.close()
         return dict(
             restaurant_hours=hours,
+            social_links=social_links,
             restaurant_address=address,
             branding=branding,
             reviews=reviews,
@@ -109,8 +121,7 @@ def create_app():
         existing = cursor.fetchone()
 
         if existing["driver_offer_status"] in ("accepted", "declined"):
-            return  # ignore duplicates
-
+            return
         if accepted:
             cursor.execute("""
                 UPDATE customer_orders

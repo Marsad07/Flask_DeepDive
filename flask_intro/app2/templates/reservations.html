@@ -46,51 +46,16 @@
         </select>
 
         <label>Select Your Table</label>
-        <div class="restaurant-layout">
-            <div class="window-wall">
-                <div class="table-item table-2" data-table="1" data-seats="2">
-                    <div class="table-circle">1</div>
-                    <div class="table-info">2 seats<br>Window</div>
-                </div>
-                <div class="table-item table-2" data-table="2" data-seats="2">
-                    <div class="table-circle">2</div>
-                    <div class="table-info">2 seats<br>Window</div>
-                </div>
-                <div class="table-item table-2" data-table="3" data-seats="2">
-                    <div class="table-circle">3</div>
-                    <div class="table-info">2 seats<br>Window</div>
-                </div>
+        <div class="restaurant-layout" id="table-canvas" style="position: relative; min-height: 500px;">
+            {% for table in tables %}
+            <div class="table-item table-{{ table.seats }}"
+                 data-table="{{ table.table_number }}"
+                 data-seats="{{ table.seats }}"
+                 style="position: absolute; left: {{ table.pos_x }}px; top: {{ table.pos_y }}px;">
+                <div class="table-{{ table.shape }}">{{ table.table_number }}</div>
+                <div class="table-info">{{ table.seats }} seats<br>{{ table.location }}</div>
             </div>
-
-            <div class="center-area">
-                <div class="table-item table-4" data-table="4" data-seats="4">
-                    <div class="table-square">4</div>
-                    <div class="table-info">4 seats<br>Center</div>
-                </div>
-                <div class="table-item table-6" data-table="5" data-seats="6">
-                    <div class="table-rect">5</div>
-                    <div class="table-info">6 seats<br>Center</div>
-                </div>
-                <div class="table-item table-4" data-table="6" data-seats="4">
-                    <div class="table-square">6</div>
-                    <div class="table-info">4 seats<br>Center</div>
-                </div>
-            </div>
-
-            <div class="booth-area">
-                <div class="table-item table-4" data-table="7" data-seats="4">
-                    <div class="table-booth">7</div>
-                    <div class="table-info">4 seats<br>Booth</div>
-                </div>
-                <div class="table-item table-8" data-table="8" data-seats="8">
-                    <div class="table-large">8</div>
-                    <div class="table-info">8 seats<br>Private</div>
-                </div>
-                <div class="table-item table-4" data-table="9" data-seats="4">
-                    <div class="table-booth">9</div>
-                    <div class="table-info">4 seats<br>Booth</div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
 
         <input type="hidden" id="table_num" name="table_num" required>
@@ -108,7 +73,6 @@
         </button>
     </form>
 </div>
-
 <!-- This is for reservations-->
 <div id="reservation-confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
     background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">

@@ -1,7 +1,7 @@
 from flask import render_template
-from app2.database import get_db
+from app2.database import get_db, staff_redirect
 
-
+@staff_redirect
 def show_menu():
     db = get_db()
     cursor = db.cursor(dictionary=True)

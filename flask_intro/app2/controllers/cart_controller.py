@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, session
-from app2.database import get_db
+from app2.database import get_db, staff_redirect
 
+@staff_redirect
 def order_now_menu():
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -14,6 +15,7 @@ def order_now_menu():
     db.close()
     return render_template("menu2.html", menu_items=items)
 
+@staff_redirect
 def view_cart():
     # This gets cart from session
     cart = session.get('cart', {})
@@ -23,6 +25,7 @@ def view_cart():
         total = sum(float(item['price']) * int(item['quantity']) for item in cart.values())
     return render_template("cart/view_cart.html", cart=cart, total=total)
 
+@staff_redirect
 def add_to_cart(item_id):
     quantity = int(request.form.get("quantity"))
 
@@ -66,6 +69,7 @@ def add_to_cart(item_id):
     session['cart_message'] = f"✓ {item['item_name']} added to cart!"
     return redirect(url_for('cart.order_now_menu'))
 
+@staff_redirect
 def remove_from_cart(item_id):
     cart = session.get('cart', {})
     item_key = str(item_id)

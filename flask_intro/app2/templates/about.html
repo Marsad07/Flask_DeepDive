@@ -8,16 +8,11 @@
     <h1>ABOUT US</h1>
     <h2>OUR STORY</h2><br>
 
-    <h2 style="text-align: left;"> WHY WE STARTED</h2>
-    <p>Paragraph of restaurants story</p>
-
-    <h2 style="text-align: left;"> WHEN THE RESTAURANT OPENED</h2>
-    <p>Paragraph 2 of restaurants story</p>
-
-    <h2 style="text-align: left;">THE RESTAURANTS MISSION</h2>
-    <p>Paragraph 3 of restaurants story</p>
+    {% for section in sections %}
+    <h2 style="text-align: left;">{{ section.heading }}</h2>
+    <p>{{ section.content }}</p>
+    {% endfor %}
 </div>
-
 <script>
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -31,5 +26,4 @@
         observer.observe(el);
     });
 </script>
-
 {% endblock %}

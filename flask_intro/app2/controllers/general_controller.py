@@ -3,8 +3,9 @@ from flask_mailman import EmailMessage
 from app2.database import get_db
 from app2 import mail
 from app2.models.image_model import get_image
+from database import staff_redirect
 
-
+@staff_redirect
 def home_page():
     return render_template("homepage.html",
                            hero=get_image("hero"),
@@ -12,10 +13,17 @@ def home_page():
                            dish2=get_image("dish2"),
                            dish3=get_image("dish3"),
     )
-
+@staff_redirect
 def about_page():
-    return render_template("about.html")
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM about_us ORDER BY display_order ASC")
+    sections = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template("about.html", sections=sections)
 
+@staff_redirect
 def contact_page():
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -25,6 +33,7 @@ def contact_page():
 
     return render_template("contact.html", info=info)
 
+@staff_redirect
 def newsletter_signup():
     if request.method == "POST":
         email = request.form.get("email")

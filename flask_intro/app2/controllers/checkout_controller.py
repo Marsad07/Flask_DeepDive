@@ -1,10 +1,11 @@
 from flask import render_template, request, redirect, url_for, session, current_app
-from app2.database import get_db
+from app2.database import get_db, staff_redirect
 from datetime import datetime, date
 from app2 import socketio, mail
 from flask_mailman import EmailMessage
 import stripe
 
+@staff_redirect
 def checkout_page():
     cart = session.get('cart', {})
     if not cart:
@@ -12,7 +13,7 @@ def checkout_page():
     total = sum(item['price'] * item['quantity'] for item in cart.values())
     return render_template('checkout/checkout_page.html', cart=cart, total=total,
                            stripe_public_key=current_app.config.get('STRIPE_PUBLIC_KEY'))
-
+@staff_redirect
 def process_order():
     full_name = request.form.get('full_name')
     email = request.form.get('email')
@@ -244,6 +245,7 @@ def process_order():
 
     return redirect(url_for('checkout.order_confirmation', order_number=order_number))
 
+@staff_redirect
 def order_confirmation(order_number):
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -269,7 +271,7 @@ def order_confirmation(order_number):
                            order=order,
                            order_items=order_items,
                            order_number=order_number)
-
+@staff_redirect
 def create_payment_intent():
     stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
     cart = session.get('cart', {})

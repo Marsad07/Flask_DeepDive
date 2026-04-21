@@ -72,7 +72,7 @@ def dashboard():
 
 def logout():
     session.clear()
-    return redirect(url_for('admin.admin_login'))
+    return redirect(url_for('staff.staff_login'))
 
 def view_reservations():
     if 'admin_id' not in session:
@@ -693,7 +693,7 @@ def manage_social_links():
     links = cursor.fetchall()
     cursor.close()
     db.close()
-    return render_template("admin/social_links.html", info=links)
+    return render_template("admin/social_links.html", links=links)
 
 def add_social_link():
     if 'admin_id' not in session:
@@ -715,7 +715,6 @@ def add_social_link():
     db.close()
     flash('Social link added', 'success')
     return redirect(url_for('admin.manage_social_links'))
-
 
 def edit_social_link(link_id):
     if 'admin_id' not in session:
@@ -741,7 +740,6 @@ def edit_social_link(link_id):
     flash('Social link updated', 'success')
     return redirect(url_for('admin.manage_social_links'))
 
-
 def delete_social_link(link_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
@@ -754,3 +752,209 @@ def delete_social_link(link_id):
     db.close()
     flash('Social link removed', 'success')
     return redirect(url_for('admin.manage_social_links'))
+
+def manage_about():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM about_us ORDER BY display_order ASC")
+    sections = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template('admin/manage_about.html', sections=sections)
+
+
+def update_about_section(section_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    heading = request.form.get('heading')
+    content = request.form.get('content')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        UPDATE about_us SET heading = %s, content = %s 
+        WHERE id = %s
+    """, (heading, content, section_id))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Section updated', 'success')
+    return redirect(url_for('admin.manage_about'))
+
+
+def add_about_section():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    heading = request.form.get('heading')
+    content = request.form.get('content')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT MAX(display_order) as max_order FROM about_us
+    """)
+    result = cursor.fetchone()
+    next_order = (result['max_order'] or 0) + 1
+    section_key = f"section_{next_order}"
+
+    cursor.execute("""
+        INSERT INTO about_us (section_key, heading, content, display_order)
+        VALUES (%s, %s, %s, %s)
+    """, (section_key, heading, content, next_order))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Section added', 'success')
+    return redirect(url_for('admin.manage_about'))
+
+
+def delete_about_section(section_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("DELETE FROM about_us WHERE id = %s", (section_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Section deleted', 'success')
+    return redirect(url_for('admin.manage_about'))
+
+def manage_drivers():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            s.staff_id, s.full_name, s.staff_username, 
+            s.is_available, s.is_active,
+            o.order_id as current_order_id,
+            o.order_status as current_order_status
+        FROM staff_accounts s
+        LEFT JOIN customer_orders o 
+            ON o.assigned_driver_id = s.staff_id 
+            AND o.order_status NOT IN ('completed', 'cancelled')
+        WHERE s.role = 'driver'
+        ORDER BY s.is_available DESC, s.full_name ASC
+    """)
+    drivers = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template('admin/drivers.html', drivers=drivers)
+
+
+def toggle_driver_active(staff_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        UPDATE staff_accounts 
+        SET is_active = NOT is_active 
+        WHERE staff_id = %s AND role = 'driver'
+    """, (staff_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Driver status updated', 'success')
+    return redirect(url_for('admin.manage_drivers'))
+
+def manage_tables():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM restaurant_customer_tables ORDER BY table_number ASC")
+    tables = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template('admin/manage_tables.html', tables=tables)
+
+
+def save_table_positions():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    import json
+    positions = request.json.get('positions', [])
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    for pos in positions:
+        cursor.execute("""
+            UPDATE restaurant_customer_tables 
+            SET pos_x = %s, pos_y = %s 
+            WHERE table_id = %s
+        """, (pos['x'], pos['y'], pos['id']))
+    db.commit()
+    cursor.close()
+    db.close()
+    return {'success': True}
+
+
+def add_table():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    table_number = request.form.get('table_number')
+    seats = request.form.get('seats')
+    location = request.form.get('location')
+    shape = request.form.get('shape')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        INSERT INTO restaurant_customer_tables (table_number, seats, location, shape, pos_x, pos_y)
+        VALUES (%s, %s, %s, %s, 50, 50)
+    """, (table_number, seats, location, shape))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Table added', 'success')
+    return redirect(url_for('admin.manage_tables'))
+
+
+def delete_table(table_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("DELETE FROM restaurant_customer_tables WHERE table_id = %s", (table_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Table removed', 'success')
+    return redirect(url_for('admin.manage_tables'))
+
+
+def update_table(table_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    seats = request.form.get('seats')
+    location = request.form.get('location')
+    shape = request.form.get('shape')
+    is_active = request.form.get('is_active', 1)
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        UPDATE restaurant_customer_tables 
+        SET seats = %s, location = %s, shape = %s, is_active = %s
+        WHERE table_id = %s
+    """, (seats, location, shape, is_active, table_id))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Table updated', 'success')
+    return redirect(url_for('admin.manage_tables'))
