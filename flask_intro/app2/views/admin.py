@@ -5,18 +5,20 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                update_order_status, manage_categories, delete_category, image_manager,
                                                manage_homepage, update_branding_settings, update_review_item,
                                                add_review_item, delete_review_item, update_dish_item, assign_driver,
-                                               offer_driver
-)
+                                               offer_driver, manage_contact, manage_social_links, add_social_link,
+                                               edit_social_link, delete_social_link)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
 admin_bp.route("/dashboard")(dashboard)
 admin_bp.route("/logout")(logout)
-admin_bp.route("/reservations")(view_reservations)
-admin_bp.route("/menu")(manage_menu)
+
 admin_bp.route("/menu/add", methods=["GET", "POST"])(add_menu_item)
 admin_bp.route("/menu/edit/<int:item_id>", methods=["GET", "POST"])(edit_menu_item)
 admin_bp.route("/menu/delete/<int:item_id>", methods=["POST"])(delete_menu_item)
+
+admin_bp.route("/reservations")(view_reservations)
+admin_bp.route("/menu")(manage_menu)
 admin_bp.route("/update_hours", methods=["GET", "POST"])(update_hours)
 admin_bp.route("/analytics")(view_analytics)
 admin_bp.route("/view_all_orders")(view_all_orders)
@@ -33,3 +35,9 @@ admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_r
 admin_bp.add_url_rule('/admin/update-dish', view_func=update_dish_item, methods=['POST'])
 admin_bp.route('/orders/<int:order_id>/assign_driver', methods=['POST'])(assign_driver)
 admin_bp.route('/orders/<int:order_id>/offer_driver', methods=['POST'])(offer_driver)
+admin_bp.route('/manage_contact', methods=['GET', 'POST'])(manage_contact)
+
+admin_bp.route('/social-links', methods=['GET'])(manage_social_links)
+admin_bp.route('/social-links/add', methods=['POST'])(add_social_link)
+admin_bp.route('/social-links/edit/<int:link_id>', methods=['POST'])(edit_social_link)
+admin_bp.route('/social-links/delete/<int:link_id>', methods=['POST'])(delete_social_link)

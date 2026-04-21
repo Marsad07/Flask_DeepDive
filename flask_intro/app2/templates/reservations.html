@@ -7,9 +7,9 @@
 
 <div class="menu-container">
     <h1>RESERVE A TABLE</h1>
-    <h3>Join us here at [restaurant name] for an unforgettable experience</h3>
+    <h3>Join us here at {{ branding.restaurant_name }} for an unforgettable experience</h3>
 
-    <form method="POST">
+    <form method="POST" id="reservation-form">
         <label for="fullname">Full Name</label>
         <input type="text" id="fullname" name="fullname" required>
 
@@ -100,10 +100,48 @@
         <textarea id="special_requests" name="special_requests" rows="4"
                   placeholder="Dietary restrictions, celebrations..."></textarea>
 
-        <input type="submit" value="CONFIRM RESERVATION">
+        <button type="button" onclick="showReservationConfirm()"
+                style="padding:12px 25px; background:#8B0000; color:#FFD700;
+                       border:none; border-radius:6px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer;">
+            CONFIRM RESERVATION
+        </button>
     </form>
 </div>
 
+<!-- This is for reservations-->
+<div id="reservation-confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="
+        background:#FFFEF2;
+        border-radius:12px;
+        padding:40px;
+        max-width:400px;
+        width:90%;
+        text-align:center;
+        font-family:Georgia, serif;
+        border-top:5px solid #8B0000;">
+
+        <h3 style="margin-bottom:10px; color:#2C2416;">Confirm Reservation</h3>
+        <p style="margin-bottom:25px; color:#2C2416;">
+            Are you sure you want to confirm this reservation?
+        </p>
+
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button onclick="closeReservationConfirm()" style="
+                padding:10px 20px; background:white; border:2px solid #8B0000;
+                color:#8B0000; border-radius:6px; cursor:pointer; font-weight:bold;">
+                Cancel
+            </button>
+
+            <button onclick="submitReservationForm()" style="
+                padding:10px 20px; background:#8B0000; color:#FFD700;
+                border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
+                Yes, Confirm
+            </button>
+        </div>
+    </div>
+</div>
 <script>
     const tables = document.querySelectorAll('.table-item');
     const tableInput = document.getElementById('table_num');
@@ -143,6 +181,27 @@
         }
     });
 
+    function showReservationConfirm() {
+        if (!tableInput.value) {
+            tableError.style.display = 'block';
+            tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        document.getElementById('reservation-confirm-modal').style.display = 'flex';
+    }
+
+    function closeReservationConfirm() {
+        document.getElementById('reservation-confirm-modal').style.display = 'none';
+    }
+
+    function submitReservationForm() {
+        document.getElementById('reservation-form').submit();
+    }
+
+    document.getElementById('reservation-confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeReservationConfirm();
+    });
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -151,7 +210,7 @@
         });
     }, { threshold: 0.1 });
 
-        ['.menu-container h1', '.menu-container h3', '.menu-container form',
+    ['.menu-container h1', '.menu-container h3', '.menu-container form',
      '.menu-container label', '.restaurant-layout'].forEach(selector => {
         document.querySelectorAll(selector).forEach(el => {
             observer.observe(el);

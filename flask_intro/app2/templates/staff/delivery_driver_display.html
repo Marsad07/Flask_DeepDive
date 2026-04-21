@@ -51,7 +51,6 @@
                 Order #{{ order.order_id }}
             </h2>
 
-            <p><strong>Order Num:</strong> {{ order.order_id }}</p>
             <p><strong>Customer:</strong> {{ order.customer_name }}</p>
             <p><strong>Address:</strong> {{ order.customer_address }}</p>
             <p><strong>Phone:</strong> {{ order.customer_phonenum }}</p>
@@ -75,12 +74,11 @@
 
             <p style="margin-top:5px;">
                 <strong>Status:</strong>
-                <span id="status-{{ order.order_id }}"
-                      style="font-weight: bold; color:
-                        {% if order.status == 'out_for_delivery' %}green
-                        {% elif order.status in ['ready', 'confirmed'] %}#D4AF37
-                        {% elif order.status == 'completed' %}green
-                        {% else %}#8B0000{% endif %};">
+                <span style="font-weight: bold; color:
+                    {% if order.status == 'out_for_delivery' %}green
+                    {% elif order.status in ['ready', 'confirmed'] %}#D4AF37
+                    {% elif order.status == 'completed' %}green
+                    {% else %}#8B0000{% endif %};">
                     {{ order.status | replace('_', ' ') | capitalize }}
                 </span>
             </p>
@@ -88,11 +86,14 @@
             <div style="margin-top: 15px; display: flex; flex-direction: column;
                         gap: 10px; max-width: 280px;">
 
+                <!-- Out for delivery button — hides once already out for delivery -->
                 {% if order.status != 'out_for_delivery' %}
-                <form method="POST" class="inline-form"
+                <form id="pickup-form-{{ order.order_id }}" method="POST" class="inline-form"
                       action="{{ url_for('staff.update_delivery_status', order_id=order.order_id) }}">
                     <input type="hidden" name="action" value="pickup">
-                    <button type="submit" style="background: #D4AF37; color: #2C2416;
+                    <button type="button"
+                            onclick="showConfirm('pickup', {{ order.order_id }})"
+                            style="background: #D4AF37; color: #2C2416;
                             padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
                             font-size: 15px; font-weight: bold; width: 100%;">
                         🚗 Mark as Out for Delivery
@@ -100,68 +101,80 @@
                 </form>
                 {% endif %}
 
-                <form method="POST" class="inline-form"
-                      action="{{ url_for('staff.update_delivery_status', order_id=order.order_id) }}"
-                      onsubmit="return confirm('Mark this order as delivered?')">
+                <!-- Mark as delivered — disabled until out for delivery -->
+                <form id="delivered-form-{{ order.order_id }}" method="POST" class="inline-form"
+                      action="{{ url_for('staff.update_delivery_status', order_id=order.order_id) }}">
                     <input type="hidden" name="action" value="delivered">
-                    <button type="submit" style="background: #8B0000; color: white;
-                            padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
-                            font-size: 15px; font-weight: bold; width: 100%;">
-                        ✓ Mark as Delivered
-                    </button>
+                    {% if order.status == 'out_for_delivery' %}
+                        <button type="button"
+                                onclick="showConfirm('delivered', {{ order.order_id }})"
+                                style="background: #8B0000; color: white;
+                                padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer;
+                                font-size: 15px; font-weight: bold; width: 100%;">
+                            ✓ Mark as Delivered
+                        </button>
+                    {% else %}
+                        <button type="button" disabled
+                                title="Mark as Out for Delivery first"
+                                style="background: #ccc; color: #888;
+                                padding: 12px 25px; border: none; border-radius: 6px; cursor: not-allowed;
+                                font-size: 15px; font-weight: bold; width: 100%;">
+                            ✓ Mark as Delivered
+                        </button>
+                    {% endif %}
                 </form>
-
             </div>
         </div>
         {% endfor %}
     {% endif %}
 
+    <!-- This is for the toast notification -->
     <div id="offer-toast" style="
-        display:none;
-        position:fixed;
-        top:20px;
-        right:20px;
-        width:300px;
-        background:white;
-        border-left:6px solid #8B0000;
-        padding:18px 20px;
-        border-radius:10px;
-        box-shadow:0 6px 25px rgba(0,0,0,0.15);
-        z-index:9999;
-        animation: slideIn 0.35s ease-out;
-        font-family: Georgia, serif;">
+        display:none; position:fixed; top:20px; right:20px; width:300px;
+        background:white; border-left:6px solid #8B0000; padding:18px 20px;
+        border-radius:10px; box-shadow:0 6px 25px rgba(0,0,0,0.15);
+        z-index:9999; animation: slideIn 0.35s ease-out; font-family: Georgia, serif;">
         <h3 style="margin:0 0 8px 0; color:#8B0000;">New Delivery Request</h3>
         <p id="toast-customer" style="margin:4px 0;"></p>
         <p id="toast-address" style="margin:4px 0;"></p>
         <p id="toast-total" style="margin:4px 0; font-weight:bold;"></p>
-
         <div style="margin-top:12px; display:flex; gap:10px;">
-            <button id="toast-accept" style="
-                flex:1;
-                background:#2C7A2C;
-                color:white;
-                padding:8px 12px;
-                border:none;
-                border-radius:6px;
-                cursor:pointer;
-                font-weight:bold;
-            ">Accept</button>
-
-            <button id="toast-decline" style="
-                flex:1;
-                background:#8B0000;
-                color:white;
-                padding:8px 12px;
-                border:none;
-                border-radius:6px;
-                cursor:pointer;
-                font-weight:bold;
-            ">Decline</button>
+            <button id="toast-accept" style="flex:1; background:#2C7A2C; color:white;
+                    padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
+                Accept
+            </button>
+            <button id="toast-decline" style="flex:1; background:#8B0000; color:white;
+                    padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
+                Decline
+            </button>
         </div>
     </div>
 
     <audio id="offer-sound" src="{{ url_for('static', filename='sounds/sound2.mp3') }}" preload="auto"></audio>
 
+    <!-- This is for the confirmation -->
+    <div id="confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
+         height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                    width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
+            <h3 id="confirm-title" style="color:#2C2416; font-size:22px; margin-bottom:15px;"></h3>
+            <p id="confirm-message" style="color:#5C4033; font-size:16px; margin-bottom:30px;"></p>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="closeConfirm()"
+                    style="padding:12px 30px; background:white; color:#2C2416;
+                           border:2px solid #D4AF37; border-radius:8px; font-family:Georgia, serif;
+                           font-size:16px; font-weight:bold; cursor:pointer;">
+                    Cancel
+                </button>
+                <button id="confirm-yes"
+                    style="padding:12px 30px; background:#8B0000; color:#FFD700;
+                           border:none; border-radius:8px; font-family:Georgia, serif;
+                           font-size:16px; font-weight:bold; cursor:pointer;">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
     <style>
     @keyframes slideIn {
         from { opacity:0; transform: translateX(40px); }
@@ -171,21 +184,60 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
 <script>
+// --- This is for the confirmation part ---
+let pendingAction = null;
+
+function showConfirm(type, orderId) {
+    const titles = {
+        pickup: 'Mark as Out for Delivery',
+        delivered: 'Mark as Delivered',
+        accept: 'Accept Delivery'
+    };
+    const messages = {
+        pickup: 'Confirm you have picked up this order and are heading to the customer?',
+        delivered: 'Confirm this order has been successfully delivered?',
+        accept: 'Accept this delivery request?'
+    };
+
+    document.getElementById('confirm-title').textContent = titles[type];
+    document.getElementById('confirm-message').textContent = messages[type];
+    document.getElementById('confirm-modal').style.display = 'flex';
+
+    document.getElementById('confirm-yes').onclick = function() {
+        closeConfirm();
+        if (type === 'pickup') {
+            document.getElementById('pickup-form-' + orderId).submit();
+        } else if (type === 'delivered') {
+            document.getElementById('delivered-form-' + orderId).submit();
+        } else if (type === 'accept') {
+            socket.emit("driver_response", { order_id: orderId, accepted: true });
+        }
+    };
+}
+
+function closeConfirm() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+});
+
 const socket = io();
 socket.emit("join_driver", { driver_id: {{ driver_id }} });
+
+let currentOfferOrderId = null;
+
 socket.on("driver_offer", function(data) {
     const sound = document.getElementById("offer-sound");
     if (sound) {
         sound.muted = false;
         sound.volume = 1;
         sound.currentTime = 0;
-
-        sound.play().catch(err => {
-            console.log("Autoplay blocked:", err);
-        });
+        sound.play().catch(err => console.log("Autoplay blocked:", err));
     }
-    currentOfferOrderId = data.order_id;
 
+    currentOfferOrderId = data.order_id;
     document.getElementById("toast-customer").textContent = "Customer: " + data.customer_name;
     document.getElementById("toast-address").textContent = "Address: " + data.address;
     document.getElementById("toast-total").textContent = "Total: £" + data.total_price;
@@ -193,23 +245,21 @@ socket.on("driver_offer", function(data) {
     const toast = document.getElementById("offer-toast");
     toast.style.display = "block";
 
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 10000);
+    setTimeout(() => { toast.style.display = "none"; }, 10000);
 });
 
 {% for order in orders %}
     socket.emit('join_order', { order_id: {{ order.order_id }} });
 {% endfor %}
 
-let currentOfferOrderId = null;
-
+// This is for accepting
 document.getElementById("toast-accept").onclick = function() {
     if (!currentOfferOrderId) return;
-    socket.emit("driver_response", { order_id: currentOfferOrderId, accepted: true });
     document.getElementById("offer-toast").style.display = "none";
+    showConfirm('accept', currentOfferOrderId);
 };
 
+// This for declining
 document.getElementById("toast-decline").onclick = function() {
     if (!currentOfferOrderId) return;
     socket.emit("driver_response", { order_id: currentOfferOrderId, accepted: false });

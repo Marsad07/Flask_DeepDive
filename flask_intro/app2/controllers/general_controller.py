@@ -17,7 +17,13 @@ def about_page():
     return render_template("about.html")
 
 def contact_page():
-    return render_template("contact.html")
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM restaurant_contact LIMIT 1")
+    info = cursor.fetchone()
+
+    return render_template("contact.html", info=info)
 
 def newsletter_signup():
     if request.method == "POST":

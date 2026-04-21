@@ -76,6 +76,7 @@
         </div>
 
         <!-- This is for offering the driver -->
+        {% if order.order_type == "delivery" %}
         <div style="margin-bottom: 25px; padding: 20px; background: #F0EFEA;
             border-radius: 8px; border-left: 4px solid #2C2416;">
             <h3 style="margin: 0 0 15px 0; color: #2C2416; font-family: Georgia, serif;">
@@ -102,12 +103,13 @@
 
                 <button type="submit"
                         style="padding: 10px 25px; background-color: #2C2416; color: #FFD700;
-                               border: none; border-radius: 6px; font-family: Georgia, serif;
+                               border: none; border-radius: 6px; font-family: Georgia, serif;Restaurant Name
                                font-size: 15px; font-weight: bold; cursor: pointer;">
                     Offer Driver
                 </button>
             </form>
         </div>
+        {% endif %}
 
         <hr style="margin: 20px 0;">
 

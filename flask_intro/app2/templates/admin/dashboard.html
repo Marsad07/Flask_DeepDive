@@ -9,7 +9,7 @@
         <div>
             <h1>ADMIN DASHBOARD</h1>
             <p style="font-size: 18px; color: #5C4033; margin-top: 10px;">Welcome back to the
-                {restaurant name} Dashboard, Mr {{ admin_name }}</p>
+                {{ branding.restaurant_name }} Dashboard, Mr {{ admin_name }}</p>
         </div>
         <a href="{{ url_for('admin.logout') }}"
            style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
@@ -106,6 +106,22 @@
            onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
            onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
             🖼️ Manage Homepage
+        </a>
+        <a href="{{ url_for('admin.manage_contact') }}"
+           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
+                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
+                  font-weight: bold; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
+            👤 Edit Contact Details
+        </a>
+        <a href="{{ url_for('admin.manage_social_links') }}"
+           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
+                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
+                  font-weight: bold; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
+           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
+            📱 Edit Social Media Links
         </a>
     </div>
 

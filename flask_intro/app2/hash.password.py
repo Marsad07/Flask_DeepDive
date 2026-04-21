@@ -15,7 +15,8 @@ new_password = "temppassword"  # The current admin password
 hashed = generate_password_hash(new_password)
 
 # This updates the database with the password
-cursor.execute("UPDATE admin_restaurant SET password_hash = %s WHERE admin_username = 'admin'", (hashed,))
+cursor.execute("UPDATE admin_restaurant SET password_hash = %s WHERE admin_username = 'admin'",
+               (hashed,))
 db.commit()
 
 print("Password hashed successfully!")

@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="menu-container" style="max-width: 900px; margin: 0 auto;">
-
+<div class="menu-container" style="max-width: 2900px; margin: 0 auto;">
+    <a href="{{ url_for('general.home_page') }}"
+           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
+                  border-radius: 8px; font-weight: bold; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#660000';"
+           onmouseout="this.style.background='#8B0000';">
+            ← Back to Dashboard
+    </a>
     <h1 style="text-align:center; color:#8B0000; margin-bottom:30px;">
         Your Order History
     </h1>

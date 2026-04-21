@@ -16,7 +16,8 @@
         </a>
     </div>
 
-    <form method="POST">
+    <form id="update-hours-form" method="POST">
+
         <!-- This is the restaurant address section -->
         <div style="margin-bottom: 30px; padding: 20px; background: #F8F4EC; border-radius: 8px;">
             <h3 style="font-family: Georgia, serif; color: #2C2416;">Restaurant Address</h3>
@@ -63,11 +64,39 @@
         <h2 style="margin-top: 30px !important;
          margin-bottom: 20px !important;" class="hours-heading">Announcements</h2>
         <textarea name="announcement" rows="5" placeholder="Special hours, events, promotions..."></textarea>
-        <input type="submit" value="SAVE CHANGES">
 
+        <button type="button" onclick="confirmHours()"
+                style="padding: 12px 25px; background:#8B0000; color:#FFD700;
+                       border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+            SAVE CHANGES
+        </button>
     </form>
-</div>
 
+    <div id="confirm-modal" style="
+        display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+
+        <div style="
+            background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+            width:90%; text-align:center; font-family:Georgia, serif; border-top: 5px solid #8B0000;">
+
+            <h3 id="modal-title" style="margin-bottom:10px;"></h3>
+            <p id="modal-message" style="margin-bottom:25px;"></p>
+
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button onclick="closeModal()"
+                        style="padding:10px 20px; border-radius:6px; background:#ccc;">
+                    Cancel
+                </button>
+
+                <button id="modal-confirm-btn"
+                        style="padding:10px 20px; border-radius:6px; background:#8B0000; color:white;">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- This is for scroll animations -->
 <script>
     const observer = new IntersectionObserver((entries) => {
@@ -81,5 +110,31 @@
     document.querySelectorAll('.menu-container h1, .menu-container h2').forEach(el => {
         observer.observe(el);
     });
+
+    function showModal(title, message, onConfirm) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').textContent = message;
+        document.getElementById('modal-confirm-btn').onclick = function() {
+            closeModal();
+            onConfirm();
+        };
+        document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('confirm-modal').style.display = 'none';
+    }
+
+    document.getElementById('confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    function confirmHours() {
+        showModal(
+            'Confirm Hours Update',
+            'Are you sure you want to update the opening hours?',
+            () => document.getElementById('update-hours-form').submit()
+        );
+    }
 </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 import requests
-from flask import render_template, request, redirect, url_for, session, Blueprint, Response, current_app
+from flask import render_template, request, redirect, url_for, session, Blueprint, Response, current_app, flash
 from app2.database import get_db
 from werkzeug.security import check_password_hash
 from app2 import socketio
@@ -589,7 +589,6 @@ def offer_driver(order_id):
                 }
             </script>
             """
-
         if status == "declined":
             return """
             <script>
@@ -607,8 +606,6 @@ def offer_driver(order_id):
                 }
             </script>
             """
-
-    # 🔥 FETCH ORDER INFO
     cursor.execute("""
         SELECT 
             customer_id,
@@ -619,8 +616,6 @@ def offer_driver(order_id):
         WHERE order_id = %s
     """, (order_id,))
     order = cursor.fetchone()
-
-    # Determine customer name
     customer_name = None
     if order["customer_id"]:
         cursor.execute("""
@@ -659,3 +654,103 @@ def offer_driver(order_id):
     }, room=f"driver_{driver_id}")
 
     return redirect(url_for('admin.view_customer_order', order_id=order_id))
+
+def manage_contact():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM restaurant_contact LIMIT 1")
+    contact = cursor.fetchone()
+
+    if request.method == "POST":
+        address = request.form["address"]
+        phone = request.form["phone"]
+        email = request.form["email"]
+
+        if contact:
+            cursor.execute("""
+                UPDATE restaurant_contact
+                SET address=%s, phonenumber=%s, email=%s
+                WHERE id=%s
+            """, (address, phone, email, contact["id"]))
+        else:
+            cursor.execute("""
+                INSERT INTO restaurant_contact (address, phonenumber, email)
+                VALUES (%s, %s, %s)
+            """, (address, phone, email))
+
+        db.commit()
+
+    return render_template("admin/edit_contact_details.html", info=contact)
+
+def manage_social_links():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM social_links ORDER BY display_order ASC")
+    links = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template("admin/social_links.html", info=links)
+
+def add_social_link():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    platform = request.form.get('platform')
+    url = request.form.get('url')
+    icon_class = request.form.get('icon_class')
+    display_order = request.form.get('display_order', 0)
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+            INSERT INTO social_links (platform, url, icon_class, display_order)
+            VALUES (%s, %s, %s, %s)
+        """, (platform, url, icon_class, display_order))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Social link added', 'success')
+    return redirect(url_for('admin.manage_social_links'))
+
+
+def edit_social_link(link_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    url = request.form.get('url')
+    icon_class = request.form.get('icon_class')
+    platform = request.form.get('platform')
+    display_order = request.form.get('display_order', 0)
+    is_active = request.form.get('is_active', 1)
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+            UPDATE social_links 
+            SET url = %s, icon_class = %s, platform = %s, 
+                display_order = %s, is_active = %s
+            WHERE id = %s
+        """, (url, icon_class, platform, display_order, is_active, link_id))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Social link updated', 'success')
+    return redirect(url_for('admin.manage_social_links'))
+
+
+def delete_social_link(link_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("DELETE FROM social_links WHERE id = %s", (link_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    flash('Social link removed', 'success')
+    return redirect(url_for('admin.manage_social_links'))

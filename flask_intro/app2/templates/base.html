@@ -151,7 +151,7 @@
 <br><br>
 {% endblock %}
 
-<h2>Restaurant Name / Logo</h2>
+<h2>{{ branding.restaurant_name }}</h2>
 
 <!-- This is the hamburger button for mobile menu -->
 <button class="hamburger" onclick="toggleMenu()">
@@ -270,64 +270,26 @@
         <div style="margin-bottom: 20px;">
             <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 16px;">FOLLOW US</h3>
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-
-                <!-- Instagram Link -->
-                <a href="https://instagram.com/yourrestaurant" target="_blank"
+                {% for link in social_links %}
+                <a href="{{ link.url }}" target="_blank"
                    style="width: 50px; height: 50px; background: #8B0000;
                           border: 2px solid #D4AF37; border-radius: 12px;
                           display: flex; align-items: center; justify-content: center;
                           transition: all 0.3s ease; text-decoration: none;"
                    onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
-                    this.style.borderColor='#FFD700';"
+                                this.style.borderColor='#FFD700';"
                    onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                    this.style.borderColor='#D4AF37';">
-                    <i class="fab fa-instagram" style="font-size: 24px; color: #FFD700;"></i>
+                               this.style.borderColor='#D4AF37';">
+                    <i class="{{ link.icon_class }}" style="font-size: 24px; color: #FFD700;"></i>
                 </a>
-
-                <!-- TikTok Link -->
-                <a href="https://tiktok.com/@yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000;
-                    border: 2px solid #D4AF37; border-radius: 12px;
-                          display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-                           text-decoration: none;"
-                   onmouseover="this.style.transform='translateY(-5px)';
-                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
-                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                    this.style.borderColor='#D4AF37';">
-                    <i class="fab fa-tiktok" style="font-size: 24px; color: #FFD700;"></i>
-                </a>
-
-                <!-- Facebook Link -->
-                <a href="https://facebook.com/yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000;
-                    border: 2px solid #D4AF37; border-radius: 12px;
-                          display: flex; align-items: center; justify-content: center;
-                           transition: all 0.3s ease; text-decoration: none;"
-                   onmouseover="this.style.transform='translateY(-5px)';
-                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
-                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                    this.style.borderColor='#D4AF37';">
-                    <i class="fab fa-facebook-f" style="font-size: 24px; color: #FFD700;"></i>
-                </a>
-
-                <!-- Twitter/X Link -->
-                <a href="https://twitter.com/yourrestaurant" target="_blank"
-                   style="width: 50px; height: 50px;
-                    background: #8B0000; border: 2px solid #D4AF37; border-radius: 12px;
-                          display: flex; align-items: center;
-                           justify-content: center; transition: all 0.3s ease; text-decoration: none;"
-                   onmouseover="this.style.transform='translateY(-5px)';
-                    this.style.background='#660000'; this.style.borderColor='#FFD700';"
-                   onmouseout="this.style.transform='translateY(0)';
-                    this.style.background='#8B0000'; this.style.borderColor='#D4AF37';">
-                    <i class="fab fa-x-twitter" style="font-size: 24px; color: #FFD700;"></i>
-                </a>
+                {% else %}
+                <p style="color: #D4AF37; font-size: 14px;">No social links added yet.</p>
+                {% endfor %}
             </div>
         </div>
-
         <!-- Copyright section -->
         <p style="font-size: 14px; color: #D4AF37; margin: 0;">
-            © 2026 [Restaurant Name]. All rights reserved.
+            © 2026 {{ branding.restaurant_name }}. All rights reserved.
         </p>
     </div>
 </footer>
