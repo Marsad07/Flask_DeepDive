@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if session.get('toast_message') %}
+<div class="toast" style="
+    position:fixed;
+    top:20px;
+    right:20px;
+    background:#8B0000;
+    color:#FFD700;
+    padding:12px 20px;
+    border-radius:6px;
+    z-index:9999;
+    animation: fadeOut 4s forwards;
+">
+    {{ session.get('toast_message') }}
+</div>
+{% set _ = session.pop('toast_message') %}
+{% endif %}
+<style>
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+</style>
+<div class="menu-container">
+    <h1>Edit Staff Account</h1>
+    <form method="POST" style="max-width:500px;">
+
+        <label>Full Name</label>
+        <input type="text" name="full_name"
+               value="{{ staff.full_name }}" required style="width:100%; margin-bottom:15px;">
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ staff.email }}" required style="width:100%; margin-bottom:15px;">
+
+        <label>Role</label>
+        <select name="role" style="width:100%; margin-bottom:15px;">
+            <option value="admin" {% if staff.role == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="kitchen" {% if staff.role == 'kitchen' %}selected{% endif %}>Kitchen</option>
+            <option value="driver" {% if staff.role == 'driver' %}selected{% endif %}>Driver</option>
+        </select>
+
+        <label>Reset Password (manual)</label>
+        <input type="password" name="password" placeholder="Leave blank to keep current"
+               style="width:100%; margin-bottom:15px;">
+
+        <label>
+            <input type="checkbox" name="is_active" {% if staff.is_active %}checked{% endif %}>
+            Active Account
+        </label>
+        <br><br>
+
+        <label>
+            <input type="checkbox" name="is_available" {% if staff.is_available %}checked{% endif %}>
+            Available (Drivers Only)
+        </label>
+        <br><br>
+
+        <button type="button"
+                onclick="showModal('Save Changes', 'Update this staff account?'
+                , () => document.querySelector('form').submit())"
+                style="padding:12px 25px; background:#8B0000; color:#FFD700; border:none; border-radius:6px;">
+            Save Changes
+        </button>
+
+        <button type="button"
+                onclick="showResetOptions()"
+                style="padding:12px 25px; background:#004080; color:white; border:none;
+                 border-radius:6px; margin-left:10px;">
+            Reset Password
+        </button>
+    </form>
+</div>
+<div id="confirm-modal" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="
+        background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+        width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
+        <h3 id="modal-title"></h3>
+        <p id="modal-message"></p>
+        <div id="modal-buttons" style="display:flex; gap:15px; justify-content:center;"></div>
+    </div>
+</div>
+<script>
+function showModal(title, message, onConfirm) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+
+    const btns = document.getElementById('modal-buttons');
+    btns.innerHTML = `
+        <button onclick="closeModal()" style="padding:10px 20px; background:#ccc; border-radius:6px;">Cancel</button>
+        <button onclick="(${onConfirm.toString()})()" style="padding:10px 20px; background:#8B0000; color:white;
+         border-radius:6px;">Confirm</button>
+    `;
+
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function showResetOptions() {
+    document.getElementById('modal-title').textContent = "Reset Password";
+    document.getElementById('modal-message').textContent = "Choose a reset method";
+
+    const id = {{ staff.staff_id }};
+    const btns = document.getElementById('modal-buttons');
+
+    btns.innerHTML = `
+        <button onclick="closeModal()" style="padding:10px 20px; background:#ccc; border-radius:6px;">Cancel</button>
+
+        <button onclick="window.location='/admin/staff/{{ staff.staff_id }}/reset-default'"
+            style="padding:10px 20px; background:#8B0000; color:#FFD700; border-radius:6px;">
+            Reset to Default
+        </button>
+
+
+        <button onclick="window.location='/admin/staff/${id}/reset-email'"
+                style="padding:10px 20px; background:#004080; color:white; border-radius:6px;">
+            Send Reset Email
+        </button>
+    `;
+
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 import requests
 from flask import render_template, request, redirect, url_for, session, Blueprint, Response, current_app, flash
 from app2.database import get_db
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from app2 import socketio
 from app2.controllers.image_manager_controller import image_manager_controller
 from app2.models.category_model import add_category, get_category
@@ -958,3 +958,89 @@ def update_table(table_id):
     db.close()
     flash('Table updated', 'success')
     return redirect(url_for('admin.manage_tables'))
+
+def manage_staff():
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM staff_accounts ORDER BY created_at DESC")
+    staff_list = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return render_template("admin/manage_staff.html", staff_list=staff_list)
+
+def create_staff():
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
+
+    if request.method == "POST":
+        full_name = request.form.get("full_name")
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = generate_password_hash(request.form.get("password"))
+        role = request.form.get("role")
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            INSERT INTO staff_accounts (full_name, staff_username, email, password_hash, role, is_active, is_available)
+            VALUES (%s, %s, %s, %s, %s, 1, 1)
+        """, (full_name, username, email, password, role))
+        db.commit()
+        cursor.close()
+        db.close()
+        return redirect(url_for('admin.manage_staff'))
+
+    return render_template("admin/create_staff.html")
+
+def edit_staff(staff_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if request.method == "POST":
+        full_name = request.form.get("full_name")
+        email = request.form.get("email")
+        role = request.form.get("role")
+        is_active = 1 if request.form.get("is_active") else 0
+        is_available = 1 if request.form.get("is_available") else 0
+
+        cursor.execute("""
+            UPDATE staff_accounts
+            SET full_name=%s, email=%s, role=%s, is_active=%s, is_available=%s
+            WHERE staff_id=%s
+        """, (full_name, email, role, is_active, is_available, staff_id))
+        new_password = request.form.get("password")
+        if new_password:
+            hashed = generate_password_hash(new_password)
+            cursor.execute("UPDATE staff_accounts SET password_hash=%s WHERE staff_id=%s",
+                           (hashed, staff_id))
+
+        db.commit()
+        cursor.close()
+        db.close()
+        return redirect(url_for('admin.manage_staff'))
+
+    cursor.execute("SELECT * FROM staff_accounts WHERE staff_id=%s", (staff_id,))
+    staff = cursor.fetchone()
+    cursor.close()
+    db.close()
+
+    return render_template("admin/edit_staff.html", staff=staff)
+
+def disable_staff(staff_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("UPDATE staff_accounts SET is_active = 0 WHERE staff_id = %s", (staff_id,))
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return redirect(url_for('admin.manage_staff'))

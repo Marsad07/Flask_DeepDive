@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="menu-container">
+    <h1>Create Staff Account</h1>
+    <form method="POST" style="max-width:500px;">
+
+        <label>Full Name</label>
+        <input type="text" name="full_name" required style="width:100%; margin-bottom:15px;">
+
+        <label>Email</label>
+        <input type="email" name="email" required style="width:100%; margin-bottom:15px;">
+
+        <label>Username</label>
+        <input type="text" name="username" required style="width:100%; margin-bottom:15px;">
+
+        <label>Password</label>
+        <input type="password" name="password" required style="width:100%; margin-bottom:15px;">
+
+        <label>Role</label>
+        <select name="role" required style="width:100%; margin-bottom:20px;">
+            <option value="admin">Admin</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="driver">Driver</option>
+        </select>
+
+        <button type="button"
+                onclick="showModal('Create Staff', 'Create this staff account?',
+                 () => document.querySelector('form').submit())"
+                style="padding:12px 25px; background:#8B0000; color:#FFD700; border:none; border-radius:6px;">
+            Create Staff
+        </button>
+    </form>
+</div>
+<div id="confirm-modal" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="
+        background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+        width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
+        <h3 id="modal-title"></h3>
+        <p id="modal-message"></p>
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button onclick="closeModal()" style="padding:10px 20px;
+             background:#ccc; border-radius:6px;">Cancel</button>
+            <button id="modal-confirm-btn" style="padding:10px 20px; background:#8B0000; color:white;
+             border-radius:6px;">Confirm</button>
+        </div>
+    </div>
+</div>
+<script>
+function showModal(title, message, onConfirm) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('modal-confirm-btn').onclick = function() {
+        closeModal();
+        onConfirm();
+    };
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}

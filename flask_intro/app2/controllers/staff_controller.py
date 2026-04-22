@@ -1,8 +1,10 @@
 from flask import render_template, request, redirect, url_for, session
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from app2.database import get_db
 from app2 import socketio
 from flask_socketio import join_room
+import secrets
+from flask_mailman import EmailMessage
 
 @socketio.on('join_kitchen')
 def handle_join_kitchen():
@@ -231,4 +233,89 @@ def update_delivery_status(order_id):
     db.close()
     return redirect(url_for('staff.driver_orders'))
 
+def reset_staff_default(staff_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
 
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT default_staff_password FROM system_settings WHERE id = 1")
+    settings = cursor.fetchone()
+    default_password = settings['default_staff_password']
+
+    hashed = generate_password_hash(default_password)
+
+    cursor.execute("""
+        UPDATE staff_accounts SET password_hash = %s WHERE staff_id = %s
+    """, (hashed, staff_id))
+    db.commit()
+
+    cursor.close()
+    db.close()
+
+    session['toast_message'] = f"Password reset to default ({default_password})"
+    return redirect(url_for('admin.edit_staff', staff_id=staff_id))
+
+def reset_staff_email(staff_id):
+    if 'admin_id' not in session:
+        return redirect(url_for('staff.staff_login'))
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT email FROM staff_accounts WHERE staff_id = %s", (staff_id,))
+    staff = cursor.fetchone()
+    if not staff or not staff['email']:
+        cursor.close()
+        db.close()
+        session['toast_message'] = "Staff member has no email on file"
+        return redirect(url_for('admin.edit_staff', staff_id=staff_id))
+
+    token = secrets.token_urlsafe(32)
+
+    cursor.execute("""
+        INSERT INTO password_resets (email, token, created_at)
+        VALUES (%s, %s, NOW())
+    """, (staff['email'], token))
+    db.commit()
+    cursor.close()
+    db.close()
+
+    reset_link = url_for('staff.staff_reset_password', token=token, _external=True)
+
+    msg = EmailMessage(
+        "Reset Your Staff Password",
+        f"Click the link below to reset your password:\n\n{reset_link}\n\nThis link expires in 1 hour.",
+        to=[staff['email']]
+    )
+    msg.send()
+    session['toast_message'] = "Password reset email sent"
+    return redirect(url_for('admin.edit_staff', staff_id=staff_id))
+
+def staff_reset_password(token):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM password_resets WHERE token = %s", (token,))
+    reset = cursor.fetchone()
+
+    if not reset:
+        cursor.close()
+        db.close()
+        return "Invalid or expired reset link"
+
+    if request.method == "POST":
+        new_password = request.form.get("password")
+        hashed = generate_password_hash(new_password)
+
+        cursor.execute("""
+            UPDATE staff_accounts SET password_hash = %s
+            WHERE email = %s
+        """, (hashed, reset['email']))
+
+        cursor.execute("DELETE FROM password_resets WHERE token = %s", (token,))
+        db.commit()
+        cursor.close()
+        db.close()
+        return redirect(url_for('staff.staff_login'))
+
+    cursor.close()
+    db.close()
+    return render_template("staff/reset_password_staff.html", token=token)

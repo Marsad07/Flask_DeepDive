@@ -9,7 +9,9 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                manage_social_links, add_social_link, edit_social_link,
                                                delete_social_link, manage_about, update_about_section,
                                                add_about_section, delete_about_section, manage_tables,
-                                               save_table_positions, add_table, delete_table, update_table)
+                                               save_table_positions, add_table, delete_table, update_table,
+                                               manage_staff, create_staff, edit_staff, disable_staff)
+from controllers.staff_controller import reset_staff_email, reset_staff_default
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
@@ -58,3 +60,10 @@ admin_bp.route('/tables/save-positions', methods=['POST'])(save_table_positions)
 admin_bp.route('/tables/add', methods=['POST'])(add_table)
 admin_bp.route('/tables/delete/<int:table_id>', methods=['POST'])(delete_table)
 admin_bp.route('/tables/update/<int:table_id>', methods=['POST'])(update_table)
+
+admin_bp.route('/staff')(manage_staff)
+admin_bp.route('/staff/create', methods=['GET', 'POST'])(create_staff)
+admin_bp.route('/staff/<int:staff_id>/edit', methods=['GET', 'POST'])(edit_staff)
+admin_bp.route('/staff/<int:staff_id>/disable')(disable_staff)
+admin_bp.route('/staff/<int:staff_id>/reset-default')(reset_staff_default)
+admin_bp.route('/staff/<int:staff_id>/reset-email')(reset_staff_email)
