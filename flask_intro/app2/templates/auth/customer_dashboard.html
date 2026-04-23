@@ -53,13 +53,13 @@
 
 <!-- This is the action buttons section -->
 <div style="display: flex; gap: 20px; justify-content: center; margin: 40px 0; flex-wrap: wrap;">
-    <a href="{{ url_for('cart.order_now_menu') }}"
+    <a href="{{ url_for('guest_lookup.find_reservation') }}"
        style="background: #8B0000; color: #FFD700; padding: 18px 40px; text-decoration: none; 
               border-radius: 8px; font-weight: bold; font-size: 18px; transition: all 0.3s ease;
               text-transform: uppercase; letter-spacing: 1px;"
        onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
        onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
-         Order Now
+         My reservations
     </a>
     
     <a href="{{ url_for('customer_auth.order_history') }}"

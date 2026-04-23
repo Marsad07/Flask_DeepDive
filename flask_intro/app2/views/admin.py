@@ -61,6 +61,7 @@ admin_bp.route('/tables/add', methods=['POST'])(add_table)
 admin_bp.route('/tables/delete/<int:table_id>', methods=['POST'])(delete_table)
 admin_bp.route('/tables/update/<int:table_id>', methods=['POST'])(update_table)
 
+
 admin_bp.route('/staff')(manage_staff)
 admin_bp.route('/staff/create', methods=['GET', 'POST'])(create_staff)
 admin_bp.route('/staff/<int:staff_id>/edit', methods=['GET', 'POST'])(edit_staff)

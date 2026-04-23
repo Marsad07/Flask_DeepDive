@@ -880,7 +880,6 @@ def manage_tables():
     db.close()
     return render_template('admin/manage_tables.html', tables=tables)
 
-
 def save_table_positions():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
@@ -898,6 +897,7 @@ def save_table_positions():
     db.commit()
     cursor.close()
     db.close()
+    socketio.emit('tables_updated', positions, broadcast=True)
     return {'success': True}
 
 
@@ -921,7 +921,6 @@ def add_table():
     db.close()
     flash('Table added', 'success')
     return redirect(url_for('admin.manage_tables'))
-
 
 def delete_table(table_id):
     if 'admin_id' not in session:

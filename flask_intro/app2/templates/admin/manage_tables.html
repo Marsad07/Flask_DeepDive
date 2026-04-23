@@ -172,8 +172,24 @@
               font-weight: bold; text-decoration: none;">
         ← Back to Dashboard
     </a>
+    <div id="save-success-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
+         height:100%; background:rgba(0,0,0,0.6); z-index:10001; align-items:center; justify-content:center;">
+        <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                    width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #2C7A2C;">
+            <div style="font-size: 50px; margin-bottom: 15px;">✓</div>
+            <h3 style="color:#2C2416; font-size:22px; margin-bottom:15px;">Layout Saved</h3>
+            <p style="color:#5C4033; font-size:16px; margin-bottom:30px;">
+                Your table layout has been saved and will now reflect on the reservations page.
+            </p>
+            <button onclick="document.getElementById('save-success-modal').style.display='none'"
+                style="padding:12px 30px; background:#8B0000; color:#FFD700;
+                       border:none; border-radius:8px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer;">
+                OK
+            </button>
+        </div>
+    </div>
 </div>
-
 <!-- This is for editing table -->
 <div id="edit-table-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
      height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
@@ -260,7 +276,6 @@
     </div>
 </div>
 <script>
-// Drag and drop
 const canvas = document.getElementById('layout-canvas');
 let dragging = null;
 let offsetX = 0;
@@ -284,7 +299,6 @@ document.addEventListener('mousemove', function(e) {
     const canvasRect = canvas.getBoundingClientRect();
     let x = e.clientX - canvasRect.left - offsetX;
     let y = e.clientY - canvasRect.top - offsetY;
-    // Keep within canvas bounds
     x = Math.max(0, Math.min(x, canvasRect.width - 80));
     y = Math.max(0, Math.min(y, canvasRect.height - 80));
     dragging.style.left = x + 'px';
@@ -299,7 +313,6 @@ document.addEventListener('mouseup', function() {
     }
 });
 
-// Save positions
 function savePositions() {
     const tables = document.querySelectorAll('.draggable-table');
     const positions = [];
@@ -319,14 +332,18 @@ function savePositions() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
+            // show modal confirmation
+            document.getElementById('save-success-modal').style.display = 'flex';
+            // optional: also flash the green text if you still want it
             const status = document.getElementById('save-status');
-            status.style.display = 'block';
-            setTimeout(() => { status.style.display = 'none'; }, 3000);
+            if (status) {
+                status.style.display = 'block';
+                setTimeout(() => { status.style.display = 'none'; }, 3000);
+            }
         }
     });
 }
 
-// Edit table modal
 function openEditTable(id, seats, location, shape, isActive) {
     document.getElementById('edit-seats').value = seats;
     document.getElementById('edit-location').value = location;
@@ -344,7 +361,6 @@ document.getElementById('edit-table-modal').addEventListener('click', function(e
     if (e.target === this) closeEditTable();
 });
 
-// Delete table modal
 function showDeleteTableConfirm(id, tableNum) {
     document.getElementById('delete-table-message').textContent =
         'Are you sure you want to remove Table ' + tableNum + '? This cannot be undone.';

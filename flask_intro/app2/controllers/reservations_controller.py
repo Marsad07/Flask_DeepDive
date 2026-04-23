@@ -1,6 +1,8 @@
 from flask import render_template, request, redirect, url_for, flash
+from requests import session
 from app2.database import get_db, staff_redirect
 from datetime import date
+from app2 import socketio
 
 @staff_redirect
 def reservations_page():
@@ -49,6 +51,10 @@ def reservations_page():
         db.commit()
         cursor.close()
         db.close()
+
+        socketio.emit('table_unavailable', {
+            'table_num': table
+        }, broadcast=True)
 
         # Send confirmation email
         try:
@@ -156,10 +162,17 @@ def reservations_page():
                                     </td>
                                 </tr>
                             </table>
-
+                            <p style="margin-top: 20px;">
+                                Need to cancel?  
+                                <a href="{{ url_for('reservations.cancel_reservation',
+                                 resv_id=reservation_id, _external=True) }}">
+                                    Click here to cancel your reservation
+                                </a>
+                            </p>
                             <p style="color: #5C4033; font-size: 14px; line-height: 1.6; font-family: Georgia,
                              serif; margin: 20px 0 0 0;">
-                                If you need to cancel or change your reservation please contact us directly.
+                                If you need to cancel or change your reservation you can either
+                                click the cancel button over or contact us directly.
                             </p>
                         </td>
                     </tr>
@@ -173,7 +186,6 @@ def reservations_page():
                             </p>
                         </td>
                     </tr>
-
                 </table>
             </td>
         </tr>
@@ -202,3 +214,54 @@ def reservations_page():
     db.close()
     today = date.today().isoformat()
     return render_template("reservations.html", today=today, tables=tables)
+
+def my_reservations():
+    if 'customer_id' not in session:
+        return redirect(url_for('customer_auth.customer_login'))
+
+    customer_id = session['customer_id']
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT * FROM reservations_restaurant
+        WHERE customer_email = (
+            SELECT email FROM customer_accounts WHERE customer_id = %s
+        )
+        ORDER BY reservation_date DESC, reservation_time DESC
+    """, (customer_id,))
+    reservations = cursor.fetchall()
+
+    cursor.close()
+    db.close()
+
+    return render_template("customer/my_reservations.html", reservations=reservations)
+
+def cancel_reservation(resv_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""SELECT table_number FROM reservations_restaurant WHERE reservation_id = %s""", (resv_id,))
+    reservation = cursor.fetchone()
+
+    if not reservation:
+        cursor.close()
+        db.close()
+        flash("Reservation not found", "danger")
+        return redirect(url_for('general.home'))
+
+    table_num = reservation["table_number"]
+
+    cursor.execute("""
+        UPDATE reservations_restaurant
+        SET reservation_status = 'Cancelled'
+        WHERE reservation_id = %s
+    """, (resv_id,))
+    db.commit()
+
+    cursor.close()
+    db.close()
+    socketio.emit('table_available', {
+        'table_num': table_num
+    }, broadcast=True)
+
+    return render_template("reservation_cancelled.html", table=table_num)

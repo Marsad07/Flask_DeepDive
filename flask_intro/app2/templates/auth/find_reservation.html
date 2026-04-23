@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="menu-container">
+    <h2 class="mb-3">Find Your Reservation</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Phone Number</label>
+            <input type="text" name="phone" class="form-control" required>
+        </div>
+        <br>
+        <button style="background: #8B0000; color: #FFD700; padding: 18px 40px; text-decoration: none;
+              border-radius: 8px; font-weight: bold; font-size: 18px; transition: all 0.3s ease;
+              text-transform: uppercase; letter-spacing: 1px;">Find Reservation
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -46,12 +46,16 @@
         </select>
 
         <label>Select Your Table</label>
-        <div class="restaurant-layout" id="table-canvas" style="position: relative; min-height: 500px;">
+        <div class="restaurant-layout" id="table-canvas"
+             style="position: relative; width: 100%; height: 550px;
+                    background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd0 100%);
+                    border: 3px solid #8B4513; border-radius: 12px; overflow: hidden;">
             {% for table in tables %}
-            <div class="table-item table-{{ table.seats }}"
+            <div class="table-item"
                  data-table="{{ table.table_number }}"
                  data-seats="{{ table.seats }}"
-                 style="position: absolute; left: {{ table.pos_x }}px; top: {{ table.pos_y }}px;">
+                 style="position: absolute; left: {{ table.pos_x }}px; top: {{ table.pos_y }}px;
+                        text-align: center; cursor: pointer;">
                 <div class="table-{{ table.shape }}">{{ table.table_number }}</div>
                 <div class="table-info">{{ table.seats }} seats<br>{{ table.location }}</div>
             </div>
@@ -106,7 +110,35 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
+     const socket = io();
+
+    socket.on('tables_updated', (positions) => {
+        positions.forEach(pos => {
+            const tableDiv = document.querySelector(`.table-item[data-table="${pos.id}"]`);
+            if (tableDiv) {
+                tableDiv.style.left = pos.x + "px";
+                tableDiv.style.top = pos.y + "px";
+            }
+        });
+    });
+
+    socket.on('table_unavailable', (data) => {
+        const tableDiv = document.querySelector(`.table-item[data-table="${data.table_num}"]`);
+        if (tableDiv) {
+            tableDiv.classList.add('unavailable');
+            tableDiv.classList.remove('selected');
+        }
+    });
+
+    socket.on('table_available', (data) => {
+        const tableDiv = document.querySelector(`.table-item[data-table="${data.table_num}"]`);
+        if (tableDiv) {
+            tableDiv.classList.remove('unavailable');
+        }
+    });
+
     const tables = document.querySelectorAll('.table-item');
     const tableInput = document.getElementById('table_num');
     const guestsSelect = document.getElementById('guests_num');
