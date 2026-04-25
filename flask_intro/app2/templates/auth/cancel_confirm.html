@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="menu-container">
+    <h2 style="color:#2C2416; font-family:Georgia, serif; margin-bottom:20px;">
+        Cancel Reservation
+    </h2>
+
+    <p style="color:#5C4033; font-size:16px; font-family:Georgia, serif;">
+        Are you sure you want to cancel your reservation?
+    </p>
+
+    <ul style="color:#2C2416; font-family:Georgia, serif; margin-bottom:25px;">
+        <li><strong>Date:</strong> {{ r.reservation_date }}</li>
+        <li><strong>Time:</strong> {{ r.reservation_time }}</li>
+        <li><strong>Table:</strong> {{ r.table_number }}</li>
+    </ul>
+
+    <button onclick="showConfirm()"
+        style="padding:14px 28px; background:#8B0000; color:#FFD700;
+               border:none; border-radius:8px; font-family:Georgia, serif;
+               font-size:16px; font-weight:bold; cursor:pointer;">
+        Cancel Reservation
+    </button>
+</div>
+<div id="confirm-modal"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                width:90%; text-align:center; font-family:Georgia, serif;
+                border-top: 5px solid #8B0000;">
+        <h3 style="color:#2C2416; font-size:22px; margin-bottom:15px;">
+            Confirm Cancellation
+        </h3>
+
+        <p style="color:#5C4033; font-size:16px; margin-bottom:30px;">
+            Are you sure you want to cancel this reservation?
+        </p>
+
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button onclick="closeConfirm()"
+                style="padding:12px 30px; background:white; color:#2C2416;
+                       border:2px solid #D4AF37; border-radius:8px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer;">
+                No, Keep It
+            </button>
+
+            <a href="{{ url_for('reservations.cancel_reservation', resv_id=r.customer_id) }}"
+                style="padding:12px 30px; background:#8B0000; color:#FFD700;
+                       border:none; border-radius:8px; font-family:Georgia, serif;
+                       font-size:16px; font-weight:bold; cursor:pointer; text-decoration:none;">
+                Yes, Cancel
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+function showConfirm() {
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+function closeConfirm() {
+    document.getElementById('confirm-modal').style.display = 'none';
+}
+
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+});
+</script>
+{% endblock %}

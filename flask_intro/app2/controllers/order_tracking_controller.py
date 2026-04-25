@@ -4,6 +4,7 @@ from app2.database import get_db
 from flask_socketio import join_room
 from app2 import socketio
 
+
 def track_order(order_number):
     db = get_db()
     cursor = db.cursor(dictionary=True)

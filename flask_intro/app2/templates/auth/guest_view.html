@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="resv-wrapper">
+  <div class="resv-card">
+    <h2>Your Reservation</h2>
+    <p class="resv-name-tag">Booked for <span>{{ r.customer_fullname }}</span></p>
+    <div class="form-divider"></div>
+
+    <div class="detail-grid">
+      <div class="detail-cell">
+        <div class="detail-label">Date</div>
+        <div class="detail-value">{{ r.reservation_date }}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-label">Time</div>
+        <div class="detail-value">{{ r.reservation_time }}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-label">Guests</div>
+        <div class="detail-value">{{ r.num_of_guests }}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-label">Table</div>
+        <div class="detail-value">{{ r.table_number }}</div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <a href="{{ url_for('reservations.guest_modify_reservation', resv_id=r.customer_id) }}" class="btn-modify">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.5 2L12 4.5L5 11.5H2.5V9L9.5 2Z" stroke="#D4AF37" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+        Modify
+      </a>
+
+      <button onclick="openModal()" class="btn-cancel">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 2L12 12M12 2L2 12" stroke="#8B0000" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</div>
+<div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal-box">
+
+    <div class="modal-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 7V11M11 15H11.01M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1
+         5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
+              stroke="#8B0000" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3>Cancel Reservation?</h3>
+    <p>This action cannot be undone. Your table will be released and you will need to book again.</p>
+
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="btn-modal-keep">Keep It</button>
+      <a href="{{ url_for('reservations.cancel_reservation', resv_id=r.customer_id) }}"
+         class="btn-modal-confirm">Yes, Cancel</a>
+    </div>
+
+  </div>
+</div>
+<script>
+  const modal = document.getElementById('confirm-modal');
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+{% endblock %}

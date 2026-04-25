@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="resv-wrapper">
+  <div class="resv-card">
+
+    <a href="{{ url_for('reservations.my_reservations') }}" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 3L5 8L10 13" stroke="#8B0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      My Reservations
+    </a>
+
+    <h2>Modify Reservation</h2>
+    <p class="resv-subtitle">Update your booking details below.</p>
+    <div class="form-divider"></div>
+
+    <form method="POST" id="modify-form">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" name="date"
+                 value="{{ r.reservation_date }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="time">Time</label>
+          <input type="time" id="time" name="time"
+                 value="{{ r.reservation_time }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="table">Table Number</label>
+          <input type="number" id="table" name="table"
+                 value="{{ r.table_number }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="guests">Number of Guests</label>
+          <input type="number" id="guests" name="guests"
+                 value="{{ r.num_of_guests }}" required>
+        </div>
+
+      </div>
+
+      <div class="submit-row">
+        <button type="button" onclick="openConfirm()" class="btn-save">
+          Save Changes
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+<div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal-box">
+
+    <div class="modal-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 7V11M11 15H11.01M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1
+         5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
+              stroke="#8B0000" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3>Confirm Changes?</h3>
+    <p>Are you sure you want to update this reservation?</p>
+
+    <div class="modal-actions">
+      <button onclick="closeConfirm()" class="btn-modal-keep">Cancel</button>
+      <button onclick="submitForm()" class="btn-modal-confirm">Yes, Update</button>
+    </div>
+
+  </div>
+</div>
+<script>
+  const modal = document.getElementById('confirm-modal');
+
+  function openConfirm() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeConfirm() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function submitForm() {
+    document.getElementById('modify-form').submit();
+  }
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeConfirm();
+  });
+</script>
+{% endblock %}

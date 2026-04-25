@@ -1,35 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="menu-container">
-  <div class="menu-container">
+<div class="resv-wrapper">
+  <div class="resv-card">
 
-    <a href="{{ url_for('general.home') }}" class="back-link">
+    <a href="{{ url_for('general.home_page') }}" class="back-link">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M10 3L5 8L10 13" stroke="#8B0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       Back
     </a>
 
-    <h2 class="mb-3">Find Your Reservation</h2>
+    <h2>Find Your Reservation</h2>
     <p class="resv-subtitle">Enter your details to view or manage your booking.</p>
     <div class="form-divider"></div>
 
     <form method="POST">
-      <div class="form-group">
+      <div class="form-group full-width">
         <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
+        <input type="email" name="email" required>
       </div>
-
-      <div class="form-group">
+      <br><br>
+      <div class="form-group full-width">
         <label>Phone Number</label>
-        <input type="text" name="phone" class="form-control" required>
+        <input type="text" name="phone" required>
       </div>
 
       <div class="submit-row">
         <button type="submit" class="btn-save">Find Reservation</button>
       </div>
     </form>
+
   </div>
 </div>
 {% endblock %}

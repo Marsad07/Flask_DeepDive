@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="resv-wrapper">
+  <div class="resv-card">
+
+    <a href="{{ url_for('general.home_page') }}" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 3L5 8L10 13" stroke="#8B0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Home
+    </a>
+    <h2>Reservation Already Cancelled</h2>
+    <p class="resv-subtitle">This reservation has already been cancelled earlier.</p>
+    <div class="form-divider"></div>
+
+    <div class="submit-row">
+      <button onclick="openModal()" class="btn-cancel">
+        View Message
+      </button>
+    </div>
+
+  </div>
+</div>
+<div id="confirm-modal" class="modal-backdrop open" role="dialog" aria-modal="true">
+  <div class="modal-box">
+
+    <div class="modal-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 7V11M11 15H11.01M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1
+         5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
+              stroke="#8B0000" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <h3>Already Cancelled</h3>
+    <p>This reservation has already been cancelled. No further action is required.</p>
+
+    <div class="modal-actions">
+      <a href="{{ url_for('general.home_page') }}" class="btn-modal-confirm">OK</a>
+    </div>
+
+  </div>
+</div>
+<script>
+  const modal = document.getElementById('confirm-modal');
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+</script>
+{% endblock %}

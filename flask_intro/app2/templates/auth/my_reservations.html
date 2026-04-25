@@ -23,6 +23,11 @@
                 <td>{{ r.num_of_guests }}</td>
                 <td>
                     {% if r.reservation_status != 'Cancelled' %}
+                    <a href="{{ url_for('reservations.modify_reservation', resv_id=r.reservation_id) }}"
+                       class="btn btn-warning btn-sm" style="margin-right: 5px;">
+                        Modify
+                    </a>
+
                     <button class="btn btn-danger btn-sm"
                             onclick="showConfirm('{{ url_for('reservations.cancel_reservation',
                              resv_id=r.reservation_id) }}')">
@@ -74,5 +79,4 @@ document.getElementById('confirm-modal').addEventListener('click', function(e) {
     if (e.target === this) closeConfirm();
 });
 </script>
-
 {% endblock %}
