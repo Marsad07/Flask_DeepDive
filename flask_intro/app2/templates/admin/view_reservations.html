@@ -1,56 +1,52 @@
 {% extends "base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <h1>ALL RESERVATIONS</h1>
-    <a href="{{ url_for('admin.dashboard') }}"
-       style="display: inline-block; color: #8B0000; text-decoration: none; margin: 20px 0; font-weight: bold;">
-        ← Back to Dashboard
-    </a>
+<div class="dash-page">
 
-    <div style="background: white; padding: 30px; border-radius: 12px;
-     box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
-
-        {% if reservations %}
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #2C2416; color: #FFD700;">
-                        <th style="padding: 15px; text-align: left;">Customer</th>
-                        <th style="padding: 15px; text-align: left;">Date</th>
-                        <th style="padding: 15px; text-align: left;">Time</th>
-                        <th style="padding: 15px; text-align: center;">Guests</th>
-                        <th style="padding: 15px; text-align: center;">Table</th>
-                        <th style="padding: 15px; text-align: left;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in reservations %}
-                    <tr style="border-bottom: 1px solid #E8DFD0;">
-                        <td style="padding: 15px;">
-                            <strong>{{ reservation.customer_fullname }}</strong><br>
-                            <small style="color: #5C4033;">{{ reservation.customer_email }}</small>
-                        </td>
-                        <td style="padding: 15px;">{{ reservation.reservation_date }}</td>
-                        <td style="padding: 15px;">{{ reservation.reservation_time }}</td>
-                        <td style="padding: 15px; text-align: center;">{{ reservation.num_of_guests }}</td>
-                        <td style="padding: 15px; text-align: center;">{{ reservation.table_number }}</td>
-                        <td style="padding: 15px;">
-                            <span style="background: #8B0000; color:
-                             #FFD700; padding: 5px 10px; border-radius: 6px; font-size: 12px;">
-                                {{ reservation.reservation_status }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p style="text-align: center; padding: 50px; color: #5C4033;">No reservations found.</p>
-        {% endif %}
-    </div>
+  <!-- This is for the top header row -->
+  <div class="dash-header">
+    <h1>All Reservations</h1>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+  </div>
+  <!-- This will show all the reservations in a table -->
+  <p class="dash-section-title">All Bookings</p>
+  <div class="dash-card">
+    {% if reservations %}
+      <table class="dash-table" style="table-layout: auto;">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th class="center">Guests</th>
+            <th class="center">Table</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reservation in reservations %}
+          <tr>
+            <td data-label="Customer">
+              <p class="resv-customer-name">{{ reservation.customer_fullname }}</p>
+              <p class="resv-customer-email">{{ reservation.customer_email }}</p>
+            </td>
+            <td data-label="Date">{{ reservation.reservation_date }}</td>
+            <td data-label="Time">{{ reservation.reservation_time }}</td>
+            <td data-label="Guests" class="center">{{ reservation.num_of_guests }}</td>
+            <td data-label="Table" class="center">{{ reservation.table_number }}</td>
+            <td data-label="Status">
+              <span class="dash-resv-badge">{{ reservation.reservation_status }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="dash-empty">No reservations found.</p>
+    {% endif %}
+  </div>
 </div>
 <script>
     const observer = new IntersectionObserver((entries) => {

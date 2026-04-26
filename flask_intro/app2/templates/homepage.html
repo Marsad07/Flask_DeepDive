@@ -1,121 +1,415 @@
 {% extends "base.html" %}
 {% block header %}{% endblock %}
 
+{% block styles %}
+
+/* This is for the hero section */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    overflow: hidden;
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.55);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(20,8,0,0.55) 100%);
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    width: 90%;
+    max-width: 820px;
+}
+
+.hero-logo {
+    max-height: 120px;
+    margin-bottom: 24px;
+}
+
+.hero-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 700;
+    margin: 0 0 16px;
+    letter-spacing: 4px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.hero-motto {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: clamp(16px, 3vw, 22px);
+    font-style: italic;
+    font-weight: 300;
+    margin: 0 0 44px;
+    color: rgba(255,255,255,0.88);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+    letter-spacing: 0.5px;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #8B0000;
+    color: #D4AF37;
+    padding: 16px 40px;
+    text-decoration: none;
+    border-radius: 2px;
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    box-shadow: 0 4px 20px rgba(139,0,0,0.45);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.hero-btn-primary:hover {
+    background: #6B0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(139,0,0,0.6);
+    color: #D4AF37;
+    text-decoration: none;
+}
+
+.hero-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: white;
+    padding: 15px 40px;
+    text-decoration: none;
+    border-radius: 2px;
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    border: 1.5px solid rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.hero-btn-secondary:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: white;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+/* This is for the story section */
+.home-story {
+    padding: 90px 40px;
+    background: linear-gradient(135deg, #FFFEF2 0%, #F5F0E8 100%);
+    text-align: center;
+}
+
+.home-section-label {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin: 0 0 14px;
+}
+
+.home-section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 12px;
+    letter-spacing: 2px;
+}
+
+.home-section-divider {
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #8B0000, #D4AF37);
+    border-radius: 2px;
+    margin: 0 auto 32px;
+}
+
+.home-story-text {
+    max-width: 760px;
+    margin: 0 auto;
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.9;
+    color: #5C4033;
+}
+
+/* This is for the signature dishes section */
+.home-dishes {
+    padding: 90px 40px;
+    background: #FFFEF2;
+}
+
+.home-dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dish-card {
+    background: #fff;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(139,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.dish-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 32px rgba(139,0,0,0.14);
+}
+
+.dish-card-img {
+    height: 240px;
+    background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.dish-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dish-card-placeholder {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+}
+
+.dish-card-body {
+    padding: 24px 26px 28px;
+    border-top: 3px solid #8B0000;
+}
+
+.dish-card-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 8px;
+}
+
+.dish-card-desc {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 14px;
+    color: #9E8C78;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* This is for the reviews section */
+.home-reviews {
+    padding: 90px 40px;
+    background: #2C2416;
+    text-align: center;
+}
+
+.home-reviews .home-section-label {
+    color: rgba(212,175,55,0.6);
+}
+
+.home-reviews .home-section-title {
+    color: #D4AF37;
+}
+
+.home-reviews .home-section-divider {
+    background: linear-gradient(90deg, #D4AF37, #8B0000);
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.review-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-radius: 2px;
+    padding: 32px 28px;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.review-card:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(212,175,55,0.3);
+}
+
+.review-stars {
+    color: #D4AF37;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.review-text {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 15px;
+    font-style: italic;
+    color: rgba(255,254,242,0.8);
+    line-height: 1.75;
+    margin: 0 0 20px;
+}
+
+.review-author {
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin: 0;
+}
+
+/* This is for mobile responsive on the homepage */
+@media (max-width: 640px) {
+    .hero { height: 500px; }
+
+    .hero-btns {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+
+    .home-story,
+    .home-dishes,
+    .home-reviews {
+        padding: 60px 20px;
+    }
+}
+{% endblock %}
 {% block content %}
 <!-- This is the hero section with overlay -->
-<div style="position: relative; width: 100%; height: 600px; overflow: hidden;">
+<div class="hero">
     <img src="{{ hero or url_for('static', filename='imgs/img1.jpg') }}"
-         alt="Restaurant Hero"
-         style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7);">
+         alt="Restaurant Hero" class="hero-img">
+    <div class="hero-overlay"></div>
 
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                text-align: center; color: white; width: 90%; max-width: 800px;">
+    <div class="hero-content">
 
         <!-- This shows logo or text depending on branding settings -->
         {% if branding.use_logo and branding.logo_path %}
-            <img src="{{ branding.logo_path }}" alt="Restaurant Logo"
-                 style="max-height: 120px; margin-bottom: 20px;">
+            <img src="{{ branding.logo_path }}" alt="Restaurant Logo" class="hero-logo">
         {% else %}
-            <h1 style="font-size: 64px; font-weight: bold; margin-bottom: 20px;
-                       text-shadow: 2px 2px 10px rgba(0,0,0,0.7); letter-spacing: 3px;">
-                {{ branding.restaurant_name }}
-            </h1>
+            <h1 class="hero-title">{{ branding.restaurant_name }}</h1>
         {% endif %}
 
-        <p style="font-size: 28px; margin-bottom: 40px; font-style: italic;
-                  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);">
-            {{ branding.restaurant_motto }}
-        </p>
-
-        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ url_for('cart.order_now_menu') }}"
-               style="background: #8B0000; color: #FFD700; padding: 18px 45px;
-                      text-decoration: none; border-radius: 50px; font-size: 20px;
-                      font-weight: bold; text-transform: uppercase; letter-spacing: 2px;
-                      box-shadow: 0 4px 15px rgba(139,0,0,0.4); transition: all 0.3s ease;"
-               onmouseover="this.style.transform='translateY(-3px)';
-                this.style.boxShadow='0 6px 20px rgba(139,0,0,0.6)'"
-               onmouseout="this.style.transform='translateY(0)';
-                this.style.boxShadow='0 4px 15px rgba(139,0,0,0.4)'">
-                🛒 Order Takeaway
+        <p class="hero-motto">{{ branding.restaurant_motto }}</p>
+        <div class="hero-btns">
+            <a href="{{ url_for('cart.order_now_menu') }}" class="hero-btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
+                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Order Takeaway
             </a>
-            <a href="{{ url_for('reservations.reservations_page') }}"
-               style="background: rgba(255,255,255,0.2); color: white; padding: 18px 45px;
-                      text-decoration: none; border-radius: 50px; font-size: 20px;
-                      font-weight: bold; text-transform: uppercase; letter-spacing: 2px;
-                      border: 3px solid white; backdrop-filter: blur(10px);
-                      transition: all 0.3s ease;"
-               onmouseover="this.style.background='rgba(255,255,255,0.3)'"
-               onmouseout="this.style.background='rgba(255,255,255,0.2)'">
-                📅 Book a Table
+            <a href="{{ url_for('reservations.reservations_page') }}" class="hero-btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                Book a Table
             </a>
         </div>
     </div>
 </div>
-
 <!-- This is the about/story section -->
-<div style="padding: 80px 20px; background: linear-gradient(135deg, #FFFEF2 0%); text-align: center;">
-    <h2 style="font-size: 48px; color: #8B0000; margin-bottom: 30px; letter-spacing: 2px;">Our Story</h2>
-    <p style="max-width: 800px; margin: 0 auto; font-size: 20px; line-height: 1.8; color: #5C4033;">
-        (Restaurant Story)
-    </p>
+<div class="home-story">
+    <p class="home-section-label">Est. since day one</p>
+    <h2 class="home-section-title">Our Story</h2>
+    <div class="home-section-divider"></div>
+    <p class="home-story-text">(Restaurant Story)</p>
 </div>
-
-<div style="font-family: Georgia, serif;">
-
 <!-- This is the featured dishes section -->
-<div style="padding: 80px 20px; background: #FFFEF2;">
-    <h2 style="text-align: center; font-size: 48px; color: #8B0000; margin-bottom: 50px; letter-spacing: 2px;">
-        Signature Dishes
-    </h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 30px; max-width: 1200px; margin: 0 auto;">
+<div class="home-dishes">
+    <p class="home-section-label" style="text-align:center;">From our kitchen</p>
+    <h2 class="home-section-title" style="text-align:center;">Signature Dishes</h2>
+    <div class="home-section-divider"></div>
+    <div class="home-dishes-grid">
         {% for dish in dishes %}
-        <div style="background: #F5F0E8; border-radius: 12px; overflow: hidden;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;"
-             onmouseover="this.style.transform='translateY(-10px)'"
-             onmouseout="this.style.transform='translateY(0)'">
-            <div style="height: 250px; background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-                        display: flex; align-items: center; justify-content: center; color: white;
-                        font-size: 18px; overflow: hidden;">
+        <div class="dish-card">
+            <div class="dish-card-img">
                 {% set dish_img = dish.dish_key %}
                 {% if dish_img == 'dish1' and dish1 %}
-                    <img src="{{ dish1 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ dish1 }}" alt="{{ dish.dish_name }}">
                 {% elif dish_img == 'dish2' and dish2 %}
-                    <img src="{{ dish2 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ dish2 }}" alt="{{ dish.dish_name }}">
                 {% elif dish_img == 'dish3' and dish3 %}
-                    <img src="{{ dish3 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ dish3 }}" alt="{{ dish.dish_name }}">
                 {% else %}
-                    Add Dish Photo
+                    <span class="dish-card-placeholder">Add Dish Photo</span>
                 {% endif %}
             </div>
-            <div style="padding: 25px; text-align: center;">
-                <h3 style="font-size: 24px; color: #2C2416; margin-bottom: 10px;">{{ dish.dish_name }}</h3>
-                <p style="color: #5C4033; font-style: italic; margin: 0;">{{ dish.dish_description }}</p>
+            <div class="dish-card-body">
+                <h3 class="dish-card-name">{{ dish.dish_name }}</h3>
+                <p class="dish-card-desc">{{ dish.dish_description }}</p>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
-</div>
-
 <!-- This is for the reviews/testimonials section -->
-<div style="padding: 80px 20px; background: #2C2416; color: white; text-align: center; margin-bottom: -8px;">
-    <h2 style="font-size: 48px; color: #FFD700; margin-bottom: 50px; letter-spacing: 2px;">
-        What Our Guests Say
-    </h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 30px; max-width: 1200px; margin: 40px auto 0 auto;">
+<div class="home-reviews">
+    <p class="home-section-label">From our guests</p>
+    <h2 class="home-section-title">What Our Guests Say</h2>
+    <div class="home-section-divider"></div>
+
+    <div class="reviews-grid">
         {% for review in reviews %}
-        <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;
-                    backdrop-filter: blur(10px);">
-            <div style="color: #FFD700; font-size: 24px; margin-bottom: 15px;">
+        <div class="review-card">
+            <div class="review-stars">
                 {% for i in range(review.rating) %}★{% endfor %}
             </div>
-            <p style="font-style: italic; margin-bottom: 20px; line-height: 1.6;">
-                "{{ review.review_text }}"
-            </p>
-            <p style="color: #D4AF37; font-weight: bold; margin: 0;">- {{ review.reviewer_name }}</p>
+            <p class="review-text">"{{ review.review_text }}"</p>
+            <p class="review-author">— {{ review.reviewer_name }}</p>
         </div>
         {% endfor %}
     </div>

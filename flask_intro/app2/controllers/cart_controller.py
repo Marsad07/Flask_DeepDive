@@ -13,7 +13,9 @@ def order_now_menu():
     items = cursor.fetchall()
     cursor.close()
     db.close()
-    return render_template("menu2.html", menu_items=items)
+    cart = session.get('cart', {})
+    cart_count = sum(item['quantity'] for item in cart.values())
+    return render_template("menu2.html", menu_items=items, cart_count=cart_count)
 
 @staff_redirect
 def view_cart():

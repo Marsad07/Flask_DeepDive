@@ -4,141 +4,97 @@
 {% endblock %}
 
 {% block content %}
-<div class="menu-container" style="background: linear-gradient(135deg, #FFFEF2 0%, #F5F0E8 100%);">
-    <!-- This is the page title with delivery badge -->
-    <h1>ORDER ONLINE
-        <span style="background: #8B0000; color: #FFD700; padding: 5px 15px;
-              border-radius: 20px; font-size: 16px; margin-left: 10px;">
-              DELIVERY & COLLECTION
-        </span>
-    </h1>
-    <h3 style="text-align: center; margin-bottom: 30px;">Choose your items and add them to cart</h3>
+<div class="order-page">
+  <!-- This is for the page header -->
+  <div class="order-header">
+    <h1>ORDER ONLINE</h1>
+    <span class="order-badge">Delivery & Collection</span>
+    <p class="order-tagline">Choose your items and add them to cart</p>
+    <div class="order-header-divider"></div>
+  </div>
 
-    <!-- This is the cart button at the top -->
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ url_for('cart.view_cart') }}"
-           style="background: #D4AF37; color: white; padding: 15px 40px;
-                  text-decoration: none; border-radius: 8px; font-weight: bold;
-                  transition: all 0.3s ease; display: inline-block;"
-           onmouseover="this.style.background='#B8941F'"
-           onmouseout="this.style.background='#D4AF37'">
-            🛒 View Cart
-        </a>
-    </div>
-    <!-- This loops through each menu category -->
-    {% for category in ['Starters', 'Mains', 'Sides', 'Desserts', 'Drinks'] %}
-    <h2>{{ category }}</h2>
+  <!-- This is for the view cart button -->
+  <div class="order-cart-bar">
+    <a href="{{ url_for('cart.view_cart') }}" class="btn-view-cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
+              stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+        View Cart {% if cart_count > 0 %}({{ cart_count }}){% endif %}
+    </a>
+  </div>
+
+  <!-- This loops through each menu category -->
+  {% for category in ['Starters', 'Mains', 'Sides', 'Desserts', 'Drinks'] %}
+  {% set ns = namespace(has_items=false) %}
+  {% for item in menu_items if item.category == category %}
+    {% set ns.has_items = true %}
+  {% endfor %}
+
+  {% if ns.has_items %}
+  <div class="order-category">
+    <h2 class="order-category-title">{{ category }}</h2>
+    <div class="order-category-divider"></div>
+
     <!-- This loops through each item in the category -->
     {% for item in menu_items if item.category == category %}
     <div class="order-item-card">
 
-        <!-- This is the left side showing item details -->
-        <div style="flex: 1;">
-            <h3 style="margin: 0 0 10px 0; color: #2C2416; font-size: 22px;">
-                {{ item.item_name }}
-            </h3>
-            <p style="margin: 5px 0; color: #5C4033; font-style: italic;">
-                {{ item.description }}
-            </p>
-            <p style="margin: 10px 0 0 0; color: #8B0000; font-weight: bold; font-size: 20px;">
-                £{{ "%.2f"|format(item.price) }}
-            </p>
-        </div>
-
-        <!-- This is the right side with quantity selector and add to cart button -->
-        <div class="order-item-actions">
-            <form method="POST" action="{{ url_for('cart.add_to_cart', item_id=item.item_id) }}"
-                  style="display: flex; align-items: center; gap: 15px; justify-content: flex-end; flex-wrap: wrap;">
-                <input type="hidden" name="item_id" value="{{ item.item_id }}">
-
-                <!-- This is the quantity selector -->
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-weight: bold; color: #2C2416;">Qty:</label>
-                    <input type="number" name="quantity" value="1" min="1" max="10"
-                           style="width: 60px; padding: 10px; border: 2px solid #D4AF37;
-                                  border-radius: 6px; font-size: 16px; text-align: center;">
-                </div>
-
-                <!-- This is the add to cart button -->
-                <button type="submit"
-                        style="background: #8B0000; color: #FFD700; padding: 12px 25px;
-                               border: none; border-radius: 8px; font-weight: bold;
-                               cursor: pointer; font-size: 16px; transition: all 0.3s ease;
-                               text-transform: uppercase; letter-spacing: 1px;"
-                        onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
-                        onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
-                    🛒 Add to Cart
-                    {% if session.get('cart_message') %}
-                        <div style="background: #28a745; color: white; padding: 10px 20px; text-align: center;
-                             border-radius: 6px; margin: 15px auto; font-weight: bold; max-width: 400px;
-                             font-size: 14px; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
-                            {{ session.pop('cart_message') }}
-                        </div>
-                    {% endif %}
-                </button>
-            </form>
-        </div>
+      <!-- This is for the item details -->
+      <div class="order-item-info">
+        <h3 class="order-item-name">{{ item.item_name }}</h3>
+        <p class="order-item-desc">{{ item.description }}</p>
+        <p class="order-item-price">£{{ "%.2f"|format(item.price) }}</p>
+      </div>
+      <!-- This is for the quantity and add to cart -->
+      <div class="order-item-actions">
+        <form method="POST" action="{{ url_for('cart.add_to_cart', item_id=item.item_id) }}"
+              class="order-item-form">
+          <input type="hidden" name="item_id" value="{{ item.item_id }}">
+          <!-- This is for the quantity selector -->
+          <div class="order-qty-wrap">
+            <label class="order-qty-label">Qty</label>
+            <div class="order-qty-controls">
+              <button type="button" class="qty-btn" onclick="changeQty(this, -1)">−</button>
+              <input type="number" name="quantity" value="1" min="1" max="10"
+                     class="order-qty-input">
+              <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+            </div>
+          </div>
+          <!-- This is the add to cart button -->
+          <button type="submit" class="btn-add-cart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="
+              currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Add to Cart
+          </button>
+        </form>
+      </div>
     </div>
     {% endfor %}
-    {% endfor %}
+  </div>
+  {% endif %}
+  {% endfor %}
 </div>
-<!-- This adds mobile-responsive styling -->
-<style>
-.order-item-card {
-    background: white;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.order-item-actions {
-    min-width: 250px;
-    text-align: right;
-}
-
-/* This makes it mobile-friendly */
-@media (max-width: 768px) {
-    .order-item-card {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 15px;
-    }
-
-    .order-item-actions {
-        width: 100%;
-        min-width: auto;
-        margin-top: 15px;
-        text-align: left;
-    }
-
-    .order-item-actions form {
-        justify-content: space-between !important;
-        width: 100%;
-    }
-
-    h1 span {
-        display: block;
-        margin: 10px 0 0 0 !important;
-        font-size: 14px !important;
-    }
-}
-</style>
-<!-- This is for scroll animations -->
 <script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
+  // this is for the +/- quantity buttons
+  function changeQty(btn, delta) {
+    const input = btn.parentElement.querySelector('.order-qty-input');
+    const current = parseInt(input.value) || 1;
+    const next = Math.min(10, Math.max(1, current + delta));
+    input.value = next;
+  }
 
-    document.querySelectorAll('.menu-container h2, .menu-container ul').forEach(el => {
-        observer.observe(el);
+  // this is for scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
     });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.order-category, .order-item-card').forEach(el => {
+    observer.observe(el);
+  });
 </script>
 {% endblock %}

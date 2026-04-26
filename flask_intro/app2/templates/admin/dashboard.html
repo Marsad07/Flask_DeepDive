@@ -1,176 +1,158 @@
 {% extends "base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+<div class="dash-page">
+  <!-- This is for the top header row -->
+  <div class="dash-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p class="dash-welcome">
+        Welcome back, <span>{{ admin_name }}</span> —
+        {{ branding.restaurant_name }}
+      </p>
+    </div>
+    <a href="{{ url_for('admin.logout') }}" class="btn-logout">Logout</a>
+  </div>
+  <!-- The data for the admin will be shown on stat cards -->
+  <div class="dash-stats dash-stats-3">
+    <div class="stat-card stat-card-red">
+      <div class="stat-number">{{ today_bookings }}</div>
+      <div class="stat-label">Today's Bookings</div>
+    </div>
+    <div class="stat-card stat-card-gold">
+      <div class="stat-number">{{ total_bookings }}</div>
+      <div class="stat-label">Total Bookings</div>
+    </div>
+    <div class="stat-card stat-card-dark">
+      <div class="stat-number">{{ newsletter_subs }}</div>
+      <div class="stat-label">Newsletter Subscribers</div>
+    </div>
+  </div>
+  <!-- These will be for the quick action buttons -->
+  <p class="dash-section-title">Quick Actions</p>
+  <div class="dash-actions">
+
+    <a href="{{ url_for('admin.manage_categories') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+      <span class="dash-action-label">Manage Categories</span>
+    </a>
+
+    <a href="{{ url_for('admin.update_hours') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round"
+             stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <span class="dash-action-label">Update Hours</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_tables') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="3"
+              rx="1"/><path d="M6 11v6M18 11v6M4 17h16"/></svg>
+      </div>
+      <span class="dash-action-label">Manage Tables</span>
+    </a>
+
+    <a href="{{ url_for('admin.view_analytics') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      </div>
+      <span class="dash-action-label">View Analytics</span>
+    </a>
+
+    <a href="{{ url_for('admin.image_manager') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18"
+              rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      </div>
+      <span class="dash-action-label">View / Change Images</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_homepage') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2
+              2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      </div>
+      <span class="dash-action-label">Manage Homepage</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_contact') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0
+              00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>
+      </div>
+      <span class="dash-action-label">Edit Contact Details</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_social_links') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round"
+             stroke-linejoin="round"><circle cx="18"
+             cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19"
+             r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+      </div>
+      <span class="dash-action-label">Edit Social Media Links</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_about') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path
+                d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014
+                 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      </div>
+      <span class="dash-action-label">Manage About Us</span>
+    </a>
+
+    <a href="{{ url_for('admin.manage_staff') }}" class="dash-action-card">
+      <div class="dash-action-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+             stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4
+              0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <span class="dash-action-label">Manage Staff</span>
+    </a>
+  </div>
+  <!-- This will show all the recent reservations -->
+  <p class="dash-section-title">Recent Reservations</p>
+  <div class="dash-card">
+
+    {% if recent_reservations %}
+      {% for reservation in recent_reservations %}
+      <div class="dash-reservation-row">
         <div>
-            <h1>ADMIN DASHBOARD</h1>
-            <p style="font-size: 18px; color: #5C4033; margin-top: 10px;">Welcome back to the
-                {{ branding.restaurant_name }} Dashboard, Mr {{ admin_name }}</p>
+          <p class="dash-resv-name">{{ reservation.customer_fullname }}</p>
+          <p class="dash-resv-details">
+            {{ reservation.reservation_date }} at {{ reservation.reservation_time }}
+            &nbsp;·&nbsp; Table {{ reservation.table_number }}
+            &nbsp;·&nbsp; {{ reservation.num_of_guests }} guests
+          </p>
         </div>
-        <a href="{{ url_for('admin.logout') }}"
-           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
-                  border-radius: 8px; font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#660000';"
-           onmouseout="this.style.background='#8B0000';">
-            LOGOUT
-        </a>
-    </div>
+        <span class="dash-resv-badge">{{ reservation.reservation_status }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="dash-empty">No reservations yet.</p>
+    {% endif %}
 
-    <!-- The data for the admin will be shown on stat cards -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin: 40px 0;">
-        <div style="background: linear-gradient(135deg, #8B0000 0%, #660000 100%); color: white; padding: 30px;
-        border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <a href="{{ url_for('admin.view_reservations') }}" class="dash-view-all">
+      View All Reservations →
+    </a>
 
-            <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ today_bookings }}</div>
-            <div style="font-size: 18px; color: #FFD700;">Today's Bookings</div>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%); color: white; padding: 30px;
-         border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-
-            <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ total_bookings }}</div>
-            <div style="font-size: 18px;">Total Bookings</div>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #2C2416 0%, #1A1410 100%); color: white; padding: 30px;
-         border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-
-            <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ newsletter_subs }}</div>
-            <div style="font-size: 18px; color: #D4AF37;">Newsletter Subscribers</div>
-        </div>
-    </div>
-
-    <!-- These will be for the quick action buttons -->
-    <h2 style="margin-top: 60px; margin-bottom: 30px;">QUICK ACTIONS</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 60px;">
-        <a href="{{ url_for('admin.manage_categories') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🍽️ Manage Categories
-        </a>
-        <a href="{{ url_for('admin.update_hours') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🕐 Update Hours
-        </a>
-        <a href="{{ url_for('admin.manage_tables') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🪑 Manage Tables
-        </a>
-        <a href=" {{ url_for('admin.view_analytics') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            📊 View Analytics
-        </a>
-        <a href="{{ url_for('admin.image_manager') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🖼️ View / Change Images
-        </a>
-        <a href="{{ url_for('admin.manage_homepage') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🖼️ Manage Homepage
-        </a>
-        <a href="{{ url_for('admin.manage_contact') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            👤 Edit Contact Details
-        </a>
-        <a href="{{ url_for('admin.manage_social_links') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            🔗 Edit Social Media Links
-        </a>
-        <a href="{{ url_for('admin.manage_about') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            📖 Manage About Us
-        </a>
-        <a href="{{ url_for('admin.manage_staff') }}"
-           style="background: white; padding: 30px; border: 2px solid #D4AF37; border-radius: 12px;
-                  text-align: center; text-decoration: none; color: #2C2416; font-size: 20px;
-                  font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#FFFEF2'; this.style.borderColor='#8B0000';"
-           onmouseout="this.style.background='white'; this.style.borderColor='#D4AF37';">
-            📖 Manage Staff
-        </a>
-    </div>
-
-    <!-- This will show all the recent reservations -->
-    <h2 style="margin-bottom: 30px;">RECENT RESERVATIONS</h2>
-    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        {% if recent_reservations %}
-            {% for reservation in recent_reservations %}
-            <div style="padding: 15px; border-bottom: 1px solid #E8DFD0; display: flex;
-             justify-content: space-between; align-items: center;">
-                <div>
-                    <strong style="color: #2C2416; font-size: 18px;">{{ reservation.customer_fullname }}</strong>
-                    <p style="color: #5C4033; margin: 5px 0 0 0;">
-                        {{ reservation.reservation_date }} at {{ reservation.reservation_time }}
-                        - Table {{ reservation.table_number }} - {{ reservation.num_of_guests }} guests
-                    </p>
-                </div>
-                <span style="background: #8B0000; color: #FFD700; padding: 5px 15px; border-radius: 6px;
-                 font-size: 12px; font-weight: bold;">
-                    {{ reservation.reservation_status }}
-                </span>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p style="text-align: center; color: #5C4033; padding: 30px;">No reservations yet.</p>
-        {% endif %}
-
-        <a href="{{ url_for('admin.view_reservations') }}"
-           style="display: block; text-align: center; margin-top: 20px; color: #8B0000;
-                  text-decoration: none; font-weight: bold; font-size: 16px;">
-            View All Reservations →
-        </a>
-    </div>
+  </div>
 </div>
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container div, .menu-container a, .menu-container table').forEach(el => {
-        observer.observe(el);
-    });
-</script>
 {% endblock %}
+

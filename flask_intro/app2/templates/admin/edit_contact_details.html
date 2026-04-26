@@ -1,81 +1,88 @@
 {% extends "base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <h1>MANAGE CONTACT DETAILS</h1>
-    <h3>Update your restaurant’s public contact information</h3>
+<div class="dash-page">
+  <!-- This is for the top header row -->
+  <div class="dash-header">
+    <h1>Manage Contact Details</h1>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+  </div>
 
-    <form method="POST" id="contact-form" style="max-width:600px; margin:30px auto;">
-        <label>Restaurant Address</label>
-        <textarea name="address" rows="3" required
-                  style="padding:12px; border:2px solid #8B0000; border-radius:6px;
-                         font-family:Georgia, serif; font-size:15px;">{{ info.address }}</textarea>
-        <label>Phone Number</label>
-        <input type="text" name="phone" required
-               pattern="[0-9]{10,}"
-               placeholder="Enter phone number (numbers only)"
-               value="{{ info.phone }}"
-               style="padding:12px; border:2px solid #8B0000; border-radius:6px;
-                      font-family:Georgia, serif; font-size:15px;">
+  <!-- This is for the contact details card -->
+  <p class="dash-section-title">Update Contact Information</p>
+  <div class="dash-card">
+    <div class="dash-card-body">
 
-        <label>Email Address</label>
-        <input type="email" name="email" required
-               value="{{ info.email }}"
-               style="padding:12px; border:2px solid #8B0000; border-radius:6px;
-                      font-family:Georgia, serif; font-size:15px;">
+      <!-- This is the form -->
+      <form method="POST" id="contact-form">
 
-        <button type="button" onclick="showConfirm()"
-                style="padding:12px 25px; background:#8B0000; color:#FFD700;
-                       border:none; border-radius:6px; font-family:Georgia, serif;
-                       font-size:16px; font-weight:bold; cursor:pointer; margin-top:20px;">
-            UPDATE CONTACT DETAILS
-        </button>
-    </form>
-</div>
-
-<!-- This is for the confirmation popup -->
-<div id="confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-                        background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px; width:90%; text-align:center;
-               font-family:Georgia, serif; border-top:5px solid #8B0000;">
-        <h3 style="margin-bottom:10px; color:#2C2416;">Confirm Update</h3>
-        <p style="margin-bottom:25px; color:#2C2416;">
-            Are you sure you want to update the restaurant contact details?
-        </p>
-
-        <div style="display:flex; gap:15px; justify-content:center;">
-            <button onclick="closeConfirm()" style="
-                padding:10px 20px; background:white; border:2px solid #8B0000;
-                color:#8B0000; border-radius:6px; cursor:pointer; font-weight:bold;">
-                Cancel
-            </button>
-
-            <button onclick="submitForm()" style="
-                padding:10px 20px; background:#8B0000; color:#FFD700;
-                border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
-                Yes, Update
-            </button>
+        <!-- Restaurant Address -->
+        <div class="form-group">
+          <label class="form-label">Restaurant Address</label>
+          <textarea name="address" rows="3" class="form-textarea" required>{{ info.address }}</textarea>
         </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="phone" class="form-input"
+                 pattern="[0-9]{10,}"
+                 placeholder="Enter phone number (numbers only)"
+                 value="{{ info.phone }}" required>
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-input"
+                 value="{{ info.email }}" required>
+        </div>
+
+        <!-- Update button -->
+        <button type="button" class="btn-primary" onclick="openConfirm()">
+          Update Contact Details
+        </button>
+
+      </form>
+
     </div>
+  </div>
+</div>
+<!-- This is for the confirmation modal -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="modal-title">Confirm Update</h3>
+    <p class="modal-message">
+      Are you sure you want to update the restaurant contact details?
+    </p>
+
+    <div class="modal-actions">
+      <button onclick="closeConfirm()" class="modal-btn-cancel">Cancel</button>
+      <button onclick="submitContactForm()" class="modal-btn-confirm">Confirm</button>
+    </div>
+  </div>
 </div>
 <script>
-function showConfirm() {
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
+  // This opens the confirmation modal
+  function openConfirm() {
+    document.getElementById("confirm-modal").style.display = "flex";
+  }
 
-function closeConfirm() {
-    document.getElementById('confirm-modal').style.display = 'none';
-}
+  // This closes the modal
+  function closeConfirm() {
+    document.getElementById("confirm-modal").style.display = "none";
+  }
 
-function submitForm() {
-    document.getElementById('contact-form').submit();
-}
+  // This submits the form after confirmation
+  function submitContactForm() {
+    document.getElementById("contact-form").submit();
+  }
 
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  // This closes modal when clicking outside the box
+  document.getElementById("confirm-modal").addEventListener("click", function(e) {
     if (e.target === this) closeConfirm();
-});
+  });
 </script>
 {% endblock %}

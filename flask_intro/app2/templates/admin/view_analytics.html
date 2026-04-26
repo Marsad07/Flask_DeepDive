@@ -1,82 +1,68 @@
 {% extends "base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
 <!-- This loads the Google Charts library which i will be using to show data -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+<div class="dash-page">
 
-<div class="menu-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-        <h1 style="flex: 1;">ANALYTICS</h1>
-        <a href="{{ url_for('admin.dashboard') }}"
-           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
-                  border-radius: 8px; font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#660000';"
-           onmouseout="this.style.background='#8B0000';">
-            ← Back to Dashboard
-        </a>
+  <!-- This is for the top header row -->
+  <div class="dash-header">
+    <h1>Analytics</h1>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+  </div>
+
+  <!-- This creates the stats cards -->
+  <div class="dash-stats dash-stats-4">
+    <div class="stat-card stat-card-red">
+      <div class="stat-number">{{ total_reservations }}</div>
+      <div class="stat-label">Total Reservations</div>
+    </div>
+    <div class="stat-card stat-card-gold">
+      <div class="stat-number">{{ total_monthly_reservations }}</div>
+      <div class="stat-label">This Month</div>
+    </div>
+    <div class="stat-card stat-card-dark">
+      <div class="stat-number">{{ "%.1f"|format(total_guests) }}</div>
+      <div class="stat-label">Avg Guests</div>
+    </div>
+    <div class="stat-card stat-card-brown">
+      <div class="stat-number">{{ popular_table }}</div>
+      <div class="stat-label">Popular Table</div>
+    </div>
+  </div>
+
+  <p class="dash-section-title">Booking Insights</p>
+  <div class="dash-chart-grid-2">
+
+    <!-- Chart 1: Bookings by Day -->
+    <div class="dash-chart-card">
+      <div class="dash-chart-card-body">
+        <p class="dash-chart-title">Bookings by Day</p>
+        <div id="bookings_by_day_chart" style="width: 100%; height: 360px;"></div>
+      </div>
     </div>
 
-    <!-- This creates the stats cards -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 30px; margin: 40px 0;">
-        <div style="background: linear-gradient(135deg, #8B0000 0%, #660000 100%); color: white; padding: 30px;
-        border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <div style="font-size: 48px;
-             font-weight: bold; margin-bottom: 10px;">{{ total_reservations }}</div>
-            <div style="font-size: 18px; color: #FFD700;">Total Reservations</div>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%); color: white; padding: 30px;
-         border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <div style="font-size: 48px;
-             font-weight: bold; margin-bottom: 10px;">{{ total_monthly_reservations }}</div>
-            <div style="font-size: 18px;">This Month</div>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #2C2416 0%, #1A1410 100%); color: white; padding: 30px;
-         border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <div style="font-size: 48px;
-             font-weight: bold; margin-bottom: 10px;">{{ "%.1f"|format(total_guests) }}</div>
-            <div style="font-size: 18px; color: #D4AF37;">Avg Guests</div>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #8B4513 0%, #5C2D0A 100%); color: white; padding: 30px;
-         border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <div style="font-size: 48px;
-            font-weight: bold; margin-bottom: 10px;">{{ popular_table }}</div>
-            <div style="font-size: 18px; color: #FFD700;">Popular Table</div>
-        </div>
+    <!-- Chart 2: Bookings by Time -->
+    <div class="dash-chart-card">
+      <div class="dash-chart-card-body">
+        <p class="dash-chart-title">Popular Time Slots</p>
+        <div id="bookings_by_time_chart" style="width: 100%; height: 360px;"></div>
+      </div>
     </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 40px 0;">
-        <!-- Chart 1: Bookings by Day -->
-        <div style="background: white; padding: 30px; border-radius: 12px;
-                    text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h2 style="margin-top: 0; color: #2C2416;">Bookings by Day</h2>
-            <div id="bookings_by_day_chart" style="width: 100%; height: 400px;"></div>
-        </div>
-
-        <!-- Chart 2: Bookings by Time -->
-        <div style="background: white; padding: 30px; border-radius: 12px;
-                    text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h2 style="margin-top: 0; color: #2C2416;">Popular Time Slots</h2>
-            <div id="bookings_by_time_chart" style="width: 100%; height: 400px;"></div>
-        </div>
+  </div>
+  <!-- Chart 3: Monthly Trend -->
+  <div class="dash-chart-grid-1">
+    <div class="dash-chart-card">
+      <div class="dash-chart-card-body">
+        <p class="dash-chart-title">Monthly Trend</p>
+        <div id="monthly_trend_chart" style="width: 100%; height: 360px;"></div>
+      </div>
     </div>
-
-    <div style="display: grid; grid-template-columns: 1fr; gap: 30px; margin: 40px 0;">
-        <!-- Chart 3: Monthly Trend -->
-        <div style="background: white; padding: 30px; border-radius: 12px;
-                    text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h2 style="margin-top: 0; color: #2C2416;">Monthly Trend</h2>
-            <div id="monthly_trend_chart" style="width: 100%; height: 400px;"></div>
-        </div>
-    </div>
+  </div>
 </div>
-
 <script type="text/javascript">
     // Load Google Charts
     google.charts.load('current', {'packages':['corechart']});
@@ -101,8 +87,10 @@
             colors: ['#8B0000'],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Day of Week' },
-            vAxis: { title: 'Number of Bookings', minValue: 0 }
+            hAxis: { title: 'Day of Week', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
+            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
+            textStyle: { color: '#5C4033' } },
+            chartArea: { width: '80%', height: '75%' }
         };
 
         var chart = new google.visualization.ColumnChart(document.getElementById('bookings_by_day_chart'));
@@ -122,8 +110,10 @@
             colors: ['#D4AF37'],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Time Slot' },
-            vAxis: { title: 'Number of Bookings', minValue: 0 }
+            hAxis: { title: 'Time Slot', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
+            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
+            textStyle: { color: '#5C4033' } },
+            chartArea: { width: '80%', height: '75%' }
         };
 
         var chart = new google.visualization.ColumnChart(document.getElementById('bookings_by_time_chart'));
@@ -143,9 +133,11 @@
             colors: ['#2C2416'],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Month' },
-            vAxis: { title: 'Number of Bookings', minValue: 0 },
-            curveType: 'function'
+            hAxis: { title: 'Month', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
+            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
+             textStyle: { color: '#5C4033' } },
+            curveType: 'function',
+            chartArea: { width: '88%', height: '75%' }
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('monthly_trend_chart'));

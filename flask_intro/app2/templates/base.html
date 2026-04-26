@@ -1,168 +1,366 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-          margin: 0;
-          padding: 0;
-        }
-
-        h2 {
-          text-align: center;
-        }
-
-        /* This is the navbar styling for desktop users */
-        ul.navbar {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-          background-color: #2C2416;
-          display: flex;
-          justify-content: center;
-          width: 100%;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-          animation: slideDown 0.5s ease forwards;
-          overflow: visible;
-          position: relative;
-          z-index: 998;
-        }
-
-        ul.navbar li a {
-          display: block;
-          color: #FFFEF2;
-          padding: 18px 28px;
-          text-decoration: none;
-          font-family: Georgia, serif;
-          font-size: 18px;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          transition: all 0.3s ease;
-        }
-
-        ul.navbar li a:hover {
-          background-color: #8B0000;
-          color: #FFD700;
-        }
-
-        /* Desktop navbar slide down animation */
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-100%);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        /* This is the hamburger menu button that appears on mobile */
-        .hamburger {
-          display: none;
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 15px;
-          position: absolute;
-          right: 20px;
-          top: 10px;
-          z-index: 1000;
-        }
-
-        .hamburger span {
-          display: block;
-          width: 30px;
-          height: 3px;
-          background: #8B0000;
-          margin: 6px 0;
-          transition: 0.3s;
-        }
-
-        /* This makes the footer grid responsive */
-        .footer-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr 1fr;
-          gap: 30px;
-          margin-bottom: 30px;
-        }
-
-        /* This makes the navbar responsive for mobile devices */
-        @media (max-width: 768px) {
-          ul.navbar {
-            flex-direction: column;
-            display: none;
-            width: 100%;
-            animation: none;
-          }
-
-          ul.navbar.active {
-            display: flex;
-            animation: slideIn 0.3s ease forwards;
-          }
-
-          ul.navbar li {
-            width: 100%;
-            text-align: center;
-          }
-
-          ul.navbar li a {
-            padding: 15px;
-            border-bottom: 1px solid #1A1410;
-          }
-
-          .hamburger {
-            display: block;
-          }
-
-          h2 {
-            font-size: 24px;
-            padding-right: 60px;
-          }
-
-          .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 40px;
-          }
-        }
-
-        /* This is for mobile menu slide animation */
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(100%);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        {% block styles %}{% endblock %}
-    </style>
+    <title>{{ branding.restaurant_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700
-            &family=Lato:wght@300;400;700&display=swap">
+          href="https://fonts.googleapis.com/
+          css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
     {% block extra_css %}{% endblock %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* This is the restaurant name heading */
+        .site-title {
+            text-align: center;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: 700;
+            color: #1C1008;
+            letter-spacing: 3px;
+            margin: 0;
+            padding: 20px 80px 20px;
+            background: #FFFEF2;
+        }
+
+        /* This is the navbar styling for desktop users */
+        ul.navbar {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: #2C2416;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            animation: slideDown 0.5s ease forwards;
+            overflow: visible;
+            position: relative;
+            z-index: 998;
+        }
+
+        ul.navbar li a {
+            display: block;
+            color: #FFFEF2;
+            padding: 18px 22px;
+            text-decoration: none;
+            font-family: 'Lato', Georgia, serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+
+        ul.navbar li a:hover {
+            background-color: #8B0000;
+            color: #FFD700;
+        }
+
+        /* This highlights the active page in the navbar */
+        ul.navbar li a.active {
+            color: #D4AF37;
+            background: rgba(139,0,0,0.35);
+        }
+
+        /* Desktop navbar slide down animation */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-100%); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* This is the hamburger menu button that appears on mobile */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 15px;
+            position: absolute;
+            right: 20px;
+            top: 18px;
+            z-index: 1000;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 2px;
+            background: #2C2416;
+            margin: 6px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* This is the account icon SVG button in the navbar */
+        .navbar-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 22px;
+            cursor: pointer;
+            color: #FFFEF2;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .navbar-icon-btn:hover {
+            background-color: #8B0000;
+            color: #FFD700;
+        }
+
+        /* This makes the footer grid responsive */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* This is the footer styling */
+        .site-footer {
+            background: #2C2416;
+            color: #FFFEF2;
+            padding: 52px 40px 32px;
+            margin-top: 60px;
+            font-family: 'Lato', Georgia, serif;
+        }
+
+        .site-footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-col-title {
+            color: #D4AF37;
+            font-family: 'Lato', Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0 0 18px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: rgba(255,254,242,0.75);
+            line-height: 1.9;
+            margin: 0;
+        }
+
+        /* This is for the quick links in the footer */
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255,254,242,0.75);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #D4AF37;
+        }
+
+        /* This is for the newsletter form in the footer */
+        .footer-newsletter-text {
+            font-size: 13px;
+            color: rgba(255,254,242,0.65);
+            margin: 0 0 14px;
+            line-height: 1.6;
+        }
+
+        .footer-newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .footer-newsletter-input {
+            padding: 10px 12px;
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 2px;
+            background: rgba(255,255,255,0.07);
+            color: #FFFEF2;
+            font-family: 'Lato', Georgia, serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .footer-newsletter-input::placeholder {
+            color: rgba(255,254,242,0.35);
+        }
+
+        .footer-newsletter-input:focus {
+            border-color: #D4AF37;
+        }
+
+        .footer-newsletter-btn {
+            padding: 10px 14px;
+            background: #8B0000;
+            color: #D4AF37;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: 'Lato', Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+
+        .footer-newsletter-btn:hover {
+            background: #6B0000;
+        }
+
+        /* This is for the social media icons in the footer */
+        .footer-social-title {
+            color: #D4AF37;
+            font-family: 'Lato', Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0 0 18px;
+            text-align: center;
+        }
+
+        .footer-social-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .footer-social-link {
+            width: 46px;
+            height: 46px;
+            background: rgba(139,0,0,0.6);
+            border: 1.5px solid #D4AF37;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s;
+        }
+
+        .footer-social-link:hover {
+            background: #8B0000;
+            border-color: #FFD700;
+            transform: translateY(-4px);
+        }
+
+        .footer-social-link i {
+            font-size: 20px;
+            color: #D4AF37;
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: rgba(212,175,55,0.2);
+            margin-bottom: 24px;
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: rgba(212,175,55,0.6);
+            margin: 0;
+            text-align: center;
+            font-family: 'Lato', Georgia, serif;
+        }
+
+        /* This makes the navbar responsive for mobile devices */
+        @media (max-width: 768px) {
+            ul.navbar {
+                flex-direction: column;
+                display: none;
+                width: 100%;
+                animation: none;
+            }
+
+            ul.navbar.active {
+                display: flex;
+                animation: slideIn 0.3s ease forwards;
+            }
+
+            ul.navbar li {
+                width: 100%;
+                text-align: center;
+            }
+
+            ul.navbar li a {
+                padding: 15px;
+                border-bottom: 1px solid #1A1410;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .site-title {
+                padding: 18px 70px 18px 20px;
+                text-align: left;
+                font-size: 20px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 36px;
+            }
+
+            .site-footer {
+                padding: 40px 24px 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+        }
+
+        /* This is for mobile menu slide animation */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        {% block styles %}{% endblock %}
+    </style>
 </head>
 <body>
 
 {% block header %}
-<br><br>
 {% endblock %}
 
-<h2>{{ branding.restaurant_name }}</h2>
+<!-- This is the restaurant name heading -->
+<h2 class="site-title">{{ branding.restaurant_name }}</h2>
 
 <!-- This is the hamburger button for mobile menu -->
-<button class="hamburger" onclick="toggleMenu()">
+<button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
     <span></span>
     <span></span>
     <span></span>
 </button>
+
 <!-- This is the navigation bar — changes based on who is logged in -->
 <ul class="navbar" id="navbar">
     {% if session.get('staff_role') == 'kitchen' %}
@@ -189,8 +387,16 @@
         <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
         <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
         <li><a href="{{ url_for('cart.order_now_menu') }}">Order Now</a></li>
+        <!-- This is the account dropdown -->
         <li class="dropdown">
-            <a href="#">👥</a>
+            <a href="#" class="navbar-icon-btn" aria-label="Account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
             <ul class="dropdown-menu">
                 {% if session.get('customer_id') %}
                     <li><a href="{{ url_for('customer_auth.customer_dashboard') }}">My Account</a></li>
@@ -203,117 +409,107 @@
         </li>
     {% endif %}
 </ul>
+
 {% block content %}{% endblock %}
+
 <!-- This is the footer section -->
-<footer style="background: #2C2416; color: #FFFEF2; padding: 40px 20px; text-align: center;
-               margin-top: 60px; font-family: Georgia, serif;">
-    <div style="max-width: 1200px; margin: 0 auto;">
+<footer class="site-footer">
+    <div class="site-footer-inner">
+
         <!-- This hides the footer content for staff users -->
         {% if not session.get('staff_role') %}
+
         <!-- This creates the footer columns that stack on mobile -->
         <div class="footer-grid">
+
             <!-- Location section -->
             <div>
-                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">LOCATION</h3>
-                <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px;">
+                <p class="footer-col-title">Location</p>
+                <p class="footer-text">
                     {% if restaurant_address %}
                         {% for part in restaurant_address.split(',') %}
                             {{ part.strip() }}<br>
                         {% endfor %}
                     {% else %}
-                        123 Main Street<br>
-                        City<br>
-                        Post Code
+                        123 Main Street<br>City<br>Post Code
                     {% endif %}
                 </p>
             </div>
+
             <!-- Hours section -->
             <div>
-                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">HOURS</h3>
+                <p class="footer-col-title">Hours</p>
                 {% for day_data in restaurant_hours %}
+                <p class="footer-text" style="margin: 2px 0;">
                     {% if not day_data.is_closed %}
-                    <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px; margin: 2px 0;">
                         {{ day_data.day_of_week[:3] }}:
-                        {{ (day_data.opening_time|string)[:5] }} - {{ (day_data.closing_time|string)[:5] }}
-                    </p>
+                        {{ (day_data.opening_time|string)[:5] }} –
+                        {{ (day_data.closing_time|string)[:5] }}
                     {% else %}
-                    <p style="line-height: 1.8; color: #FFFEF2; font-size: 14px; margin: 2px 0;">
                         {{ day_data.day_of_week[:3] }}: Closed
-                    </p>
                     {% endif %}
+                </p>
                 {% endfor %}
             </div>
-            <!-- Quick Links section -->
+
+            <!-- Quick links section -->
             <div>
-                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">QUICK LINKS</h3>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <a href="{{ url_for('menu.show_menu') }}" style="color: #FFFEF2; text-decoration: none;
-                       font-size: 14px; transition: color 0.3s;">Menu</a>
-                    <a href="{{ url_for('reservations.reservations_page') }}" style="color: #FFFEF2;
-                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Book a Table</a>
-                    <a href="{{ url_for('general.about_page') }}" style="color: #FFFEF2;
-                       text-decoration: none; font-size: 14px; transition: color 0.3s;">About Us</a>
-                    <a href="{{ url_for('general.contact_page') }}" style="color: #FFFEF2;
-                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Contact</a>
-                    <a href="{{ url_for('cart.order_now_menu') }}" style="color: #FFFEF2;
-                       text-decoration: none; font-size: 14px; transition: color 0.3s;">Order Now</a>
+                <p class="footer-col-title">Quick Links</p>
+                <div class="footer-links">
+                    <a href="{{ url_for('menu.show_menu') }}">Menu</a>
+                    <a href="{{ url_for('reservations.reservations_page') }}">Book a Table</a>
+                    <a href="{{ url_for('general.about_page') }}">About Us</a>
+                    <a href="{{ url_for('general.contact_page') }}">Contact</a>
+                    <a href="{{ url_for('cart.order_now_menu') }}">Order Now</a>
                 </div>
             </div>
+
             <!-- Newsletter section -->
             <div>
-                <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 18px;">NEWSLETTER</h3>
-                <p style="font-size: 13px; color: #FFFEF2; margin-bottom: 12px;">
-                    Stay updated with our latest offers!
-                </p>
+                <p class="footer-col-title">Newsletter</p>
+                <p class="footer-newsletter-text">Stay updated with our latest offers!</p>
                 <form method="POST" action="{{ url_for('general.newsletter_signup') }}"
-                      style="display: flex; flex-direction: column; gap: 8px;">
-                    <input type="email" name="email" placeholder="Your email" required
-                           style="padding: 10px; border: none; border-radius: 6px; font-size: 13px;
-                                  font-family: Georgia, serif;">
-                    <button type="submit"
-                            style="padding: 10px; background: #8B0000; color: #FFD700; border: none;
-                                   border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;
-                                   font-family: Georgia, serif; transition: all 0.3s ease;">
-                        SUBSCRIBE
-                    </button>
+                      class="footer-newsletter-form">
+                    <input type="email" name="email" placeholder="Your email address"
+                           class="footer-newsletter-input" required>
+                    <button type="submit" class="footer-newsletter-btn">Subscribe</button>
                 </form>
             </div>
+
         </div>
+
         <!-- Social media section -->
-        <div style="margin-bottom: 20px;">
-            <h3 style="color: #FFD700; margin-bottom: 15px; letter-spacing: 2px; font-size: 16px;">FOLLOW US</h3>
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                {% for link in social_links %}
-                <a href="{{ link.url }}" target="_blank"
-                   style="width: 50px; height: 50px; background: #8B0000;
-                          border: 2px solid #D4AF37; border-radius: 12px;
-                          display: flex; align-items: center; justify-content: center;
-                          transition: all 0.3s ease; text-decoration: none;"
-                   onmouseover="this.style.transform='translateY(-5px)'; this.style.background='#660000';
-                                this.style.borderColor='#FFD700';"
-                   onmouseout="this.style.transform='translateY(0)'; this.style.background='#8B0000';
-                               this.style.borderColor='#D4AF37';">
-                    <i class="{{ link.icon_class }}" style="font-size: 24px; color: #FFD700;"></i>
-                </a>
-                {% else %}
-                <p style="color: #D4AF37; font-size: 14px;">No social links added yet.</p>
-                {% endfor %}
-            </div>
+        <p class="footer-social-title">Follow Us</p>
+        <div class="footer-social-row">
+            {% for link in social_links %}
+            <a href="{{ link.url }}" target="_blank" class="footer-social-link"
+               aria-label="{{ link.icon_class }}">
+                <i class="{{ link.icon_class }}"></i>
+            </a>
+            {% else %}
+            <p class="footer-text">No social links added yet.</p>
+            {% endfor %}
         </div>
 
         {% endif %}
+
+        <div class="footer-divider"></div>
+
         <!-- Copyright section, this always shows for everyone -->
-        <p style="font-size: 14px; color: #D4AF37; margin: 0;">
-            © 2026 {{ branding.restaurant_name }}. All rights reserved.
+        <p class="footer-copyright">
+            &copy; 2026 {{ branding.restaurant_name }}. All rights reserved.
         </p>
+
     </div>
 </footer>
+
 <script>
 // This handles the mobile menu toggle
 function toggleMenu() {
     const navbar = document.getElementById('navbar');
     navbar.classList.toggle('active');
 }
+
 // This handles the account dropdown toggle — only runs if dropdown exists
 const dropdownLink = document.querySelector('.dropdown > a');
 if (dropdownLink) {
@@ -331,6 +527,7 @@ if (dropdownLink) {
         }
     });
 }
+
 // This closes the menu when a non-dropdown link is clicked on mobile
 document.querySelectorAll('.navbar a').forEach(link => {
     link.addEventListener('click', function() {
@@ -345,6 +542,14 @@ window.addEventListener('resize', () => {
     const navbar = document.getElementById('navbar');
     if (window.innerWidth > 768) {
         navbar.classList.remove('active');
+    }
+});
+
+// This highlights the active page link in the navbar
+const currentPath = window.location.pathname;
+document.querySelectorAll('.navbar a').forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
     }
 });
 </script>

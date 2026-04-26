@@ -1,140 +1,107 @@
 {% extends "base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-        <h1 style="flex: 1;">UPDATE HOURS</h1>
-        <a href="{{ url_for('admin.dashboard') }}"
-           style="background: #8B0000; color: #FFD700; padding: 12px 30px; text-decoration: none;
-                  border-radius: 8px; font-weight: bold; transition: all 0.3s ease;"
-           onmouseover="this.style.background='#660000';"
-           onmouseout="this.style.background='#8B0000';">
-            ← Back to Dashboard
-        </a>
+<div class="hours-page-outer">
+<div class="hours-page">
+
+  <!-- Header row -->
+  <div class="dash-header">
+    <h1>Update Hours</h1>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+  </div>
+
+  <form id="update-hours-form" method="POST">
+
+    <!-- Restaurant address -->
+    <div class="hours-address-card">
+      <h3>Restaurant Address</h3>
+      <p>Enter your full address including postcode. This is used to calculate delivery times.</p>
+      <input type="text" name="address" class="form-input"
+             value="{{ hours[0].address if hours[0].address else '' }}"
+             placeholder="e.g. 123 Main Street, Manchester, M1 1AA">
     </div>
 
-    <form id="update-hours-form" method="POST">
+    <!-- Opening hours -->
+    <h2 class="hours-heading">Opening Hours</h2>
 
-        <!-- This is the restaurant address section -->
-        <div style="margin-bottom: 30px; padding: 20px; background: #F8F4EC; border-radius: 8px;">
-            <h3 style="font-family: Georgia, serif; color: #2C2416;">Restaurant Address</h3>
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">
-                Enter your full address including postcode. This is used to calculate delivery times.
-            </p>
-            <input type="text" name="address"
-                   value="{{ hours[0].address if hours[0].address else '' }}"
-                   placeholder="e.g. 123 Main Street, Manchester, M1 1AA"
-                   style="
-                       width: 100%;
-                       padding: 10px 15px;
-                       border: 2px solid #D4AF37;
-                       border-radius: 6px;
-                       font-family: Georgia, serif;
-                       font-size: 15px;
-                       color: #2C2416;
-                       box-sizing: border-box;">
+    {% for day_data in hours %}
+    <div class="hours-day-block">
+      <p class="hours-day-name">{{ day_data.day_of_week }}</p>
+      <div class="hours-time-grid">
+        <div class="hours-time-group">
+          <label>Opening Time</label>
+          <input type="time" name="{{ day_data.day_of_week.lower() }}_open"
+                 value="{{ day_data.opening_time }}">
         </div>
-
-        <h2 style="margin-top: 20px !important;" class="hours-heading">Opening Hours</h2>
-
-        <!-- This loops through each day of the week -->
-        {% for day_data in hours %}
-        <div style="margin-bottom: 25px;">
-            <label style="font-weight: bold;
-             display: block; margin-bottom: 10px; font-size: 18px;">{{ day_data.day_of_week }}</label>
-            <div style="margin-left: 20px;">
-                <label>Opening Time:</label>
-                <input type="time" name="{{ day_data.day_of_week.lower() }}_open" value="{{ day_data.opening_time }}">
-                <br><br>
-                <label>Closing Time:</label>
-                <input type="time" name="{{ day_data.day_of_week.lower() }}_close" value="{{ day_data.closing_time }}">
-                <br><br>
-                <label>
-                     <input type="checkbox" name="{{ day_data.day_of_week.lower() }}_closed"
-                            {% if day_data.is_closed %}checked{% endif %}> Closed this day
-                </label>
-            </div>
+        <div class="hours-time-group">
+          <label>Closing Time</label>
+          <input type="time" name="{{ day_data.day_of_week.lower() }}_close"
+                 value="{{ day_data.closing_time }}">
         </div>
-        {% endfor %}
-
-        <!-- This section is for announcements -->
-        <h2 style="margin-top: 30px !important;
-         margin-bottom: 20px !important;" class="hours-heading">Announcements</h2>
-        <textarea name="announcement" rows="5" placeholder="Special hours, events, promotions..."></textarea>
-
-        <button type="button" onclick="confirmHours()"
-                style="padding: 12px 25px; background:#8B0000; color:#FFD700;
-                       border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
-            SAVE CHANGES
-        </button>
-    </form>
-
-    <div id="confirm-modal" style="
-        display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-        background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-
-        <div style="
-            background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
-            width:90%; text-align:center; font-family:Georgia, serif; border-top: 5px solid #8B0000;">
-
-            <h3 id="modal-title" style="margin-bottom:10px;"></h3>
-            <p id="modal-message" style="margin-bottom:25px;"></p>
-
-            <div style="display:flex; gap:15px; justify-content:center;">
-                <button onclick="closeModal()"
-                        style="padding:10px 20px; border-radius:6px; background:#ccc;">
-                    Cancel
-                </button>
-
-                <button id="modal-confirm-btn"
-                        style="padding:10px 20px; border-radius:6px; background:#8B0000; color:white;">
-                    Confirm
-                </button>
-            </div>
-        </div>
+      </div>
+      <label class="hours-closed-row">
+        <input type="checkbox" name="{{ day_data.day_of_week.lower() }}_closed"
+               {% if day_data.is_closed %}checked{% endif %}>
+        <span>Closed this day</span>
+      </label>
     </div>
+    {% endfor %}
+
+    <!-- Announcements -->
+    <div class="hours-announce-card">
+      <h3>Announcements</h3>
+      <textarea name="announcement" rows="4"
+                placeholder="Special hours, events, promotions...">{{ announcement if announcement else '' }}</textarea>
+    </div>
+
+    <!-- Save button -->
+    <div class="hours-save-row">
+      <button type="button" class="btn-primary" onclick="confirmHours()"
+              style="padding: 14px 40px; font-size: 15px;">
+        Save Changes
+      </button>
+    </div>
+
+  </form>
+  </div>
+</div>>
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modal-title" class="modal-title"></h3>
+    <p id="modal-message" class="modal-message"></p>
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
+      <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
+    </div>
+  </div>
 </div>
-<!-- This is for scroll animations -->
 <script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
+  function showModal(title, message, onConfirm) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('modal-confirm-btn').onclick = function () {
+      closeModal();
+      onConfirm();
+    };
+    document.getElementById('confirm-modal').style.display = 'flex';
+  }
 
-    document.querySelectorAll('.menu-container h1, .menu-container h2').forEach(el => {
-        observer.observe(el);
-    });
+  function closeModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+  }
 
-    function showModal(title, message, onConfirm) {
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-message').textContent = message;
-        document.getElementById('modal-confirm-btn').onclick = function() {
-            closeModal();
-            onConfirm();
-        };
-        document.getElementById('confirm-modal').style.display = 'flex';
-    }
+  document.getElementById('confirm-modal').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
+  });
 
-    function closeModal() {
-        document.getElementById('confirm-modal').style.display = 'none';
-    }
-
-    document.getElementById('confirm-modal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
-
-    function confirmHours() {
-        showModal(
-            'Confirm Hours Update',
-            'Are you sure you want to update the opening hours?',
-            () => document.getElementById('update-hours-form').submit()
-        );
-    }
+  function confirmHours() {
+    showModal(
+      'Confirm Hours Update',
+      'Are you sure you want to update the opening hours?',
+      () => document.getElementById('update-hours-form').submit()
+    );
+  }
 </script>
 {% endblock %}

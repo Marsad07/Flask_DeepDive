@@ -276,6 +276,24 @@
     </div>
 </div>
 <script>
+function savePositions() {
+    const tables = document.querySelectorAll('.draggable-table');
+    const positions = [];
+    const canvasWidth = canvas.getBoundingClientRect().width; // add this
+    tables.forEach(t => {
+        positions.push({
+            id: t.dataset.id,
+            x: parseInt(t.style.left),
+            y: parseInt(t.style.top)
+        });
+    });
+
+    fetch('...', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ positions: positions, canvas_width: canvasWidth }) // add this
+    })
+
 const canvas = document.getElementById('layout-canvas');
 let dragging = null;
 let offsetX = 0;
