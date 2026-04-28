@@ -13,280 +13,283 @@
           css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
     {% block extra_css %}{% endblock %}
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
+    body {
+        margin: 0;
+        padding: 0;
+    }
 
-        /* This is the restaurant name heading */
-        .site-title {
-            text-align: center;
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: clamp(22px, 4vw, 32px);
-            font-weight: 700;
-            color: #1C1008;
-            letter-spacing: 3px;
-            margin: 0;
-            padding: 20px 80px 20px;
-            background: #FFFEF2;
-        }
+    /* This is the restaurant name heading */
+    .site-title {
+        text-align: center;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: clamp(22px, 4vw, 32px);
+        font-weight: 700;
+        color: #1C1008;
+        letter-spacing: 3px;
+        margin: 0;
+        padding: 20px 80px 20px;
+        background: #FFFEF2;
+    }
 
-        /* This is the navbar styling for desktop users */
-        ul.navbar {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            background-color: #2C2416;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            animation: slideDown 0.5s ease forwards;
-            overflow: visible;
-            position: relative;
-            z-index: 998;
-        }
+    /* This is the navbar styling for desktop users */
+    ul.navbar {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        background-color: #2C2416;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        animation: slideDown 0.5s ease forwards;
+        overflow: visible;
+        position: relative;
+        z-index: 998;
+    }
 
-        ul.navbar li a {
-            display: block;
-            color: #FFFEF2;
-            padding: 18px 22px;
-            text-decoration: none;
-            font-family: 'Lato', Georgia, serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: background 0.2s, color 0.2s;
-            position: relative;
-        }
+    ul.navbar li a {
+        display: block;
+        color: #FFFEF2;
+        padding: 18px 22px;
+        text-decoration: none;
+        font-family: Georgia, serif; /* NAVBAR NOW MATCHES FOOTER */
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: background 0.2s, color 0.2s;
+        position: relative;
+    }
 
-        ul.navbar li a:hover {
-            background-color: #8B0000;
-            color: #FFD700;
-        }
+    ul.navbar li a:hover {
+        background-color: #8B0000;
+        color: #FFD700;
+    }
 
-        /* This highlights the active page in the navbar */
-        ul.navbar li a.active {
-            color: #D4AF37;
-            background: rgba(139,0,0,0.35);
-        }
+    /* This highlights the active page in the navbar */
+    ul.navbar li a.active {
+        color: #D4AF37;
+        background: rgba(139,0,0,0.35);
+    }
 
-        /* Desktop navbar slide down animation */
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-100%); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    /* Desktop navbar slide down animation */
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-100%); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 
-        /* This is the hamburger menu button that appears on mobile */
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 15px;
-            position: absolute;
-            right: 20px;
-            top: 18px;
-            z-index: 1000;
-        }
+    /* This is the hamburger menu button that appears on mobile */
+    .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 15px;
+        position: absolute;
+        right: 20px;
+        top: 18px;
+        z-index: 1000;
+    }
 
-        .hamburger span {
-            display: block;
-            width: 26px;
-            height: 2px;
-            background: #2C2416;
-            margin: 6px 0;
-            transition: 0.3s;
-            border-radius: 2px;
-        }
+    .hamburger span {
+        display: block;
+        width: 26px;
+        height: 2px;
+        background: #2C2416;
+        margin: 6px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+    }
 
-        /* This is the account icon SVG button in the navbar */
-        .navbar-icon-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 18px 22px;
-            cursor: pointer;
-            color: #FFFEF2;
-            transition: background 0.2s, color 0.2s;
-        }
+    /* This is the account icon SVG button in the navbar */
+    .navbar-icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 22px;
+        cursor: pointer;
+        color: #FFFEF2;
+        transition: background 0.2s, color 0.2s;
+    }
 
-        .navbar-icon-btn:hover {
-            background-color: #8B0000;
-            color: #FFD700;
-        }
+    .navbar-icon-btn:hover {
+        background-color: #8B0000;
+        color: #FFD700;
+    }
 
-        /* This makes the footer grid responsive */
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
+    /* This makes the footer grid responsive */
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
 
-        /* This is the footer styling */
-        .site-footer {
-            background: #2C2416;
-            color: #FFFEF2;
-            padding: 52px 40px 32px;
-            margin-top: 60px;
-            font-family: 'Lato', Georgia, serif;
-        }
+    /* This is the footer styling */
+    .site-footer {
+        background: #2C2416;
+        color: #FFFEF2;
+        padding: 52px 40px 32px;
+        margin-top: 60px;
+        font-family: Georgia, serif; /* FOOTER NOW MATCHES NAVBAR */
+    }
 
-        .site-footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    .site-footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-        .footer-col-title {
-            color: #D4AF37;
-            font-family: 'Lato', Georgia, serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin: 0 0 18px;
-        }
+    .footer-col-title {
+        color: #D4AF37;
+        font-family: Georgia, serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin: 0 0 18px;
+    }
 
-        .footer-text {
-            font-size: 14px;
-            color: rgba(255,254,242,0.75);
-            line-height: 1.9;
-            margin: 0;
-        }
+    .footer-text {
+        font-size: 14px;
+        color: rgba(255,254,242,0.75);
+        line-height: 1.9;
+        margin: 0;
+        font-family: Georgia, serif;
+    }
 
-        /* This is for the quick links in the footer */
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    /* This is for the quick links in the footer */
+    .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-        .footer-links a {
-            color: rgba(255,254,242,0.75);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
+    .footer-links a {
+        color: rgba(255,254,242,0.75);
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s;
+        font-family: Georgia, serif;
+    }
 
-        .footer-links a:hover {
-            color: #D4AF37;
-        }
+    .footer-links a:hover {
+        color: #D4AF37;
+    }
 
-        /* This is for the newsletter form in the footer */
-        .footer-newsletter-text {
-            font-size: 13px;
-            color: rgba(255,254,242,0.65);
-            margin: 0 0 14px;
-            line-height: 1.6;
-        }
+    /* This is for the newsletter form in the footer */
+    .footer-newsletter-text {
+        font-size: 13px;
+        color: rgba(255,254,242,0.65);
+        margin: 0 0 14px;
+        line-height: 1.6;
+        font-family: Georgia, serif;
+    }
 
-        .footer-newsletter-form {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+    .footer-newsletter-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
 
-        .footer-newsletter-input {
-            padding: 10px 12px;
-            border: 1px solid rgba(212,175,55,0.3);
-            border-radius: 2px;
-            background: rgba(255,255,255,0.07);
-            color: #FFFEF2;
-            font-family: 'Lato', Georgia, serif;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+    .footer-newsletter-input {
+        padding: 10px 12px;
+        border: 1px solid rgba(212,175,55,0.3);
+        border-radius: 2px;
+        background: rgba(255,255,255,0.07);
+        color: #FFFEF2;
+        font-family: Georgia, serif;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
 
-        .footer-newsletter-input::placeholder {
-            color: rgba(255,254,242,0.35);
-        }
+    .footer-newsletter-input::placeholder {
+        color: rgba(255,254,242,0.35);
+    }
 
-        .footer-newsletter-input:focus {
-            border-color: #D4AF37;
-        }
+    .footer-newsletter-input:focus {
+        border-color: #D4AF37;
+    }
 
-        .footer-newsletter-btn {
-            padding: 10px 14px;
-            background: #8B0000;
-            color: #D4AF37;
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            font-family: 'Lato', Georgia, serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: background 0.2s;
-        }
+    .footer-newsletter-btn {
+        padding: 10px 14px;
+        background: #8B0000;
+        color: #D4AF37;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family: Georgia, serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: background 0.2s;
+    }
 
-        .footer-newsletter-btn:hover {
-            background: #6B0000;
-        }
+    .footer-newsletter-btn:hover {
+        background: #6B0000;
+    }
 
-        /* This is for the social media icons in the footer */
-        .footer-social-title {
-            color: #D4AF37;
-            font-family: 'Lato', Georgia, serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin: 0 0 18px;
-            text-align: center;
-        }
+    /* This is for the social media icons in the footer */
+    .footer-social-title {
+        color: #D4AF37;
+        font-family: Georgia, serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin: 0 0 18px;
+        text-align: center;
+    }
 
-        .footer-social-row {
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-        }
+    .footer-social-row {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+    }
 
-        .footer-social-link {
-            width: 46px;
-            height: 46px;
-            background: rgba(139,0,0,0.6);
-            border: 1.5px solid #D4AF37;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: background 0.2s, transform 0.2s, border-color 0.2s;
-        }
+    .footer-social-link {
+        width: 46px;
+        height: 46px;
+        background: rgba(139,0,0,0.6);
+        border: 1.5px solid #D4AF37;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    }
 
-        .footer-social-link:hover {
-            background: #8B0000;
-            border-color: #FFD700;
-            transform: translateY(-4px);
-        }
+    .footer-social-link:hover {
+        background: #8B0000;
+        border-color: #FFD700;
+        transform: translateY(-4px);
+    }
 
-        .footer-social-link i {
-            font-size: 20px;
-            color: #D4AF37;
-        }
+    .footer-social-link i {
+        font-size: 20px;
+        color: #D4AF37;
+    }
 
-        .footer-divider {
-            height: 1px;
-            background: rgba(212,175,55,0.2);
-            margin-bottom: 24px;
-        }
+    .footer-divider {
+        height: 1px;
+        background: rgba(212,175,55,0.2);
+        margin-bottom: 24px;
+    }
 
-        .footer-copyright {
-            font-size: 13px;
-            color: rgba(212,175,55,0.6);
-            margin: 0;
-            text-align: center;
-            font-family: 'Lato', Georgia, serif;
-        }
+    .footer-copyright {
+        font-size: 13px;
+        color: rgba(212,175,55,0.6);
+        margin: 0;
+        text-align: center;
+        font-family: Georgia, serif;
+    }
 
-        /* This makes the navbar responsive for mobile devices */
+    /* This makes the navbar responsive for mobile devices */
         @media (max-width: 768px) {
             ul.navbar {
                 flex-direction: column;
@@ -295,55 +298,55 @@
                 animation: none;
             }
 
-            ul.navbar.active {
-                display: flex;
-                animation: slideIn 0.3s ease forwards;
-            }
-
-            ul.navbar li {
-                width: 100%;
-                text-align: center;
-            }
-
-            ul.navbar li a {
-                padding: 15px;
-                border-bottom: 1px solid #1A1410;
-            }
-
-            .hamburger {
-                display: block;
-            }
-
-            .site-title {
-                padding: 18px 70px 18px 20px;
-                text-align: left;
-                font-size: 20px;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 36px;
-            }
-
-            .site-footer {
-                padding: 40px 24px 28px;
-            }
+        ul.navbar.active {
+            display: flex;
+            animation: slideIn 0.3s ease forwards;
         }
 
-        @media (max-width: 480px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
+        ul.navbar li {
+            width: 100%;
+            text-align: center;
         }
 
-        /* This is for mobile menu slide animation */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100%); }
-            to   { opacity: 1; transform: translateX(0); }
+        ul.navbar li a {
+            padding: 15px;
+            border-bottom: 1px solid #1A1410;
         }
 
-        {% block styles %}{% endblock %}
+        .hamburger {
+            display: block;
+        }
+
+        .site-title {
+            padding: 18px 70px 18px 20px;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 36px;
+        }
+
+        .site-footer {
+            padding: 40px 24px 28px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+    }
+
+    /* This is for mobile menu slide animation */
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    {% block styles %}{% endblock %}
     </style>
 </head>
 <body>

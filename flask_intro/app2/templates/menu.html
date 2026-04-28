@@ -4,33 +4,63 @@
 {% endblock %}
 
 {% block content %}
+<div class="menu-page">
+  <!-- This is the page header -->
+  <div class="menu-header">
+    <h1>OUR MENU</h1>
+    <p class="menu-tagline">Crafted with passion, served with pride</p>
+    <div class="menu-header-divider"></div>
+  </div>
 
-<div class="menu-container">
-    <h1>MENU</h1>
+  <div class="menu-body">
 
+    <!-- This loops through each category -->
     {% for category in ['Starters', 'Mains', 'Sides', 'Desserts', 'Drinks'] %}
-    <h2>{{ category }}</h2>
-    <ul>
-        {% for item in menu_items if item.category == category %}
-        <li>{{ item.item_name }}</li>
-        <p>{{ item.description }} - £{{ "%.2f"|format(item.price) }}</p>
-        {% endfor %}
-    </ul>
+    {% set ns = namespace(has_items=false) %}
+    {% for item in menu_items if item.category == category %}
+      {% set ns.has_items = true %}
     {% endfor %}
+
+    {% if ns.has_items %}
+    <div class="menu-category">
+      <div class="menu-category-header">
+        <h2 class="menu-category-title">{{ category }}</h2>
+        <div class="menu-category-divider"></div>
+      </div>
+
+      <!-- This loops through each item in the category -->
+      {% for item in menu_items if item.category == category %}
+      <div class="menu-item">
+        <div class="menu-item-main">
+          <span class="menu-item-name">{{ item.item_name }}</span>
+          <span class="menu-item-dots"></span>
+          <span class="menu-item-price">
+            £{{ "%.2f"|format(item.price) }}
+          </span>
+        </div>
+        {% if item.description %}
+        <p class="menu-item-desc">{{ item.description }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endfor %}
+
+  </div>
 </div>
-
 <script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.menu-container h2, .menu-container ul').forEach(el => {
-        observer.observe(el);
+  // This is for the scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
     });
-</script>
+  }, { threshold: 0.08 });
 
+  document.querySelectorAll(
+    '.menu-header, .menu-category, .menu-item'
+  ).forEach(el => observer.observe(el));
+</script>
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dash-page">
+    <div class="dash-header">
+        <h1>Drivers</h1>
+    </div>
+    <div class="dash-card">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Active Orders</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in drivers %}
+                <tr>
+                    <td data-label="Name">{{ d.full_name }}</td>
+                    <td data-label="Username">{{ d.staff_username }}</td>
+
+                    <td data-label="Status">
+                        {% if d.is_active %}
+                            <span style="color:#008000; font-weight:bold;">Active</span>
+                        {% else %}
+                            <span style="color:#8B0000; font-weight:bold;">Disabled</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Active Orders">
+                        {{ d.active_orders }}
+                    </td>
+                    <td data-label="Actions">
+                        <a href="{{ url_for('admin.driver_details', driver_id=d.staff_id) }}"
+                           class="btn-primary" style="padding:6px 14px; font-size:11px;">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

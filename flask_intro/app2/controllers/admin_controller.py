@@ -1041,5 +1041,48 @@ def disable_staff(staff_id):
     db.commit()
     cursor.close()
     db.close()
-
     return redirect(url_for('admin.manage_staff'))
+
+def manage_drivers():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT s.staff_id, s.full_name, s.staff_username, s.is_active,
+        (
+            SELECT COUNT(*) FROM customer_orders o
+            WHERE o.assigned_driver_id = s.staff_id
+            AND o.order_status IN ('assigned', 'on_the_way')
+        ) AS active_orders
+        FROM staff_accounts s
+        WHERE s.role = 'driver'
+        ORDER BY s.full_name ASC
+    """)
+
+    drivers = cursor.fetchall()
+    cursor.close()
+    return render_template("admin/manage_drivers.html", drivers=drivers)
+
+def driver_details(driver_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM staff_accounts
+        WHERE staff_id = %s
+    """, (driver_id,))
+    driver = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM customer_orders
+        WHERE assigned_driver_id = %s
+        ORDER BY order_id DESC
+    """, (driver_id,))
+    orders = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template("admin/driver_details.html", driver=driver, orders=orders)
+
+
+

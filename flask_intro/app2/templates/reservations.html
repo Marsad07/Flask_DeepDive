@@ -5,12 +5,15 @@
 
 {% block content %}
 <div class="resv-page">
-  <h1>RESERVE A TABLE</h1>
-  <h3>Join us here at {{ branding.restaurant_name }} for an unforgettable experience</h3>
+  <h1>Reserve a Table</h1>
+  <h3>
+    Join us here at {{ branding.restaurant_name }} for an unforgettable experience
+  </h3>
 
   <div class="resv-form-card">
     <form method="POST" id="reservation-form">
 
+      <!-- This is the main fields grid -->
       <div class="field-grid">
         <div class="field-group">
           <label for="fullname">Full Name</label>
@@ -62,16 +65,25 @@
         </div>
       </div>
 
-      <!-- this is for the table selector -->
+      <!-- This is for the table selector -->
       <p class="section-label">Select Your Table</p>
 
-      <div class="table-grid" id="table-canvas">
+      <div class="restaurant-layout" id="table-canvas">
+        <!-- Room labels -->
+        <div class="layout-label window-label">WINDOW SIDE</div>
+        <div class="layout-label entrance-label">ENTRANCE</div>
+
+        <!-- This loops through each table and renders the correct shape -->
         {% for table in tables %}
         <div class="table-item"
              data-table="{{ table.table_number }}"
-             data-seats="{{ table.seats }}">
-          <div class="table-{{ table.shape }}">{{ table.table_number }}</div>
-          <div class="table-info">{{ table.seats }} seats<br>{{ table.location }}</div>
+             data-seats="{{ table.seats }}"
+             data-px="{{ table.pos_x }}"
+             data-py="{{ table.pos_y }}">
+          <div class="table-{{ table.shape }}">
+            {{ table.table_number }}
+          </div>
+          <div class="table-info">{{ table.seats }} seats</div>
         </div>
         {% endfor %}
       </div>
@@ -79,23 +91,23 @@
       <input type="hidden" id="table_num" name="table_num" required>
       <p id="table-error">Please select a table</p>
 
-      <!-- this is for special requests -->
+      <!-- This is for special requests -->
       <div class="field-group field-group-spaced">
         <label for="special_requests">Special Requests (Optional)</label>
         <textarea id="special_requests" name="special_requests"
-                  placeholder="Dietary restrictions, celebrations..."></textarea>
+                  placeholder="Dietary restrictions, celebrations...">
+        </textarea>
       </div>
 
       <button type="button" class="btn-confirm"
               onclick="showReservationConfirm()">
         Confirm Reservation
       </button>
-
     </form>
   </div>
 </div>
 
-<!-- this is for the confirmation modal -->
+<!-- This is the confirmation modal -->
 <div id="reservation-confirm-modal" class="modal-backdrop"
      role="dialog" aria-modal="true">
   <div class="modal-box">
@@ -112,27 +124,57 @@
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-  // this is for socket.io - handles real time table updates
+  // ── Position tables: converts stored px values to % so the layout
+  //    is consistent on every screen size. Runs on load and on resize.
+  function positionTables() {
+    const canvas = document.getElementById('table-canvas');
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    document.querySelectorAll('.table-item').forEach(el => {
+      const px = parseFloat(el.dataset.px);
+      const py = parseFloat(el.dataset.py);
+      el.style.left = (px / w * 100) + '%';
+      el.style.top  = (py / h * 100) + '%';
+    });
+  }
+
+  positionTables();
+  window.addEventListener('resize', positionTables);
+
+  // ── Socket.io: handles real-time table position and availability updates
   const socket = io();
 
   socket.on('tables_updated', (positions) => {
     positions.forEach(pos => {
-      const el = document.querySelector(`.table-item[data-table="${pos.id}"]`);
-      if (el) { el.style.left = pos.x + 'px'; el.style.top = pos.y + 'px'; }
+      const el = document.querySelector(
+        `.table-item[data-table="${pos.id}"]`
+      );
+      if (el) {
+        el.dataset.px = pos.x;
+        el.dataset.py = pos.y;
+      }
     });
+    positionTables();
   });
 
   socket.on('table_unavailable', (data) => {
-    const el = document.querySelector(`.table-item[data-table="${data.table_num}"]`);
-    if (el) { el.classList.add('unavailable'); el.classList.remove('selected'); }
+    const el = document.querySelector(
+      `.table-item[data-table="${data.table_num}"]`
+    );
+    if (el) {
+      el.classList.add('unavailable');
+      el.classList.remove('selected');
+    }
   });
 
   socket.on('table_available', (data) => {
-    const el = document.querySelector(`.table-item[data-table="${data.table_num}"]`);
+    const el = document.querySelector(
+      `.table-item[data-table="${data.table_num}"]`
+    );
     if (el) el.classList.remove('unavailable');
   });
 
-  // this is for table selection
+  // ── Table selection logic
   const tables       = document.querySelectorAll('.table-item');
   const tableInput   = document.getElementById('table_num');
   const guestsSelect = document.getElementById('guests_num');
@@ -170,7 +212,7 @@
     }
   });
 
-  // this is for the reservation confirmation modal
+  // ── Reservation confirmation modal
   const modal = document.getElementById('reservation-confirm-modal');
 
   function showReservationConfirm() {

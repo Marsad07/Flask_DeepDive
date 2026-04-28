@@ -1,78 +1,96 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="menu-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+<div class="dash-page">
+    <!-- This is for the top header row -->
+    <div class="dash-header">
         <h1>Manage Staff</h1>
-        <a href="{{ url_for('admin.create_staff') }}"
-           style="background:#8B0000; color:#FFD700; padding:10px 20px; border-radius:6px; text-decoration:none;">
+        <a href="{{ url_for('admin.create_staff') }}" class="btn-primary" style="text-decoration:none;">
             + Add Staff Member
         </a>
     </div>
-    <table style="width:100%; border-collapse:collapse;">
-        <tr style="background:#8B0000; color:#FFD700;">
-            <th style="padding:10px;">Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Last Login</th>
-            <th>Actions</th>
-        </tr>
-        {% for s in staff_list %}
-        <tr style="border-bottom:1px solid #ccc;">
-            <td style="padding:10px;">{{ s.full_name }}</td>
-            <td>{{ s.staff_username }}</td>
-            <td>{{ s.email }}</td>
-            <td>{{ s.role }}</td>
-            <td>{{ 'Active' if s.is_active else 'Disabled' }}</td>
-            <td>{{ s.last_login if s.last_login else 'Never' }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_staff', staff_id=s.staff_id) }}"
-                   style="color:#8B0000; font-weight:bold;">Edit</a>
-                {% if s.is_active %}
-                <button onclick="showModal('Disable Staff', 'Disable {{ s.full_name }}?',
-                    () => window.location='{{ url_for('admin.disable_staff', staff_id=s.staff_id) }}')"
-                    style="margin-left:10px; background:none; border:none; color:#660000; cursor:pointer;">
-                    Disable
-                </button>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <!-- This is the staff table -->
+    <div class="dash-card">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in staff_list %}
+                <tr>
+                    <td data-label="Name">{{ s.full_name }}</td>
+                    <td data-label="Username">{{ s.staff_username }}</td>
+                    <td data-label="Email">{{ s.email }}</td>
+                    <td data-label="Role">{{ s.role }}</td>
+                    <td data-label="Status">{{ 'Active' if s.is_active else 'Disabled' }}</td>
+                    <td data-label="Last Login">{{ s.last_login if s.last_login else 'Never' }}</td>
+
+                    <td data-label="Actions">
+                        <!-- This is for editing staff -->
+                        <a href="{{ url_for('admin.edit_staff', staff_id=s.staff_id) }}"
+                           class="btn-primary" style="padding:6px 14px; font-size:11px;">
+                            Edit
+                        </a>
+                        {% if s.is_active %}
+                        <!-- This is for disabling staff -->
+                        <button type="button"
+                                class="btn-danger"
+                                style="padding:6px 14px; font-size:11px; margin-left:8px;"
+                                onclick="confirmDisableStaff('{{ s.staff_id }}', '{{ s.full_name }}')">
+                            Disable
+                        </button>
+                        {% endif %}
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-<div id="confirm-modal" style="
-    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div style="
-        background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
-        width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
-        <h3 id="modal-title"></h3>
-        <p id="modal-message"></p>
-        <div style="display:flex; gap:15px; justify-content:center;">
-            <button onclick="closeModal()" style="padding:10px 20px;
-             background:#ccc; border-radius:6px;">Cancel</button>
-            <button id="modal-confirm-btn" style="padding:10px 20px;
-             background:#8B0000; color:white; border-radius:6px;">Confirm</button>
+<!-- This is for the confirmation modal -->
+<div id="confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 id="modal-title" class="modal-title"></h3>
+        <p id="modal-message" class="modal-message"></p>
+
+        <div class="modal-actions">
+            <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
+            <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
         </div>
     </div>
 </div>
 <script>
-function showModal(title, message, onConfirm) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
-    document.getElementById('modal-confirm-btn').onclick = function() {
-        closeModal();
-        onConfirm();
-    };
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
-function closeModal() {
-    document.getElementById('confirm-modal').style.display = 'none';
-}
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
+    // This opens the confirmation modal for disabling staff
+    function confirmDisableStaff(staffId, staffName) {
+        document.getElementById("modal-title").innerText = "Disable Staff Member";
+        document.getElementById("modal-message").innerText =
+            `Are you sure you want to disable "${staffName}"? They will no longer be able to log in.`;
+
+        const confirmBtn = document.getElementById("modal-confirm-btn");
+        confirmBtn.onclick = function () {
+            window.location = `/admin/staff/disable/${staffId}`;
+        };
+
+        document.getElementById("confirm-modal").style.display = "flex";
+    }
+
+    // This closes the modal
+    function closeModal() {
+        document.getElementById("confirm-modal").style.display = "none";
+    }
+
+    // Close modal when clicking outside the box
+    document.getElementById("confirm-modal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+    });
 </script>
 {% endblock %}

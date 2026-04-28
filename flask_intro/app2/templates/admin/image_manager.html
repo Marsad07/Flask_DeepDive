@@ -1,128 +1,172 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="menu-container">
-    <h1>IMAGE MANAGER</h1>
-    <a href="{{ url_for('admin.dashboard') }}"
-       style="display: inline-block; color: #8B0000; text-decoration: none; margin: 20px 0; font-weight: bold;">
-        ← Back to Dashboard
-    </a>
+<div class="dash-page">
+    <!-- This is for the top header row -->
+    <div class="dash-header">
+        <h1>Image Manager</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    </div>
+
     <!-- This is the grid layout for all image sections -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                 gap: 25px; max-width: 1200px; margin: 30px auto;">
+
         <!-- This is the hero image section -->
-        <div style="background: white; border-radius: 12px; padding: 20px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #8B0000;">
-            <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 15px 0;">
-                Homepage Hero Image
-            </h3>
-            <!-- This shows the current hero image if one exists -->
-            {% if hero %}
-                <img src="{{ hero }}" style="width: 100%; height: 180px;
-                     object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-            {% else %}
-                <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
-                            display: flex; align-items: center; justify-content: center;
-                            margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
-                    No image uploaded
-                </div>
-            {% endif %}
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="image_key" value="hero">
-                <input type="file" name="image_file" accept="image/*" required
-                       style="margin-bottom: 10px; width: 100%;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #8B0000;
-                        color: #FFD700; border: none; border-radius: 6px; font-family: Georgia, serif;
-                        font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">
-                    UPLOAD
-                </button>
-            </form>
+        <div class="dash-card" style="border-left: 4px solid #8B0000;">
+            <div class="dash-card-body">
+
+                <p class="dash-card-title">Homepage Hero Image</p>
+
+                <!-- This shows the current hero image if one exists -->
+                {% if hero %}
+                    <img src="{{ hero }}" style="width: 100%; height: 180px;
+                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                {% else %}
+                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                                display: flex; align-items: center; justify-content: center;
+                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                        No image uploaded
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="form-hero">
+                    <input type="hidden" name="image_key" value="hero">
+                    <input type="file" name="image_file" accept="image/*" required
+                           class="form-file-input" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-primary" style="width: 100%;"
+                            onclick="confirmImageUpload('hero')">
+                        Upload
+                    </button>
+                </form>
+
+            </div>
         </div>
         <!-- This is the dish 1 image section -->
-        <div style="background: white; border-radius: 12px; padding: 20px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #D4AF37;">
-            <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 15px 0;">
-                Dish 1 Image
-            </h3>
-            <!-- This shows the current dish 1 image if one exists -->
-            {% if dish1 %}
-                <img src="{{ dish1 }}" style="width: 100%; height: 180px;
-                     object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-            {% else %}
-                <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
-                            display: flex; align-items: center; justify-content: center;
-                            margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
-                    No image uploaded
-                </div>
-            {% endif %}
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="image_key" value="dish1">
-                <input type="file" name="image_file" accept="image/*" required
-                       style="margin-bottom: 10px; width: 100%;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #8B0000;
-                        color: #FFD700; border: none; border-radius: 6px; font-family: Georgia, serif;
-                        font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">
-                    UPLOAD
-                </button>
-            </form>
-        </div>
+        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+            <div class="dash-card-body">
 
+                <p class="dash-card-title">Dish 1 Image</p>
+
+                {% if dish1 %}
+                    <img src="{{ dish1 }}" style="width: 100%; height: 180px;
+                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                {% else %}
+                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                                display: flex; align-items: center; justify-content: center;
+                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                        No image uploaded
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="form-dish1">
+                    <input type="hidden" name="image_key" value="dish1">
+                    <input type="file" name="image_file" accept="image/*" required
+                           class="form-file-input" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-primary" style="width: 100%;"
+                            onclick="confirmImageUpload('dish1')">
+                        Upload
+                    </button>
+                </form>
+
+            </div>
+        </div>
         <!-- This is the dish 2 image section -->
-        <div style="background: white; border-radius: 12px; padding: 20px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #D4AF37;">
-            <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 15px 0;">
-                Dish 2 Image
-            </h3>
-            <!-- This shows the current dish 2 image if one exists -->
-            {% if dish2 %}
-                <img src="{{ dish2 }}" style="width: 100%; height: 180px;
-                     object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-            {% else %}
-                <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
-                            display: flex; align-items: center; justify-content: center;
-                            margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
-                    No image uploaded
-                </div>
-            {% endif %}
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="image_key" value="dish2">
-                <input type="file" name="image_file" accept="image/*" required
-                       style="margin-bottom: 10px; width: 100%;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #8B0000;
-                        color: #FFD700; border: none; border-radius: 6px; font-family: Georgia, serif;
-                        font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">
-                    UPLOAD
-                </button>
-            </form>
+        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+            <div class="dash-card-body">
+
+                <p class="dash-card-title">Dish 2 Image</p>
+
+                {% if dish2 %}
+                    <img src="{{ dish2 }}" style="width: 100%; height: 180px;
+                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                {% else %}
+                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                                display: flex; align-items: center; justify-content: center;
+                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                        No image uploaded
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="form-dish2">
+                    <input type="hidden" name="image_key" value="dish2">
+                    <input type="file" name="image_file" accept="image/*" required
+                           class="form-file-input" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-primary" style="width: 100%;"
+                            onclick="confirmImageUpload('dish2')">
+                        Upload
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        <!-- This is the dish 3 image section -->
+        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+            <div class="dash-card-body">
+
+                <p class="dash-card-title">Dish 3 Image</p>
+
+                {% if dish3 %}
+                    <img src="{{ dish3 }}" style="width: 100%; height: 180px;
+                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                {% else %}
+                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                                display: flex; align-items: center; justify-content: center;
+                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                        No image uploaded
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="form-dish3">
+                    <input type="hidden" name="image_key" value="dish3">
+                    <input type="file" name="image_file" accept="image/*" required
+                           class="form-file-input" style="margin-bottom: 10px;">
+                    <button type="button" class="btn-primary" style="width: 100%;"
+                            onclick="confirmImageUpload('dish3')">
+                        Upload
+                    </button>
+                </form>
+
+            </div>
         </div>
 
-        <!-- This is the dish 3 image section -->
-        <div style="background: white; border-radius: 12px; padding: 20px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #D4AF37;">
-            <h3 style="font-family: Georgia, serif; color: #2C2416; margin: 0 0 15px 0;">
-                Dish 3 Image
-            </h3>
-            <!-- This shows the current dish 3 image if one exists -->
-            {% if dish3 %}
-                <img src="{{ dish3 }}" style="width: 100%; height: 180px;
-                     object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-            {% else %}
-                <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
-                            display: flex; align-items: center; justify-content: center;
-                            margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
-                    No image uploaded
-                </div>
-            {% endif %}
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="image_key" value="dish3">
-                <input type="file" name="image_file" accept="image/*" required
-                       style="margin-bottom: 10px; width: 100%;">
-                <button type="submit" style="width: 100%; padding: 10px; background: #8B0000;
-                        color: #FFD700; border: none; border-radius: 6px; font-family: Georgia, serif;
-                        font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 1px;">
-                    UPLOAD
-                </button>
-            </form>
-        </div>
     </div>
 </div>
+
+<!-- This is for the confirmation modal -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modal-title" class="modal-title"></h3>
+    <p id="modal-message" class="modal-message"></p>
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
+      <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+<script>
+    // This opens the confirmation modal for image uploads
+    function confirmImageUpload(key) {
+        document.getElementById("modal-title").innerText = "Upload Image";
+        document.getElementById("modal-message").innerText =
+            "Are you sure you want to upload this image? It will replace the current one.";
+
+        const confirmBtn = document.getElementById("modal-confirm-btn");
+        confirmBtn.onclick = function () {
+            document.getElementById(`form-${key}`).submit();
+        };
+
+        document.getElementById("confirm-modal").style.display = "flex";
+    }
+
+    // This closes the modal
+    function closeModal() {
+        document.getElementById("confirm-modal").style.display = "none";
+    }
+
+    // Close modal when clicking outside the box
+    document.getElementById("confirm-modal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
 {% endblock %}

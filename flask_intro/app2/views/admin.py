@@ -10,7 +10,9 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                delete_social_link, manage_about, update_about_section,
                                                add_about_section, delete_about_section, manage_tables,
                                                save_table_positions, add_table, delete_table, update_table,
-                                               manage_staff, create_staff, edit_staff, disable_staff)
+                                               manage_staff, create_staff, edit_staff, disable_staff, manage_drivers,
+                                               driver_details)
+
 from controllers.staff_controller import reset_staff_email, reset_staff_default
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -44,6 +46,7 @@ admin_bp.route('/drivers/<int:staff_id>/toggle-active', methods=['POST'])(toggle
 admin_bp.route('/orders/<int:order_id>/assign_driver', methods=['POST'])(assign_driver)
 admin_bp.route('/orders/<int:order_id>/offer_driver', methods=['POST'])(offer_driver)
 admin_bp.route('/manage_contact', methods=['GET', 'POST'])(manage_contact)
+admin_bp.route('/drivers/<int:driver_id>')(driver_details)
 
 admin_bp.route('/social-links', methods=['GET'])(manage_social_links)
 admin_bp.route('/social-links/add', methods=['POST'])(add_social_link)

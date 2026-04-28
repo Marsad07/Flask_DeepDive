@@ -4,26 +4,42 @@
 {% endblock %}
 
 {% block content %}
-<div class="menu-container">
+<div class="about-page">
+
+  <!-- This is the page header -->
+  <div class="about-header">
     <h1>ABOUT US</h1>
-    <h2>OUR STORY</h2><br>
+    <p class="about-tagline">Our story, our passion, our craft</p>
+    <div class="about-header-divider"></div>
+  </div>
 
+  <!-- This is the story section title -->
+  <div class="about-body">
+    <p class="about-section-eyebrow">OUR STORY</p>
+
+    <!-- This loops through each content section -->
     {% for section in sections %}
-    <h2 style="text-align: left;">{{ section.heading }}</h2>
-    <p>{{ section.content }}</p>
+    <div class="about-section">
+      <h2 class="about-section-heading">{{ section.heading }}</h2>
+      <p class="about-section-content">{{ section.content }}</p>
+    </div>
     {% endfor %}
-</div>
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
+  </div>
 
-    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container p').forEach(el => {
-        observer.observe(el);
+</div>
+
+<script>
+  // This is for the scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
     });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll(
+    '.about-header, .about-section-eyebrow, .about-section'
+  ).forEach(el => observer.observe(el));
 </script>
 {% endblock %}

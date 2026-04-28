@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="order-page">
+
   <!-- This is for the page header -->
   <div class="order-header">
     <h1>ORDER ONLINE</h1>
@@ -20,7 +21,7 @@
         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
               stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-        View Cart {% if cart_count > 0 %}({{ cart_count }}){% endif %}
+      View Cart {% if cart_count > 0 %}({{ cart_count }}){% endif %}
     </a>
   </div>
 
@@ -46,11 +47,13 @@
         <p class="order-item-desc">{{ item.description }}</p>
         <p class="order-item-price">£{{ "%.2f"|format(item.price) }}</p>
       </div>
+
       <!-- This is for the quantity and add to cart -->
       <div class="order-item-actions">
         <form method="POST" action="{{ url_for('cart.add_to_cart', item_id=item.item_id) }}"
               class="order-item-form">
           <input type="hidden" name="item_id" value="{{ item.item_id }}">
+
           <!-- This is for the quantity selector -->
           <div class="order-qty-wrap">
             <label class="order-qty-label">Qty</label>
@@ -61,11 +64,12 @@
               <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
             </div>
           </div>
+
           <!-- This is the add to cart button -->
           <button type="submit" class="btn-add-cart">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="
-              currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             Add to Cart
           </button>
@@ -76,9 +80,10 @@
   </div>
   {% endif %}
   {% endfor %}
+
 </div>
 <script>
-  // this is for the +/- quantity buttons
+  // This is for the +/- quantity buttons
   function changeQty(btn, delta) {
     const input = btn.parentElement.querySelector('.order-qty-input');
     const current = parseInt(input.value) || 1;
@@ -86,7 +91,7 @@
     input.value = next;
   }
 
-  // this is for scroll animations
+  // This is for scroll animations
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) entry.target.classList.add('visible');
