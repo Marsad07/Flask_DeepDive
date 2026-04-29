@@ -121,10 +121,9 @@
     </div>
   </div>
 </div>
-
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-  // ── Position tables: converts stored px values to % so the layout
+  // Position tables: converts stored px values to % so the layout
   //    is consistent on every screen size. Runs on load and on resize.
   function positionTables() {
     const canvas = document.getElementById('table-canvas');
@@ -141,7 +140,7 @@
   positionTables();
   window.addEventListener('resize', positionTables);
 
-  // ── Socket.io: handles real-time table position and availability updates
+  // Socket.io: handles real-time table position and availability updates
   const socket = io();
 
   socket.on('tables_updated', (positions) => {
@@ -174,7 +173,7 @@
     if (el) el.classList.remove('unavailable');
   });
 
-  // ── Table selection logic
+  // Table selection logic
   const tables       = document.querySelectorAll('.table-item');
   const tableInput   = document.getElementById('table_num');
   const guestsSelect = document.getElementById('guests_num');
@@ -212,7 +211,7 @@
     }
   });
 
-  // ── Reservation confirmation modal
+  // Reservation confirmation modal
   const modal = document.getElementById('reservation-confirm-modal');
 
   function showReservationConfirm() {

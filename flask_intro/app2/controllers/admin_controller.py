@@ -897,7 +897,7 @@ def save_table_positions():
     db.commit()
     cursor.close()
     db.close()
-    socketio.emit('tables_updated', positions, broadcast=True)
+    socketio.emit('tables_updated', positions)
     return {'success': True}
 
 
