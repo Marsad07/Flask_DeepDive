@@ -4,62 +4,112 @@
 
 {% block content %}
 <div class="dash-page">
+    <!-- Page header -->
+    <div class="dash-header">
+        <div>
+            <h1>All Reservations</h1>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    </div>
+    <!-- Reservations table -->
+    <p class="dash-section-title">All Bookings</p>
+    <div class="dash-card">
+        {% if reservations %}
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th class="center">Guests</th>
+                    <th class="center">Table</th>
+                    <th>Status</th>
+                    <th class="center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservations %}
+                <tr>
+                    <td data-label="Customer">
+                        <p class="resv-customer-name">{{ r.customer_fullname }}</p>
+                        <p class="resv-customer-email">{{ r.customer_email }}</p>
+                    </td>
+                    <td data-label="Date">{{ r.reservation_date }}</td>
+                    <td data-label="Time">{{ r.reservation_time }}</td>
+                    <td data-label="Guests" class="center">{{ r.num_of_guests }}</td>
+                    <td data-label="Table" class="center">{{ r.table_number }}</td>
+                    <td data-label="Status">
+                        <span class="dash-resv-badge"
+                              data-status="{{ r.status }}">{{ r.status }}</span>
+                    </td>
+                    <td data-label="Actions" class="center">
+                        <div class="row-actions">
+                            <a href="{{ url_for('admin.edit_reservation', id=r.customer_id) }}"
+                               class="btn-small btn-small-gold">Edit</a>
+                            <form method="POST"
+                                  action="{{ url_for('admin.cancel_reservation', id=r.customer_id) }}"
+                                  id="cancel-form-{{ r.customer_id }}"
+                                  class="inline-form">
+                                <button type="button"
+                                        class="btn-small btn-small-red"
+                                        onclick="showCancelConfirm({{ r.customer_id }}, '{{ r.customer_fullname }}')">
+                                    Cancel
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-  <!-- This is for the top header row -->
-  <div class="dash-header">
-    <h1>All Reservations</h1>
-    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
-  </div>
-  <!-- This will show all the reservations in a table -->
-  <p class="dash-section-title">All Bookings</p>
-  <div class="dash-card">
-    {% if reservations %}
-      <table class="dash-table" style="table-layout: auto;">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th class="center">Guests</th>
-            <th class="center">Table</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for reservation in reservations %}
-          <tr>
-            <td data-label="Customer">
-              <p class="resv-customer-name">{{ reservation.customer_fullname }}</p>
-              <p class="resv-customer-email">{{ reservation.customer_email }}</p>
-            </td>
-            <td data-label="Date">{{ reservation.reservation_date }}</td>
-            <td data-label="Time">{{ reservation.reservation_time }}</td>
-            <td data-label="Guests" class="center">{{ reservation.num_of_guests }}</td>
-            <td data-label="Table" class="center">{{ reservation.table_number }}</td>
-            <td data-label="Status">
-              <span class="dash-resv-badge">{{ reservation.reservation_status }}</span>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p class="dash-empty">No reservations found.</p>
-    {% endif %}
-  </div>
+        {% else %}
+        <p class="dash-empty">No reservations found.</p>
+        {% endif %}
+    </div>
+</div>
+<div id="cancel-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+    <div class="modal-box">
+        <p class="modal-title" id="cancel-modal-title">Cancel Reservation</p>
+        <p class="modal-message">Are you sure you want to cancel the reservation for
+            <strong id="cancel-name"></strong>? This cannot be undone.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeCancelConfirm()">Keep It</button>
+            <button class="modal-btn-confirm" id="cancel-confirm-btn">Yes, Cancel</button>
+        </div>
+    </div>
 </div>
 <script>
+    function showCancelConfirm(customerId, name) {
+        document.getElementById('cancel-name').textContent = name;
+        document.getElementById('cancel-confirm-btn').onclick = function () {
+            document.getElementById('cancel-form-' + customerId).submit();
+        };
+        document.getElementById('cancel-modal').classList.add('open');
+    }
+
+    function closeCancelConfirm() {
+        document.getElementById('cancel-modal').classList.remove('open');
+    }
+
+    // Close on backdrop click
+    document.getElementById('cancel-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeCancelConfirm();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeCancelConfirm();
+    });
+
+    // Scroll-reveal animation
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
+            if (entry.isIntersecting) entry.target.classList.add('visible');
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.05 });
 
-    document.querySelectorAll('.menu-container h1, .menu-container h2, .menu-container div,
-     .menu-container a, .menu-container table').forEach(el => {
-        observer.observe(el);
-    });
+    document.querySelectorAll('.dash-card, .dash-header').forEach(el => observer.observe(el));
 </script>
 {% endblock %}

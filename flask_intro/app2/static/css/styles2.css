@@ -3773,3 +3773,193 @@ html {
         height: 360px;
     }
 }
+
+/* ── Small action buttons (used in table rows) ── */
+.btn-small {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-family: 'Lato', Georgia, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-small-gold {
+    background: #D4AF37;
+    color: #2C2416;
+}
+
+.btn-small-gold:hover {
+    background: #B8941F;
+    color: #2C2416;
+}
+
+.btn-small-red {
+    background: #8B0000;
+    color: #D4AF37;
+}
+
+.btn-small-red:hover {
+    background: #660000;
+}
+
+/* ── Status badge colours (driven by data-status) ── */
+.dash-resv-badge[data-status="confirmed"],
+.dash-resv-badge[data-status="Confirmed"] {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.dash-resv-badge[data-status="pending"],
+.dash-resv-badge[data-status="Pending"] {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.dash-resv-badge[data-status="cancelled"],
+.dash-resv-badge[data-status="Cancelled"] {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+/* ── Customer name / email in table ── */
+.resv-customer-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2C2416;
+    margin: 0 0 3px;
+    font-style: normal;
+}
+
+.resv-customer-email {
+    font-family: 'Lato', Georgia, sans-serif;
+    font-size: 12px;
+    color: #8B7355;
+    margin: 0;
+    font-style: normal;
+}
+
+/* ── Centre-align helper ── */
+.dash-table th.center,
+.dash-table td.center {
+    text-align: center;
+}
+
+/* ── Action cell gap ── */
+.row-actions {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   EDIT RESERVATION PAGE
+   static/css/edit_reservation.css
+   ============================================ */
+
+/* ── Form card padding ── */
+.edit-resv-card {
+    padding: 36px 32px;
+    max-width: 860px;
+}
+
+/* ── Section labels ── */
+.edit-resv-section-title {
+    font-size: 11px;
+    font-family: 'Lato', Georgia, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #8B4513;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #F0EBE0;
+    font-style: normal;
+}
+
+.edit-resv-section-title + .edit-resv-section-title {
+    margin-top: 32px;
+}
+
+/* ── Two-column grid for fields ── */
+.edit-resv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 28px;
+    margin-bottom: 32px;
+}
+
+/* ── Full-width field (spans both columns) ── */
+.edit-resv-full {
+    grid-column: 1 / -1;
+}
+
+/* ── Action buttons row ── */
+.edit-resv-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    padding-top: 24px;
+    border-top: 2px solid #F0EBE0;
+    margin-top: 8px;
+}
+
+.edit-resv-discard {
+    background: transparent;
+    color: #8B0000;
+    border: 1.5px solid rgba(139, 0, 0, 0.3);
+    box-shadow: none;
+    font-size: 11px;
+    padding: 11px 24px;
+}
+
+.edit-resv-discard:hover {
+    background: #FFF0F0;
+    border-color: #8B0000;
+    box-shadow: none;
+    color: #660000;
+}
+
+.edit-resv-save {
+    padding: 11px 28px;
+    font-size: 11px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .edit-resv-card {
+        padding: 24px 18px;
+    }
+
+    .edit-resv-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .edit-resv-full {
+        grid-column: 1;
+    }
+
+    .edit-resv-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .edit-resv-discard,
+    .edit-resv-save {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}

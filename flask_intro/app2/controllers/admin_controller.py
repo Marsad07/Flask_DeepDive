@@ -900,7 +900,6 @@ def save_table_positions():
     socketio.emit('tables_updated', positions)
     return {'success': True}
 
-
 def add_table():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
@@ -934,7 +933,6 @@ def delete_table(table_id):
     db.close()
     flash('Table removed', 'success')
     return redirect(url_for('admin.manage_tables'))
-
 
 def update_table(table_id):
     if 'admin_id' not in session:
@@ -1081,7 +1079,6 @@ def driver_details(driver_id):
     orders = cursor.fetchall()
 
     cursor.close()
-
     return render_template("admin/driver_details.html", driver=driver, orders=orders)
 
 

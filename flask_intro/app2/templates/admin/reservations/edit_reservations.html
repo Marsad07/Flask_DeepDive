@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="dash-page">
+    <div class="dash-header">
+        <h1>Edit Reservation</h1>
+        <a href="{{ url_for('admin.view_reservations') }}" class="btn-back">← Back to Reservations</a>
+    </div>
+    <div class="dash-card edit-resv-card">
+        <form method="POST" id="edit-resv-form">
+
+            <p class="edit-resv-section-title">Customer Details</p>
+            <div class="edit-resv-grid">
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input class="form-input" type="text" name="customer_fullname"
+                           value="{{ reservation.customer_fullname }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input class="form-input" type="email" name="customer_email"
+                           value="{{ reservation.customer_email }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input class="form-input" type="text" name="customer_phonenum"
+                           value="{{ reservation.customer_phonenum }}">
+                </div>
+
+            </div>
+            <p class="edit-resv-section-title">Reservation Details</p>
+            <div class="edit-resv-grid">
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input class="form-input" type="date" name="reservation_date"
+                           value="{{ reservation.reservation_date }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Time</label>
+                    <input class="form-input" type="time" name="reservation_time"
+                           value="{{ reservation.reservation_time }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Number of Guests</label>
+                    <input class="form-input" type="number" name="num_of_guests"
+                           value="{{ reservation.num_of_guests }}" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Table Number</label>
+                    <input class="form-input" type="number" name="table_number"
+                           value="{{ reservation.table_number }}" min="1" required>
+                </div>
+
+                <div class="form-group edit-resv-full">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="confirmed"
+                                {% if reservation.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="pending"
+                                {% if reservation.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="cancelled"
+                                {% if reservation.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="completed"
+                                {% if reservation.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+
+                <div class="form-group edit-resv-full">
+                    <label class="form-label">Special Requests</label>
+                    <textarea class="form-textarea" name="special_requests"
+                              rows="4">{{ reservation.special_requests }}</textarea>
+                </div>
+
+            </div>
+
+            <div class="edit-resv-actions">
+                <button type="button" class="btn-danger edit-resv-discard"
+                        onclick="showDiscardConfirm()">Discard</button>
+                <button type="button" class="btn-primary edit-resv-save"
+                        onclick="showSaveConfirm()">Save Changes</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+<div id="save-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <p class="modal-title">Confirm Changes</p>
+        <p class="modal-message">Are you sure you want to save these changes to the reservation?</p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('save-modal')">Go Back</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('edit-resv-form').submit()">Yes, Save</button>
+        </div>
+    </div>
+</div>
+
+<div id="discard-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <p class="modal-title">Discard Changes</p>
+        <p class="modal-message">Are you sure you want to discard your changes? Any unsaved edits will be lost.</p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('discard-modal')">Keep Editing</button>
+            <a class="modal-btn-confirm" href="{{ url_for('admin.view_reservations') }}">Yes, Discard</a>
+        </div>
+    </div>
+</div>
+
+<div id="cannot-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
+     height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
+                width:90%; text-align:center; font-family:Georgia, serif; border-top: 5px solid #8B0000;">
+        <h3>Cannot Edit</h3>
+        <p>This reservation has been cancelled and cannot be edited.</p>
+        <button onclick="closeCannotEdit()" style="padding:10px 20px; background:#8B0000;
+         color:white; border:none; border-radius:6px; cursor:pointer;">OK</button>
+    </div>
+</div>
+<script>
+function showSaveConfirm() {
+    document.getElementById('save-modal').classList.add('open');
+}
+
+function showDiscardConfirm() {
+    document.getElementById('discard-modal').classList.add('open');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+    overlay.addEventListener('click', function (e) {
+        if (e.target === this) this.classList.remove('open');
+    });
+});
+
+function showCannotEdit() {
+    document.getElementById('cannot-edit-modal').style.display = 'flex';
+}
+
+function closeCannotEdit() {
+    document.getElementById('cannot-edit-modal').style.display = 'none';
+}
+
+document.getElementById('cannot-edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCannotEdit();
+});
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(function (m) {
+            m.classList.remove('open');
+        });
+    }
+});
+
+{% if cannot_edit %}
+window.onload = function() {
+    showCannotEdit();
+}
+{% endif %}
+</script>
+{% endblock %}

@@ -14,6 +14,7 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                driver_details)
 
 from controllers.staff_controller import reset_staff_email, reset_staff_default
+from controllers.admin_reservations_controller import (edit_reservation, cancel_reservation)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
@@ -25,6 +26,8 @@ admin_bp.route("/menu/edit/<int:item_id>", methods=["GET", "POST"])(edit_menu_it
 admin_bp.route("/menu/delete/<int:item_id>", methods=["POST"])(delete_menu_item)
 
 admin_bp.route("/reservations")(view_reservations)
+admin_bp.route("/reservations/edit/<int:id>", methods=["GET", "POST"])(edit_reservation)
+admin_bp.route("/reservations/cancel/<int:id>", methods=["POST"])(cancel_reservation)
 admin_bp.route("/menu")(manage_menu)
 admin_bp.route("/update_hours", methods=["GET", "POST"])(update_hours)
 admin_bp.route("/analytics")(view_analytics)
