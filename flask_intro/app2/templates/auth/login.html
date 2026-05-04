@@ -1,66 +1,100 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <h1>CUSTOMER LOGIN</h1>
-    <h3>Restaurant Customer Portal</h3>
-    {% if error %}
-    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
-      border-radius: 8px; margin: 20px auto; max-width: 500px;">
-        {{ error }}
-    </p>
-    {% endif %}
-    <div class="form-box">
-    <div class="button-box">
-        <div id="btn"></div>
-        <button type="button" class="toggle-btn" onclick="leftClick()">Customer</button>
-        <button type="button" class="toggle-btn" onclick="rightClick()">Staff</button>
-    </div>
-    </div>
 
-    <form method="POST" style="max-width: 500px; margin: 40px auto;">
-        <label for="customer_email">Email Address</label>
-        <input type="email" id="customer_email" name="customer_email" required autofocus>
-
-        <label for="customer_password">Password</label>
-        <input type="password" id="customer_password" name="customer_password" required>
-        <p style="text-align: center; margin-top: 15px; font-family: Georgia, serif; font-size: 14px;">
-            <a href="{{ url_for('customer_auth.forgot_password') }}"
-            style="color: #8B0000; text-decoration: none;">
-                Forgot your password?
-            </a>
-        </p>
-        <input type="submit" value="LOGIN">
-    </form>
-
-    <p style="text-align: center; margin-top: 20px; color: #5C4033;">
-        Don't have an account?
-        <a href="{{ url_for('customer_auth.register') }}"
-           style="color: #8B0000; text-decoration: none; font-weight: bold;">Create one here</a>
-    </p>
-
-    <p style="text-align: center; margin-top: 15px; color: #5C4033; font-size: 14px;">
-        <a href="{{ url_for('general.home_page') }}"
-           style="color: #8B0000; text-decoration: none;">← Back to Main Site</a>
-    </p>
+<!-- Toast notification -->
+<div id="toast" class="toast">
+    <span class="toast-icon">⚠️</span>
+    <span id="toast-msg"></span>
+    <button class="toast-close" onclick="closeToast()">✕</button>
 </div>
+
+<div class="login-page">
+    <div class="login-card">
+
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Sign in to your account</p>
+
+        <!-- Customer / Staff toggle -->
+        <div class="toggle-wrap">
+            <div class="toggle-slider" id="toggle-slider"></div>
+            <button type="button" class="toggle-btn active" id="btn-customer" onclick="leftClick()">
+                Customer
+            </button>
+            <button type="button" class="toggle-btn" id="btn-staff" onclick="rightClick()">
+                Staff
+            </button>
+        </div>
+
+        <!-- Login form -->
+        <form method="POST" class="login-form">
+            <div class="field-group">
+                <label for="customer_email">Email Address</label>
+                <input type="email" id="customer_email" name="customer_email" required autofocus>
+            </div>
+            <div class="field-group">
+                <label for="customer_password">Password</label>
+                <input type="password" id="customer_password" name="customer_password" required>
+                <div class="forgot-link">
+                    <a href="{{ url_for('customer_auth.forgot_password') }}">Forgot your password?</a>
+                </div>
+            </div>
+            <input type="submit" value="LOGIN">
+        </form>
+
+        <p class="login-link" style="margin-top: 24px;">
+            Don't have an account?
+            <a href="{{ url_for('customer_auth.register') }}">Create one here</a>
+        </p>
+
+        <p class="login-link" style="margin-top: 12px;">
+            <a href="{{ url_for('general.home_page') }}">← Back to Main Site</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
 <script>
-    var btn = document.getElementById('btn')
+    {% if error %}
+    window.addEventListener('DOMContentLoaded', function() {
+        showToast("{{ error }}");
+    });
+    {% endif %}
+
+    function showToast(message) {
+        document.getElementById('toast-msg').textContent = message;
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(closeToast, 4000);
+    }
+
+    function closeToast() {
+        document.getElementById('toast').classList.remove('show');
+    }
+
+    var slider = document.getElementById('toggle-slider');
+
     function leftClick() {
-        btn.style.left = '0';
+        slider.style.left = '4px';
+        document.getElementById('btn-customer').classList.add('active');
+        document.getElementById('btn-staff').classList.remove('active');
         setTimeout(function() {
             window.location.href = "{{ url_for('customer_auth.login') }}";
-        }, 500);
+        }, 350);
     }
 
     function rightClick() {
-        btn.style.left = '110px';
+        slider.style.left = 'calc(50%)';
+        document.getElementById('btn-staff').classList.add('active');
+        document.getElementById('btn-customer').classList.remove('active');
         setTimeout(function() {
             window.location.href = "{{ url_for('staff.staff_login') }}";
-        }, 500);
+        }, 350);
     }
 </script>
 {% endblock %}

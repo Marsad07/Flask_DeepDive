@@ -1,7 +1,9 @@
 from flask import render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, login_required
 from app2.database import get_db, staff_redirect
-from app2 import mail
+from app2 import mail, login_manager
+from app2.models.customer_user import CustomerUser
 from flask_mailman import EmailMessage
 import secrets
 from datetime import datetime, timedelta
@@ -20,9 +22,15 @@ def customer_login():
         db.close()
 
         if user and check_password_hash(user['customer_password_hash'], customer_password):
+            # Log in with Flask-Login
+            customer_user = CustomerUser(user)
+            login_user(customer_user)
+
+            # Keep session data for your existing session-based checks
             session['customer_id'] = user['customer_id']
             session['customer_name'] = user['customer_fullname']
             session['customer_email'] = user['customer_email']
+            session['customer_phonenum'] = user['customer_phonenum']
             return redirect(url_for('customer_auth.customer_dashboard'))
         else:
             return render_template('auth/login.html', error="Incorrect email or password")
@@ -57,7 +65,17 @@ def customer_register():
         """, (customer_fullname, customer_email, customer_phonenum, hashed_password))
         db.commit()
 
-        session['customer_id'] = cursor.lastrowid
+        new_id = cursor.lastrowid
+
+        # Log in with Flask-Login
+        new_user_row = {
+            "customer_id": new_id,
+            "customer_fullname": customer_fullname,
+            "customer_email": customer_email
+        }
+        login_user(CustomerUser(new_user_row))
+
+        session['customer_id'] = new_id
         session['customer_name'] = customer_fullname
         session['customer_email'] = customer_email
 
@@ -68,6 +86,7 @@ def customer_register():
     return render_template('auth/register.html')
 
 def customer_logout():
+    logout_user()
     session.clear()
     return redirect(url_for('general.home_page'))
 
@@ -200,6 +219,7 @@ def update_profile():
         db.close()
         return render_template('auth/customer_profile.html',
                                customer=customer, success="Profile updated successfully!")
+
     cursor.close()
     db.close()
     return redirect(url_for('customer_auth.customer_profile_settings'))
@@ -208,7 +228,7 @@ def update_profile():
 def order_history():
     customer_id = session.get('customer_id')
     if not customer_id:
-        return redirect(url_for('auth.login_page'))
+        return redirect(url_for('customer_auth.login'))  # FIXED: was 'auth.login_page'
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -236,6 +256,7 @@ def order_history():
     db.close()
     return render_template("auth/order_history.html", orders=orders)
 
+
 @staff_redirect
 def forgot_password():
     if request.method == "POST":
@@ -257,7 +278,6 @@ def forgot_password():
             """, (email, token, expires_at))
             db.commit()
 
-            # This sends the reset email
             reset_url = url_for('customer_auth.reset_password', token=token, _external=True)
             try:
                 html_body = f'''<!DOCTYPE html>

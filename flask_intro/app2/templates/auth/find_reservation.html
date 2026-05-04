@@ -1,35 +1,124 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="menu-container">
-  <div class="menu-container">
+{% block styles %}
+.resv-lookup-wrap {
+    max-width: 480px;
+    margin: 48px auto 80px;
+    padding: 0 24px;
+}
 
-    <a href="{{ url_for('general.home') }}" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10 3L5 8L10 13" stroke="#8B0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Back
+.resv-lookup-back {
+    display: inline-block;
+    color: #8B0000;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    margin-bottom: 20px;
+}
+
+.resv-lookup-back:hover { opacity: 0.75; }
+
+.resv-lookup-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 8px;
+    letter-spacing: 1px;
+}
+
+.resv-lookup-subtitle {
+    font-size: 14px;
+    color: #9E8C78;
+    margin: 0 0 28px;
+    font-family: 'Lato', sans-serif;
+}
+
+.resv-lookup-card {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(139,0,0,0.1);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 32px 32px 36px;
+    border-top: 3px solid #8B0000;
+}
+
+.resv-lookup-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #5C4033;
+    margin-bottom: 7px;
+    font-family: 'Lato', sans-serif;
+}
+
+.resv-lookup-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid rgba(212,175,55,0.4);
+    border-radius: 2px;
+    background: #FFFEF2;
+    color: #2C2416;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    margin-bottom: 18px;
+}
+
+.resv-lookup-input:focus { border-color: #D4AF37; }
+
+.resv-lookup-btn {
+    width: 100%;
+    padding: 13px;
+    background: #8B0000;
+    color: #D4AF37;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 4px;
+}
+
+.resv-lookup-btn:hover { background: #6B0000; }
+{% endblock %}
+
+{% block content %}
+<div class="resv-lookup-wrap">
+
+    <a href="{{ url_for('general.home_page') }}" class="resv-lookup-back">
+        ← Back to Home
     </a>
 
-    <h2 class="mb-3">Find Your Reservation</h2>
-    <p class="resv-subtitle">Enter your details to view or manage your booking.</p>
-    <div class="form-divider"></div>
+    <h1 class="resv-lookup-title">Find Your Reservation</h1>
+    <p class="resv-lookup-subtitle">Enter your details to view or manage your booking.</p>
 
-    <form method="POST">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
-      </div>
+    <div class="resv-lookup-card">
+        <form method="POST">
 
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="text" name="phone" class="form-control" required>
-      </div>
+            <label class="resv-lookup-label">Email</label>
+            <input type="email" name="email" class="resv-lookup-input"
+                   value="{{ prefill_email }}" required>
 
-      <div class="submit-row">
-        <button type="submit" class="btn-save">Find Reservation</button>
-      </div>
-    </form>
-  </div>
+            <label class="resv-lookup-label">Phone Number</label>
+            <input type="text" name="phone" class="resv-lookup-input"
+                   value="{{ prefill_phone }}" required>
+
+            <button type="submit" class="resv-lookup-btn">
+                Find Reservation
+            </button>
+
+        </form>
+    </div>
+
 </div>
 {% endblock %}

@@ -1,36 +1,42 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="resv-wrapper">
-  <div class="resv-card">
 
-    <a href="{{ url_for('general.home_page') }}" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10 3L5 8L10 13" stroke="#8B0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Back
-    </a>
+<a href="{{ url_for('general.home_page') }}" class="customer-back-link">
+    ← Back to Home
+</a>
 
-    <h2>Find Your Reservation</h2>
-    <p class="resv-subtitle">Enter your details to view or manage your booking.</p>
-    <div class="form-divider"></div>
+<div class="customer-page-wrapper">
 
-    <form method="POST">
-      <div class="form-group full-width">
-        <label>Email</label>
-        <input type="email" name="email" required>
-      </div>
-      <br><br>
-      <div class="form-group full-width">
-        <label>Phone Number</label>
-        <input type="text" name="phone" required>
-      </div>
+  <h1 class="customer-page-title">Find Your Reservation</h1>
+  <p class="customer-page-subtitle">
+      Enter your details to view or manage your booking.
+  </p>
 
-      <div class="submit-row">
-        <button type="submit" class="btn-save">Find Reservation</button>
-      </div>
-    </form>
+  <div class="customer-form-card">
+      <form method="POST" action="{{ url_for('guest_lookup.find_reservation') }}">
 
+          <div class="field-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" required
+                     value="{{ prefill_email }}">
+          </div>
+
+          <div class="field-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" name="phone" required
+                     value="{{ prefill_phone }}">
+          </div>
+
+          <button type="submit" class="customer-form-submit">
+              Find Reservation
+          </button>
+
+      </form>
   </div>
 </div>
 {% endblock %}

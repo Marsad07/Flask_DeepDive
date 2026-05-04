@@ -1,10 +1,12 @@
-{% extends "base.html" %}
+{% extends "customer_base.html" %}
 
-{% block content %}
-<div class="menu-container">
-    <h2 class="mb-3">My Reservations</h2>
-    {% if reservations %}
-    <table class="table table-bordered table-striped">
+{% block customer_content %}
+
+<h1 class="customer-page-title">My Reservations</h1>
+
+{% if reservations %}
+<div class="customer-card" style="padding: 0; overflow-x: auto;">
+    <table class="customer-table">
         <thead>
             <tr>
                 <th>Date</th>
@@ -12,6 +14,7 @@
                 <th>Table</th>
                 <th>Guests</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,62 +24,64 @@
                 <td>{{ r.reservation_time }}</td>
                 <td>{{ r.table_number }}</td>
                 <td>{{ r.num_of_guests }}</td>
+                <td>{{ r.reservation_status }}</td>
                 <td>
                     {% if r.reservation_status != 'Cancelled' %}
-                    <a href="{{ url_for('reservations.modify_reservation', resv_id=r.reservation_id) }}"
-                       class="btn btn-warning btn-sm" style="margin-right: 5px;">
-                        Modify
-                    </a>
-
-                    <button class="btn btn-danger btn-sm"
-                            onclick="showConfirm('{{ url_for('reservations.cancel_reservation',
-                             resv_id=r.reservation_id) }}')">
+                    <a href="{{ url_for('reservations.modify_reservation', resv_id=r.customer_id) }}"
+                       class="table-btn modify">Modify</a>
+                    <button class="table-btn cancel"
+                            onclick="showConfirm
+                            ('{{ url_for('reservations.cancel_reservation', resv_id=r.customer_id) }}')">
                         Cancel
                     </button>
                     {% else %}
-                    <span class="text-muted">Cancelled</span>
+                    <span class="cancelled-text">Cancelled</span>
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% else %}
-    <p class="text-muted">You have no reservations.</p>
-    {% endif %}
 </div>
-<div id="confirm-modal"
-     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
-                width:90%; text-align:center; font-family:Georgia, serif; border-top: 5px solid #8B0000;">
+{% else %}
+    <p class="customer-empty">You have no reservations yet.</p>
+{% endif %}
+
+<!-- Cancel confirmation modal -->
+<div id="confirm-modal" class="customer-modal-overlay">
+    <div class="customer-modal-box">
         <h3>Confirm Cancellation</h3>
         <p>Are you sure you want to cancel this reservation?</p>
-
-        <div style="display:flex; gap:15px; justify-content:center;">
-            <button onclick="closeConfirm()" class="btn btn-secondary">No</button>
-            <button onclick="submitCancel()" class="btn btn-danger">Yes, Cancel</button>
+        <div class="customer-modal-actions">
+            <button onclick="closeConfirm()" class="customer-modal-cancel">No, Keep It</button>
+            <button onclick="submitCancel()" class="customer-modal-confirm">Yes, Cancel</button>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block scripts %}
 <script>
-let pendingCancelUrl = null;
+    let pendingCancelUrl = null;
 
-function showConfirm(url) {
-    pendingCancelUrl = url;
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
+    function showConfirm(url) {
+        pendingCancelUrl = url;
+        document.getElementById('confirm-modal').classList.add('open');
+    }
 
-function closeConfirm() {
-    document.getElementById('confirm-modal').style.display = 'none';
-}
+    function closeConfirm() {
+        document.getElementById('confirm-modal').classList.remove('open');
+    }
 
-function submitCancel() {
-    window.location.href = pendingCancelUrl;
-}
+    function submitCancel() {
+        window.location.href = pendingCancelUrl;
+    }
 
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeConfirm();
-});
+    document.getElementById('confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeConfirm();
+    });
 </script>
 {% endblock %}

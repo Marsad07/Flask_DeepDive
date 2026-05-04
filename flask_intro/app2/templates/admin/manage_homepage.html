@@ -1,8 +1,6 @@
-{% extends "base.html" %}
+{% extends "admin_base.html" %}
 
-{% block header %}{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 <div class="dash-page">
 
   <!-- This is for the top header row -->
@@ -74,6 +72,30 @@
         <!-- This is for saving branding -->
         <button type="button" class="btn-primary" onclick="confirmBranding()">
           Save Branding
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- This is for the footer about text section -->
+  <p class="dash-section-title">Footer</p>
+  <div class="dash-card">
+    <div class="dash-card-body">
+
+      <form method="POST" action="{{ url_for('admin.update_footer_about') }}"
+            id="footer-about-form">
+
+        <!-- This is for the footer about text -->
+        <div class="form-group">
+          <label class="form-label">About Text</label>
+          <textarea name="footer_about" class="form-textarea"
+                    rows="3">{{ branding.footer_about }}</textarea>
+        </div>
+
+        <!-- This is for saving the footer about text -->
+        <button type="button" class="btn-primary" onclick="confirmFooterAbout()">
+          Save Footer About
         </button>
 
       </form>
@@ -242,7 +264,6 @@
     </form>
   </div>
   {% endfor %}
-
 </div>
 
 <!-- This is for the confirmation modal -->
@@ -257,70 +278,79 @@
   </div>
 </div>
 <script>
-  // Opens the modal with custom title + message + confirm action
-  function openModal(title, message, onConfirm) {
-    document.getElementById("modal-title").innerText = title;
-    document.getElementById("modal-message").innerText = message;
+    // Opens the modal with custom title + message + confirm action
+    function openModal(title, message, onConfirm) {
+      document.getElementById("modal-title").innerText   = title;
+      document.getElementById("modal-message").innerText = message;
 
-    const confirmBtn = document.getElementById("modal-confirm-btn");
-    confirmBtn.onclick = onConfirm;
+      const confirmBtn   = document.getElementById("modal-confirm-btn");
+      confirmBtn.onclick = onConfirm;
 
-    document.getElementById("confirm-modal").style.display = "flex";
-  }
+      document.getElementById("confirm-modal").style.display = "flex";
+    }
 
-  // Close modal
-  function closeModal() {
-    document.getElementById("confirm-modal").style.display = "none";
-  }
+    // Close modal
+    function closeModal() {
+      document.getElementById("confirm-modal").style.display = "none";
+    }
 
-  // BRANDING
-  function confirmBranding() {
-    openModal(
-      "Save Branding",
-      "Are you sure you want to update the homepage branding?",
-      () => document.getElementById("branding-form").submit()
-    );
-  }
+    // Branding
+    function confirmBranding() {
+      openModal(
+        "Save Branding",
+        "Are you sure you want to update the homepage branding?",
+        () => document.getElementById("branding-form").submit()
+      );
+    }
 
-  // DISH UPDATE
-  function confirmDish(dishKey) {
-    openModal(
-      "Update Dish",
-      "Are you sure you want to update this dish?",
-      () => document.getElementById(`dish-form-${dishKey}`).submit()
-    );
-  }
+    // Footer about
+    function confirmFooterAbout() {
+      openModal(
+        "Update Footer About",
+        "Are you sure you want to update the footer about text?",
+        () => document.getElementById("footer-about-form").submit()
+      );
+    }
 
-  // ADD REVIEW
-  function confirmAddReview() {
-    openModal(
-      "Add Review",
-      "Are you sure you want to add this new review?",
-      () => document.getElementById("add-review-form").submit()
-    );
-  }
+    // Dish update
+    function confirmDish(dishKey) {
+      openModal(
+        "Update Dish",
+        "Are you sure you want to update this dish?",
+        () => document.getElementById(`dish-form-${dishKey}`).submit()
+      );
+    }
 
-  // UPDATE REVIEW
-  function confirmUpdateReview(reviewId) {
-    openModal(
-      "Update Review",
-      "Are you sure you want to update this review?",
-      () => document.getElementById(`review-form-${reviewId}`).submit()
-    );
-  }
+    // Adding review
+    function confirmAddReview() {
+      openModal(
+        "Add Review",
+        "Are you sure you want to add this new review?",
+        () => document.getElementById("add-review-form").submit()
+      );
+    }
 
-  // DELETE REVIEW
-  function confirmDeleteReview(reviewId, reviewerName) {
-    openModal(
-      "Delete Review",
-      `Are you sure you want to delete the review by "${reviewerName}"? This cannot be undone.`,
-      () => document.getElementById(`delete-review-form-${reviewId}`).submit()
-    );
-  }
+    // Updating review
+    function confirmUpdateReview(reviewId) {
+      openModal(
+        "Update Review",
+        "Are you sure you want to update this review?",
+        () => document.getElementById(`review-form-${reviewId}`).submit()
+      );
+    }
 
-  // Close modal when clicking outside
-  document.getElementById("confirm-modal").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
-  });
+    // Deleting review
+    function confirmDeleteReview(reviewId, reviewerName) {
+      openModal(
+        "Delete Review",
+        `Are you sure you want to delete the review by "${reviewerName}"? This cannot be undone.`,
+        () => document.getElementById(`delete-review-form-${reviewId}`).submit()
+      );
+    }
+
+    // Close modal when clicking outside
+    document.getElementById("confirm-modal").addEventListener("click", function (e) {
+      if (e.target === this) closeModal();
+    });
 </script>
 {% endblock %}

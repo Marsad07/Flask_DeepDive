@@ -14,9 +14,14 @@ def find_reservation():
             ORDER BY reservation_date DESC
         """, (email, phone))
         reservations = cursor.fetchall()
-
         cursor.close()
         db.close()
 
-        return render_template("auth/guest_reservation.html", reservations=reservations)
-    return render_template("auth/find_reservation.html")
+        return render_template("auth/guest_reservation.html",
+                               reservations=reservations,
+                               prefill_email=email,
+                               prefill_phone=phone)
+
+    return render_template("auth/find_reservation.html",
+                           prefill_email=session.get('customer_email', ''),
+                           prefill_phone=session.get('customer_phonenum', ''))

@@ -1,0 +1,215 @@
+/* Kitchen page header */
+.kitchen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.kitchen-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0;
+}
+
+.kitchen-welcome {
+    font-size: 14px;
+    color: #9E8C78;
+    margin: 4px 0 0;
+}
+
+/* Empty state */
+.kitchen-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.kitchen-empty p:first-child {
+    font-size: 20px;
+    color: #2C2416;
+    margin: 0 0 8px;
+}
+
+.kitchen-empty p:last-child {
+    font-size: 14px;
+    color: #9E8C78;
+    margin: 0;
+}
+
+/* Order card */
+.kitchen-card {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(139,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.kitchen-card-accent {
+    height: 4px;
+    background: #8B0000;
+}
+
+.kitchen-card-accent.preparing {
+    background: #D4AF37;
+}
+
+.kitchen-card-body {
+    padding: 20px 24px;
+}
+
+/* Order card top row */
+.kitchen-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.kitchen-order-ref {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0;
+}
+
+.kitchen-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.badge-delivery {
+    background: #8B0000;
+    color: #D4AF37;
+}
+
+.badge-collection {
+    background: #D4AF37;
+    color: #2C2416;
+}
+
+.badge-count {
+    background: #2C2416;
+    color: #FFFEF2;
+}
+
+.badge-timer {
+    background: #E0D8C8;
+    color: #2C2416;
+    min-width: 60px;
+    text-align: center;
+}
+
+.badge-timer.warning {
+    background: #FF8C00;
+    color: #fff;
+}
+
+.badge-timer.urgent {
+    background: #8B0000;
+    color: #D4AF37;
+}
+
+/* Toggle items button */
+.kitchen-toggle-btn {
+    background: none;
+    border: 1px solid #D4AF37;
+    color: #2C2416;
+    padding: 7px 16px;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: background 0.2s;
+}
+
+.kitchen-toggle-btn:hover {
+    background: rgba(212,175,55,0.1);
+}
+
+/* Items list */
+.kitchen-items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: none;
+}
+
+.kitchen-items-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dotted rgba(212,175,55,0.3);
+    font-size: 15px;
+    color: #2C2416;
+}
+
+.kitchen-items-list li:last-child {
+    border-bottom: none;
+}
+
+.kitchen-item-qty {
+    font-weight: 700;
+    color: #8B0000;
+}
+
+/* Special instructions */
+.kitchen-instructions {
+    background: #FFF8E7;
+    border-left: 3px solid #D4AF37;
+    padding: 10px 14px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #5C4033;
+}
+
+/* Action buttons */
+.kitchen-action-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.kitchen-action-btn.start {
+    background: #8B0000;
+    color: #D4AF37;
+}
+
+.kitchen-action-btn.start:hover { background: #6B0000; }
+
+.kitchen-action-btn.ready {
+    background: #2C2416;
+    color: #D4AF37;
+}
+
+.kitchen-action-btn.ready:hover { background: #1A1410; }

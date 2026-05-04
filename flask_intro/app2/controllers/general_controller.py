@@ -3,7 +3,7 @@ from flask_mailman import EmailMessage
 from app2.database import get_db
 from app2 import mail
 from app2.models.image_model import get_image
-from database import staff_redirect
+from app2.database import staff_redirect
 
 @staff_redirect
 def home_page():

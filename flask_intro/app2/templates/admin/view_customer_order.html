@@ -1,9 +1,8 @@
-{% extends "base.html" %}
+{% extends "admin_base.html" %}
 
-{% block header %}
-{% endblock %}
 
-{% block content %}
+
+{% block admin_content %}
 <div class="menu-container">
     <h1 style="margin-bottom: 10px;">
         {{ customer.customer_fullname }}'s Order
@@ -249,3 +248,6 @@ document.getElementById("driver-warning-modal").addEventListener("click", functi
 </script>
 
 {% endblock %}
+
+
+

@@ -4,7 +4,6 @@ from app2.database import get_db
 from flask_socketio import join_room
 from app2 import socketio
 
-
 def track_order(order_number):
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -17,6 +16,7 @@ def track_order(order_number):
     customer_lat = None
     customer_lng = None
 
+    # Check if logged in customer or guest
     customer_id = session.get('customer_id')
     if customer_id:
         customer_email = session.get('customer_email')
@@ -45,6 +45,7 @@ def track_order(order_number):
             error = "Order not found"
 
     if order and verified:
+        # Fetch order items
         db2 = get_db()
         cursor2 = db2.cursor(dictionary=True)
         cursor2.execute("SELECT * FROM order_items WHERE order_id = %s", (order['order_id'],))
@@ -52,14 +53,20 @@ def track_order(order_number):
         cursor2.close()
         db2.close()
 
+        # Fetch restaurant location
         db3 = get_db()
         cursor3 = db3.cursor(dictionary=True)
-        cursor3.execute("SELECT latitude, longitude, address FROM restaurant_info WHERE latitude IS NOT "
-                        "NULL LIMIT 1")
+        cursor3.execute("""
+            SELECT latitude, longitude, address 
+            FROM restaurant_info 
+            WHERE latitude IS NOT NULL 
+            LIMIT 1
+        """)
         restaurant = cursor3.fetchone()
         cursor3.close()
         db3.close()
 
+        # Calculate delivery route if applicable
         if order['order_type'] == 'delivery' and restaurant and order.get('guest_delivery_address'):
             api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6'
                        'IjlhM2ZkYzcyOTQ4YzQ3YzE4NjlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
@@ -69,11 +76,23 @@ def track_order(order_number):
                 order['guest_delivery_address'],
                 api_key
             )
+
+    # Fetch branding for the template
+    db_b = get_db()
+    cursor_b = db_b.cursor(dictionary=True)
+    cursor_b.execute("SELECT * FROM restaurant_branding LIMIT 1")
+    branding = cursor_b.fetchone()
+    cursor_b.close()
+    db_b.close()
+
     cursor.close()
     db.close()
 
+    # Use customer template if logged in, base template for guests
+    template = 'orders/tracking.html' if customer_id else 'orders/tracking.html'
+
     return render_template(
-        'orders/tracking.html',
+        template,
         order=order,
         items=items,
         error=error,
@@ -82,11 +101,13 @@ def track_order(order_number):
         restaurant=restaurant,
         route_coords=route_coords,
         customer_lat=customer_lat,
-        customer_lng=customer_lng
+        customer_lng=customer_lng,
+        branding=branding
     )
 
 def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_key):
     try:
+        # Geocode the delivery address
         geocode_response = requests.get(
             'https://nominatim.openstreetmap.org/search',
             params={
@@ -107,6 +128,7 @@ def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_
         customer_lat = float(geocode_data[0]['lat'])
         customer_lng = float(geocode_data[0]['lon'])
 
+        # Get driving route
         directions_response = requests.post(
             'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
             json={'coordinates': [[restaurant_lng, restaurant_lat], [customer_lng, customer_lat]]},
@@ -128,6 +150,7 @@ def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_
     except Exception as e:
         print(f"Route error: {e}")
         return None, None, None
+
 
 @socketio.on('join_order')
 def handle_join(data):

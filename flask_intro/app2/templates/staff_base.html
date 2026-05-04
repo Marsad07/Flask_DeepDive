@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ branding.restaurant_name }} — Staff</title>
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Playfair+
+          Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
+
+    {% block head %}{% endblock %}
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #F7F4EE;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* Staff topbar */
+        .staff-topbar {
+            background: #2C2416;
+            color: #FFFEF2;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .staff-topbar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #D4AF37;
+            letter-spacing: 2px;
+        }
+
+        .staff-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .staff-topbar-name {
+            font-size: 13px;
+            color: rgba(255,254,242,0.7);
+        }
+
+        .staff-topbar-logout {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #D4AF37;
+            text-decoration: none;
+            border: 1px solid rgba(212,175,55,0.3);
+            padding: 6px 14px;
+            border-radius: 2px;
+            transition: background 0.2s;
+        }
+
+        .staff-topbar-logout:hover {
+            background: rgba(212,175,55,0.1);
+        }
+
+        /* Staff main content */
+        .staff-main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Staff topbar -->
+    <div class="staff-topbar">
+        <span class="staff-topbar-title">{{ branding.restaurant_name }}</span>
+        <div class="staff-topbar-right">
+            <span class="staff-topbar-name">{{ staff_name }}</span>
+            <a href="{{ url_for('staff.staff_logout') }}" class="staff-topbar-logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="staff-main">
+        {% block staff_content %}{% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

@@ -1,356 +1,270 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'customer_base.html' %}
 
-<div class="menu-container">
-    <h1>Track Your Order</h1>
-    <h3>Order Reference: {{ order_number }}</h3>
-    <!-- This is the customer/guest verification form -->
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tracking.css') }}">
+{% endblock %}
+
+{% block customer_content %}
+
+<div class="track-wrapper">
+
+    <h1 class="track-title">Track Your Order</h1>
+    <h3 class="track-ref">Order Reference: {{ order_number }}</h3>
+
     {% if not verified %}
-    <form method="POST">
-        <h2 style="text-align:left; font-size:22px; margin-top:10px;">Verify Your Order</h2>
-        <p style="margin:0 0 10px 0;">Enter the email address you used at checkout to view your order status.</p>
+
+    <!-- Verify form -->
+    <div class="track-verify-card">
+        <h2 class="track-verify-title">Verify Your Order</h2>
+        <p class="track-verify-subtitle">
+            Enter the email address you used at checkout to view your order status.
+        </p>
 
         {% if error %}
-        <p style="color: #8B0000; font-weight: bold; margin-bottom: 10px;">⚠ {{ error }}</p>
+        <p class="track-error">⚠ {{ error }}</p>
         {% endif %}
-        <label for="guest_email">Email Address</label>
-        <input type="email" name="guest_email" id="guest_email"
-               placeholder="e.g. john@example.com" required>
-        <input type="submit" value="Find My Order">
-    </form>
+
+        <form method="POST">
+            <div class="resv-field-group">
+                <label for="guest_email">Email Address</label>
+                <input type="email" name="guest_email" id="guest_email"
+                       placeholder="e.g. john@example.com" required>
+            </div>
+            <button type="submit" class="resv-btn-save" style="width:100%; margin-top: 8px;">
+                Find My Order
+            </button>
+        </form>
+    </div>
+
     {% else %}
-    <p>Order type: {{ order.order_type }}</p>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-    <!-- Here is all the indication that will be shown in the progress tracker -->
+    <p class="track-order-type">Order type: {{ order.order_type }}</p>
+
     {% set stages = ['pending', 'confirmed', 'preparing', 'ready', 'completed'] %}
     {% set stage_labels = ['Received', 'Confirmed', 'Preparing', 'Ready', 'Completed'] %}
     {% set stage_icons = ['📋', '✅', '👨‍🍳', '🍽️', '🎉'] %}
     {% set current_index = stages.index(order.order_status) if order.order_status in stages else 0 %}
 
-    <!-- Leaflet CSS for creating map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <!-- Leaflet JS for creating map -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div class="track-content">
 
-    <div style="max-width: 800px; margin: 40px auto;">
-        <!-- This is for showing the status timeline -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 50px;">
+        <!-- Progress bar -->
+        <div class="track-progress">
             {% for i in range(stages|length) %}
-            <div style="text-align: center; flex: 1;">
-                <div class="status-circle" style="
-                    width: 60px; height: 60px;
-                    border-radius: 50%;
-                    margin: 0 auto 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 22px;
-                    background-color: {{ '#8B0000' if i <= current_index else '#e0d8c8' }};
-                    box-shadow: {{ '0 4px 15px rgba(139,0,0,0.3)' if i == current_index else 'none' }};
-                    border: {{ '3px solid #D4AF37' if i == current_index else '3px solid transparent' }};
-                    transition: all 0.3s ease;">
+            <div class="track-stage">
+                <div class="status-circle {{ 'active' if i <= current_index }} {{ 'current' if i == current_index }}">
                     {{ stage_icons[i] }}
                 </div>
-                <small class="status-label" style="
-                    font-family: Georgia, serif;
-                    font-size: 12px;
-                    font-weight: bold;
-                    color: {{ '#8B0000' if i <= current_index else '#9e9e9e' }};
-                    letter-spacing: 1px;
-                    text-transform: uppercase;">
+                <small class="status-label {{ 'active' if i <= current_index }}">
                     {{ stage_labels[i] }}
                 </small>
             </div>
             {% if not loop.last %}
-            <div class="status-line" style="
-                flex-grow: 1;
-                height: 3px;
-                margin-bottom: 30px;
-                background: {{ '#8B0000' if i < current_index else '#e0d8c8' }};
-                transition: background 0.3s ease;">
-            </div>
+            <div class="status-line {{ 'active' if i < current_index }}"></div>
             {% endif %}
             {% endfor %}
         </div>
 
-        <!-- This is for orders that may get cancelled -->
+        <!-- Cancelled banner -->
         {% if order.order_status == 'cancelled' %}
-        <div style="
-            background: #fff0f0;
-            border-left: 5px solid #8B0000;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            font-family: Georgia, serif;
-            color: #8B0000;">
+        <div class="track-cancelled-banner">
             ⚠ Your order has been cancelled. Please contact us if you have any questions.
         </div>
         {% endif %}
 
-        <!-- This is for showing the order in a summary -->
-        <div class="contact-info-item" style="margin-bottom: 30px;">
-            <strong>Order Summary</strong>
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Type:</span>
+        <!-- Order Summary -->
+        <div class="track-card">
+            <strong class="track-card-title">Order Summary</strong>
+            <p class="track-card-row">
+                <span class="track-card-label">Type:</span>
                 {{ order.order_type | capitalize }}
             </p>
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Order Status:</span>
+            <p class="track-card-row">
+                <span class="track-card-label">Order Status:</span>
                 <span id="order-status-text">{{ order.order_status | capitalize }}</span>
             </p>
-
             {% if order.estimated_minutes %}
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Estimated Time:</span>
+            <p class="track-card-row">
+                <span class="track-card-label">Estimated Time:</span>
                 <span id="countdown-display">{{ order.estimated_minutes }} minutes</span>
             </p>
             {% endif %}
-
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Payment:</span>
+            <p class="track-card-row">
+                <span class="track-card-label">Payment:</span>
                 {{ order.payment_method | capitalize }} —
-                <span style="
-                    display: inline-block;
-                    padding: 2px 10px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    font-weight: bold;
-                    background: {{ '#d4edda' if order.payment_status == 'paid' else '#fff3cd' }};
-                    color: {{ '#155724' if order.payment_status == 'paid' else '#856404' }};">
+                <span class="track-payment-badge {{ 'paid' if order.payment_status == 'paid' else 'pending' }}">
                     {{ order.payment_status | capitalize }}
                 </span>
             </p>
             {% if order.special_instructions %}
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Notes:</span>
+            <p class="track-card-row">
+                <span class="track-card-label">Notes:</span>
                 {{ order.special_instructions }}
             </p>
             {% endif %}
             {% if order.order_type == 'delivery' and order.guest_delivery_address %}
-            <p style="margin: 5px 0;">
-                <span style="color: #2C2416; font-weight: bold;">Delivering to:</span>
+            <p class="track-card-row">
+                <span class="track-card-label">Delivering to:</span>
                 {{ order.guest_delivery_address }}
             </p>
             {% endif %}
         </div>
 
-        <!-- This is the map section that changes depending if the user
-         chose collection or delivery-->
-        <div class="contact-info-item" style="margin-top: 30px;">
-            <strong>
-                {% if order.order_type == 'delivery' %}
-                    Delivery Tracking
-                {% else %}
-                    Collection Address
-                {% endif %}
+        <!-- Map -->
+        <div class="track-card">
+            <strong class="track-card-title">
+                {% if order.order_type == 'delivery' %}Delivery Tracking{% else %}Collection Address{% endif %}
             </strong>
-            <div id="order-map" style="height: 300px; border-radius: 8px; margin-top: 15px"></div>
+            <div id="order-map" class="track-map">Loading map...</div>
+            {% if order.order_type == 'delivery' and not route_coords %}
+            <p class="track-map-warning">
+                ⚠ Could not calculate delivery route — address may not be geocodable.
+            </p>
+            {% endif %}
         </div>
 
-        <!-- This is for showing the items in order -->
-        <div class="contact-info-item">
-            <strong>Your Items</strong>
-            <ul class="visible" style="list-style: none; padding: 0; margin: 15px 0 0 0;">
+        <!-- Items -->
+        <div class="track-card">
+            <strong class="track-card-title">Your Items</strong>
+            <ul class="track-items-list">
                 {% for item in items %}
-                <li style="
-                    display: flex;
-                    justify-content: space-between;
-                    font-family: Georgia, serif;
-                    font-size: 16px;
-                    color: #2C2416 !important;
-                    font-weight: bold;
-                    border-bottom: 1px dotted #D4AF37;
-                    padding: 10px 0;">
-                    <span style="color: #2C2416 !important;">{{ item.item_name }} x{{ item.quantity }}</span>
-                    <span style="color: #2C2416 !important;">
-                        £{{ "%.2f" % (item.item_price|float * item.quantity|int) }}</span>
+                <li class="track-item-row">
+                    <span>{{ item.item_name }} x{{ item.quantity }}</span>
+                    <span>£{{ "%.2f" % (item.item_price|float * item.quantity|int) }}</span>
                 </li>
                 {% endfor %}
-                <!-- This shows the total -->
-                <li style="
-                    display: flex;
-                    justify-content: space-between;
-                    font-family: Georgia, serif;
-                    font-size: 18px;
-                    color: #2C2416;
-                    font-weight: bold;
-                    padding: 15px 0 5px 0;">
+                <li class="track-item-total">
                     <span>Total</span>
-                    <span style="color: #8B0000;">£{{ "%.2f" % order.total_price|float }}</span>
+                    <span class="track-total-price">£{{ "%.2f" % order.total_price|float }}</span>
                 </li>
             </ul>
         </div>
-
-        <!-- Back button for users to go back -->
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="{{ url_for('general.home_page') }}" style="
-                display: inline-block;
-                padding: 14px 40px;
-                background-color: #8B0000;
-                color: #FFD700;
-                font-family: Georgia, serif;
-                font-size: 16px;
-                font-weight: bold;
-                text-decoration: none;
-                border-radius: 8px;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                transition: all 0.3s ease;"
-                onmouseover="this.style.backgroundColor='#660000'; this.style.transform='translateY(-2px)'"
-                onmouseout="this.style.backgroundColor='#8B0000'; this.style.transform='translateY(0)'">
-                Back to Home
-            </a>
-        </div>
     </div>
-
-    <!-- This loads the SocketIO client — inside verified block so order is never None -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
-    <script>
-        const socket = io();
-        const orderId = {{ order.order_id }};
-
-        // This joins the room for this specific order
-        socket.emit('join_order', { order_id: orderId });
-
-        // This listens for status updates from the server
-        socket.on('order_status_update', function(data) {
-            if (data.order_id == orderId) {
-                updateProgressBar(data.new_status);
-                if (data.estimated_minutes) {
-                    startCountdown(parseInt(data.estimated_minutes));
-                }
-            }
-        });
-
-        // This updates the progress bar and status text without a page reload
-        function updateProgressBar(newStatus) {
-            const stages = ['pending', 'confirmed', 'preparing', 'ready', 'completed'];
-            const currentIndex = stages.indexOf(newStatus);
-
-            const circles = document.querySelectorAll('.status-circle');
-            const lines = document.querySelectorAll('.status-line');
-            const labels = document.querySelectorAll('.status-label');
-
-            circles.forEach((circle, i) => {
-                if (i <= currentIndex) {
-                    circle.style.backgroundColor = '#8B0000';
-                    circle.style.border = i === currentIndex ? '3px solid #D4AF37' : '3px solid transparent';
-                    circle.style.boxShadow = i === currentIndex ? '0 4px 15px rgba(139,0,0,0.3)' : 'none';
-                    labels[i].style.color = '#8B0000';
-                } else {
-                    circle.style.backgroundColor = '#e0d8c8';
-                    circle.style.border = '3px solid transparent';
-                    circle.style.boxShadow = 'none';
-                    labels[i].style.color = '#9e9e9e';
-                }
-            });
-
-            lines.forEach((line, i) => {
-                line.style.background = i < currentIndex ? '#8B0000' : '#e0d8c8';
-            });
-
-            // This updates the order status text in the summary card
-            const statusText = document.getElementById('order-status-text');
-            if (statusText) {
-                statusText.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-            }
-
-            showNotification(newStatus);
-        }
-
-        // This shows a toast notification when status changes
-        function showNotification(status) {
-            const messages = {
-                'confirmed': '✅ Your order has been confirmed!',
-                'preparing': '👨‍🍳 Your order is being prepared!',
-                'ready': '🍽️ Your order is ready for collection!',
-                'completed': '🎉 Order completed. Enjoy your meal!'
-            };
-            const msg = messages[status];
-            if (!msg) return;
-
-            const toast = document.createElement('div');
-            toast.textContent = msg;
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
-                background: #2C2416;
-                color: #FFD700;
-                padding: 16px 24px;
-                border-radius: 8px;
-                font-family: Georgia, serif;
-                font-size: 16px;
-                border-left: 4px solid #8B0000;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                z-index: 9999;
-            `;
-            document.body.appendChild(toast);
-
-            // This removes the toast after 4 seconds
-            setTimeout(() => toast.remove(), 4000);
-        }
-
-        // This starts the countdown timer
-        let countdownInterval = null;
-
-        function startCountdown(minutes) {
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            let totalSeconds = minutes * 60;
-            const display = document.getElementById('countdown-display');
-            if (!display) return;
-
-            countdownInterval = setInterval(function() {
-                if (totalSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    display.textContent = 'Any moment now!';
-                    return;
-                }
-                const mins = Math.floor(totalSeconds / 60);
-                const secs = totalSeconds % 60;
-                display.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's remaining';
-                totalSeconds--;
-            }, 1000);
-        }
-
-       function initMap(restaurantLat, restaurantLng, orderType) {
-    map = L.map('order-map').setView([restaurantLat, restaurantLng], 14);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    // This adds the restaurant pin
-    const restaurantPin = L.marker([restaurantLat, restaurantLng]).addTo(map);
-    restaurantPin.bindPopup('📍 Restaurant').openPopup();
-
-    // This draws the delivery route and customer pin if it's a delivery order
-    {% if order.order_type == 'delivery' and route_coords and customer_lat and customer_lng %}
-
-    // This draws the route line on the map
-    const routeCoords = {{ route_coords | tojson }};
-    L.polyline(routeCoords, {
-        color: '#8B0000',
-        weight: 4,
-        opacity: 0.8
-    }).addTo(map);
-
-    // This adds the customer pin
-    const customerPin = L.marker([{{ customer_lat }}, {{ customer_lng }}]).addTo(map);
-    customerPin.bindPopup('🏠 Delivery Address');
-
-    // This fits the map to show both pins and the full route
-    const bounds = L.latLngBounds(routeCoords);
-    map.fitBounds(bounds, { padding: [30, 30] });
-    {% endif %}
-    }
-
-    {% if restaurant and restaurant.latitude and restaurant.longitude %}
-    initMap({{ restaurant.latitude }}, {{ restaurant.longitude }}, '{{ order.order_type }}');
-    {% endif %}
-    </script>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if verified %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+const socket = io();
+const orderId = "{{ order.order_id }}";
+
+socket.emit('join_order', { order_id: orderId });
+
+socket.on('order_status_update', function(data) {
+    if (data.order_id == orderId) {
+        updateProgressBar(data.new_status);
+        if (data.estimated_minutes) {
+            startCountdown(parseInt(data.estimated_minutes));
+        }
+    }
+});
+
+function updateProgressBar(newStatus) {
+    const stages = ['pending', 'confirmed', 'preparing', 'ready', 'completed'];
+    const currentIndex = stages.indexOf(newStatus);
+    const circles = document.querySelectorAll('.status-circle');
+    const lines = document.querySelectorAll('.status-line');
+    const labels = document.querySelectorAll('.status-label');
+
+    circles.forEach((circle, i) => {
+        circle.classList.toggle('active', i <= currentIndex);
+        circle.classList.toggle('current', i === currentIndex);
+        labels[i].classList.toggle('active', i <= currentIndex);
+    });
+
+    lines.forEach((line, i) => {
+        line.classList.toggle('active', i < currentIndex);
+    });
+
+    const statusText = document.getElementById('order-status-text');
+    if (statusText) statusText.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+    showNotification(newStatus);
+}
+
+function showNotification(status) {
+    const messages = {
+        'confirmed': '✅ Your order has been confirmed!',
+        'preparing': '👨‍🍳 Your order is being prepared!',
+        'ready': '🍽️ Your order is ready for collection!',
+        'completed': '🎉 Order completed. Enjoy your meal!'
+    };
+    const msg = messages[status];
+    if (!msg) return;
+
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.className = 'track-toast';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+let countdownInterval = null;
+function startCountdown(minutes) {
+    if (countdownInterval) clearInterval(countdownInterval);
+    let totalSeconds = minutes * 60;
+    const display = document.getElementById('countdown-display');
+    if (!display) return;
+
+    countdownInterval = setInterval(function() {
+        if (totalSeconds <= 0) {
+            clearInterval(countdownInterval);
+            display.textContent = 'Any moment now!';
+            return;
+        }
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        display.textContent = mins + 'm ' + (secs < 10 ? '0' : '') + secs + 's remaining';
+        totalSeconds--;
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const mapEl = document.getElementById('order-map');
+    if (!mapEl) return;
+
+    {% if restaurant and restaurant.latitude and restaurant.longitude %}
+        mapEl.innerHTML = '';
+        mapEl.style.display = 'block';
+
+        const map = L.map('order-map').setView(
+            [{{ restaurant.latitude }}, {{ restaurant.longitude }}], 14
+        );
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([{{ restaurant.latitude }}, {{ restaurant.longitude }}])
+            .addTo(map)
+            .bindPopup('📍 Restaurant')
+            .openPopup();
+
+        {% if order.order_type == 'delivery' and route_coords %}
+            const routeCoords = {{ route_coords | tojson }};
+            L.polyline(routeCoords, {
+                color: '#8B0000', weight: 4, opacity: 0.8
+            }).addTo(map);
+
+            L.marker([{{ customer_lat }}, {{ customer_lng }}])
+                .addTo(map)
+                .bindPopup('🏠 Delivery Address');
+
+            map.fitBounds(L.latLngBounds(routeCoords), { padding: [30, 30] });
+        {% endif %}
+
+    {% else %}
+        mapEl.innerHTML = '<p style="padding:20px; color:#8B0000; font-family:Georgia,serif;">
+        ⚠ Map unavailable — restaurant location not configured.</p>';
+        mapEl.style.background = '#fff0f0';
+        mapEl.style.display = 'flex';
+    {% endif %}
+});
+</script>
+{% endif %}
 {% endblock %}

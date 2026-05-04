@@ -1,41 +1,54 @@
-{% extends "base.html" %}
+{% extends "customer_base.html" %}
 
-{% block header %}
-{% endblock %}
+{% block customer_content %}
 
-{% block content %}
-<!-- This is the recent orders section -->
-<div style="background: white; padding: 30px;
- border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 40px 0;">
-    <h2 style="margin-top: 0; font-size: 24px;
-     color: #8B0000; border-bottom: 2px solid #D4AF37; padding-bottom: 15px;">
-        Recent Orders
-    </h2>
-    
+<h1 class="customer-page-title">My Dashboard</h1>
+<!-- Stat cards -->
+<div class="customer-stats">
+    <div class="customer-stat-card">
+        <p class="customer-stat-number">{{ total_orders }}</p>
+        <p class="customer-stat-label">Total Orders</p>
+    </div>
+    <div class="customer-stat-card">
+        <p class="customer-stat-number">{{ total_spent }}</p>
+        <p class="customer-stat-label">Total Spent</p>
+    </div>
+    <div class="customer-stat-card">
+        <p class="customer-stat-number">{{ customer_fav_item }}</p>
+        <p class="customer-stat-label">Favourite Item</p>
+    </div>
+</div>
+<!-- Action cards -->
+<div class="customer-actions">
+    <a href="{{ url_for('guest_lookup.find_reservation') }}" class="customer-action-card red">
+        <p class="customer-action-title">My Reservations</p>
+        <p class="customer-action-subtitle">View or manage your bookings</p>
+    </a>
+    <a href="{{ url_for('customer_auth.order_history') }}" class="customer-action-card gold">
+        <p class="customer-action-title">View All Orders</p>
+        <p class="customer-action-subtitle">See your full order history</p>
+    </a>
+    <a href="{{ url_for('customer_auth.customer_profile') }}" class="customer-action-card grey">
+        <p class="customer-action-title">Settings</p>
+        <p class="customer-action-subtitle">Manage your account</p>
+    </a>
+</div>
+<!-- Recent orders -->
+<p class="customer-section-title">Recent Orders</p>
+<div class="customer-card">
     {% if recent_orders %}
         {% for order in recent_orders %}
-        <div style="display: flex; justify-content: space-between; align-items: center;
-         padding: 20px 0; border-bottom: 1px solid #eee;">
+        <div class="customer-order-row">
             <div>
-                <p style="margin: 0 0 5px 0; font-weight: bold; color: #2C2416; font-size: 18px;">
-                    Order #{{ order.order_id }}
-                </p>
-                <p style="margin: 0; color: #5C4033; font-size: 14px;">
-                    {{ order.order_date.strftime('%B %d, %Y') }} • 
-                    {% if order.order_type == 'collection' %}🏪 Collection{% else %}🚗 Delivery{% endif %}
+                <p class="customer-order-id">Order #{{ order.order_id }}</p>
+                <p class="customer-order-meta">
+                    {{ order.order_date.strftime('%B %d, %Y') }} •
+                    {{ '🏪 Collection' if order.order_type == 'collection' else '🚗 Delivery' }}
                 </p>
             </div>
-            
-            <div style="text-align: right;">
-                <p style="margin: 0 0 8px 0; font-weight: bold; color: #8B0000; font-size: 20px;">
-                    £{{ "%.2f"|format(order.total_price) }}
-                </p>
-                <span style="padding: 6px 15px; border-radius: 20px; font-size: 12px;
-                 font-weight: bold; text-transform: uppercase;
-                      {% if order.order_status == 'completed' %}background: #28a745; color: white;
-                      {% elif order.order_status == 'preparing' %}background: #ffc107; color: black;
-                      {% elif order.order_status == 'ready' %}background: #17a2b8; color: white;
-                      {% else %}background: #6c757d; color: white;{% endif %}">
+            <div>
+                <p class="customer-order-price">£{{ "%.2f"|format(order.total_price) }}</p>
+                <span class="customer-badge {{ order.order_status }}">
                     {% if order.order_status == 'completed' %}✓ Completed
                     {% elif order.order_status == 'preparing' %}⏱ Preparing
                     {% elif order.order_status == 'ready' %}✓ Ready
@@ -45,40 +58,7 @@
         </div>
         {% endfor %}
     {% else %}
-        <p style="text-align: center; color: #5C4033; padding: 40px 0; font-style: italic;">
-            You haven't placed any orders yet!
-        </p>
+        <p class="customer-empty">You haven't placed any orders yet!</p>
     {% endif %}
 </div>
-
-<!-- This is the action buttons section -->
-<div style="display: flex; gap: 20px; justify-content: center; margin: 40px 0; flex-wrap: wrap;">
-    <a href="{{ url_for('guest_lookup.find_reservation') }}"
-       style="background: #8B0000; color: #FFD700; padding: 18px 40px; text-decoration: none; 
-              border-radius: 8px; font-weight: bold; font-size: 18px; transition: all 0.3s ease;
-              text-transform: uppercase; letter-spacing: 1px;"
-       onmouseover="this.style.background='#660000'; this.style.transform='translateY(-2px)'"
-       onmouseout="this.style.background='#8B0000'; this.style.transform='translateY(0)'">
-         My reservations
-    </a>
-    
-    <a href="{{ url_for('customer_auth.order_history') }}"
-       style="background: #D4AF37; color: white; padding: 18px 40px; text-decoration: none; 
-              border-radius: 8px; font-weight: bold; font-size: 18px; transition: all 0.3s ease;
-              text-transform: uppercase; letter-spacing: 1px;"
-       onmouseover="this.style.background='#B8941F'; this.style.transform='translateY(-2px)'"
-       onmouseout="this.style.background='#D4AF37'; this.style.transform='translateY(0)'">
-         View All Orders
-    </a>
-    
-    <a href="{{ url_for('customer_auth.customer_profile') }}"
-       style="background: #6c757d; color: white; padding: 18px 40px; text-decoration: none; 
-              border-radius: 8px; font-weight: bold; font-size: 18px; transition: all 0.3s ease;
-              text-transform: uppercase; letter-spacing: 1px;"
-       onmouseover="this.style.background='#5a6268'; this.style.transform='translateY(-2px)'"
-       onmouseout="this.style.background='#6c757d'; this.style.transform='translateY(0)'">
-         Settings
-    </a>
-</div>
-
 {% endblock %}

@@ -1,56 +1,92 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
 
-{% block content%}
-<div class="menu-container">
-    <h1>STAFF LOGIN</h1>
-    <h3 style="font-style: italic; color: #5C4033'">Restaurant Management Portal</h3>
-    <div class="form-box">
-    <div class="button-box">
-        <div id="btn"></div>
-        <button type="button" class="toggle-btn" onclick="leftClick()">Customer</button>
-        <button type="button" class="toggle-btn" onclick="rightClick()">Staff</button>
+{% block content %}
+
+<!-- Toast notification -->
+<div id="toast" class="toast">
+    <span class="toast-icon">⚠️</span>
+    <span id="toast-msg"></span>
+    <button class="toast-close" onclick="closeToast()">✕</button>
+</div>
+
+<div class="login-page">
+    <div class="login-card login-card-staff">
+
+        <h1 class="login-title">Staff Portal</h1>
+        <p class="login-subtitle">Restaurant Management Login</p>
+
+        <!-- Customer / Staff toggle -->
+        <div class="toggle-wrap">
+            <div class="toggle-slider toggle-slider-staff" id="toggle-slider"></div>
+            <button type="button" class="toggle-btn" id="btn-customer" onclick="leftClick()">
+                Customer
+            </button>
+            <button type="button" class="toggle-btn active" id="btn-staff" onclick="rightClick()">
+                Staff
+            </button>
+        </div>
+
+        <!-- Login form -->
+        <form method="POST" class="login-form">
+            <div class="field-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            <div class="field-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <input type="submit" value="LOGIN" class="submit-staff">
+        </form>
+
+        <p class="login-link" style="margin-top: 24px;">
+            <a href="{{ url_for('general.home_page') }}">← Back to Main Site</a>
+        </p>
+
     </div>
-    </div>
-    {%if error %}
-    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
-      border-radius: 8px; margin: 20px auto; max-width: 500px;">
-        {{ error }}
-    </p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    {% if error %}
+    window.addEventListener('DOMContentLoaded', function() {
+        showToast("{{ error }}");
+    });
     {% endif %}
 
-    <form method="POST" style="max-width: 400px; margin: 40px auto;">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required autofocus>
+    function showToast(message) {
+        document.getElementById('toast-msg').textContent = message;
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(closeToast, 4000);
+    }
 
-         <label for="password">Password</label>
-        <input type="text" id="password" name="password" required autofocus>
+    function closeToast() {
+        document.getElementById('toast').classList.remove('show');
+    }
 
-        <input type="submit" value="LOGIN">
-    </form>
-    <p style="text-align: center; margin-top: 30px; color: #5C4033; font-size: 14px;">
-        <a href="{{ url_for('general.home_page') }}"
-           style="color: #8B0000; text-decoration: none;">← Back to Main Site</a>
-    </p>
-</div>
-<script>
-    var btn = document.getElementById('btn')
-    btn.style.left = '110px';
+    var slider = document.getElementById('toggle-slider');
 
     function leftClick() {
-        btn.style.left = '0';
+        slider.style.left = '4px';
+        document.getElementById('btn-customer').classList.add('active');
+        document.getElementById('btn-staff').classList.remove('active');
         setTimeout(function() {
             window.location.href = "{{ url_for('customer_auth.login') }}";
-        }, 500);
+        }, 350);
     }
 
     function rightClick() {
-        btn.style.left = '110px';
+        slider.style.left = 'calc(50%)';
+        document.getElementById('btn-staff').classList.add('active');
+        document.getElementById('btn-customer').classList.remove('active');
         setTimeout(function() {
             window.location.href = "{{ url_for('staff.staff_login') }}";
-        }, 500);
+        }, 350);
     }
 </script>
 {% endblock %}

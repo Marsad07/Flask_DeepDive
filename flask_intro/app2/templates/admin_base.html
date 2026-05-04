@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .site-title { display: none !important; }
+        ul.navbar { display: none !important; }
+        .hamburger { display: none !important; }
+        .site-footer { display: none !important; }
+        .content { padding: 0 !important; }
+        body { background: #F7F4EE; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-title">
+            <h2>{{ branding.restaurant_name }}</h2>
+            <p>Admin Panel</p>
+        </div>
+
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link">
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin.view_all_orders') }}" class="admin-nav-link">
+                <span>Orders</span>
+            </a>
+            <a href="{{ url_for('admin.manage_menu') }}" class="admin-nav-link">
+                <span>Menu</span>
+            </a>
+            <a href="{{ url_for('admin.view_reservations') }}" class="admin-nav-link">
+                <span>Reservations</span>
+            </a>
+            <a href="{{ url_for('admin.manage_drivers') }}" class="admin-nav-link">
+                <span>Drivers</span>
+            </a>
+
+            <div class="admin-dropdown">
+                <button class="admin-dropdown-toggle">Admin Tools</button>
+                <div class="admin-dropdown-menu" id="adminDropdownMenu">
+                    <a href="{{ url_for('admin.manage_categories') }}">Manage Categories</a>
+                    <a href="{{ url_for('admin.update_hours') }}">Update Hours</a>
+                    <a href="{{ url_for('admin.manage_tables') }}">Manage Tables</a>
+                    <a href="{{ url_for('admin.view_analytics') }}">View Analytics</a>
+                    <a href="{{ url_for('admin.image_manager') }}">Image Manager</a>
+                    <a href="{{ url_for('admin.manage_homepage') }}">Manage Homepage</a>
+                    <a href="{{ url_for('admin.manage_contact') }}">Edit Contact Details</a>
+                    <a href="{{ url_for('admin.manage_social_links') }}">Edit Social Links</a>
+                    <a href="{{ url_for('admin.manage_about') }}">Manage About Us</a>
+                    <a href="{{ url_for('admin.manage_staff') }}">Manage Staff</a>
+                </div>
+            </div>
+
+            <a href="{{ url_for('admin.logout') }}" class="admin-nav-link logout-link">
+                <span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        {% block admin_content %}{% endblock %}
+    </main>
+
+</div>
+
+<script>
+    document.querySelector('.admin-dropdown-toggle').addEventListener('click', function () {
+        document.getElementById('adminDropdownMenu').classList.toggle('open');
+    });
+</script>
+{% endblock %}

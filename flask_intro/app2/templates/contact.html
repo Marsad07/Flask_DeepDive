@@ -1,124 +1,113 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="contact-page">
-  <!-- This is for the page header -->
-  <div class="contact-header">
-    <h1>CONTACT US</h1>
-    <p class="contact-tagline">We'd love to hear from you</p>
-    <div class="contact-header-divider"></div>
-  </div>
 
-  <div class="contact-body">
-
-    <!-- This is for the left column - contact info -->
-    <div class="contact-info-col">
-      <h2 class="contact-col-title">GET IN TOUCH</h2>
-
-      <div class="contact-info-item">
-        <div class="contact-info-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z
-                     m0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12
-                     2.5-2.5 2.5z" fill="#D4AF37"/>
-          </svg>
-        </div>
-        <div class="contact-info-text">
-          <span class="contact-info-label">Address</span>
-          <span class="contact-info-value">{{ info.address }}</span>
-        </div>
-      </div>
-
-      <div class="contact-info-item">
-        <div class="contact-info-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36
-                     1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1
-                     -9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2
-                     2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#D4AF37"/>
-          </svg>
-        </div>
-        <div class="contact-info-text">
-          <span class="contact-info-label">Phone</span>
-          <span class="contact-info-value">{{ info.phonenumber }}</span>
-        </div>
-      </div>
-
-      <div class="contact-info-item">
-        <div class="contact-info-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6
-                     c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#D4AF37"/>
-          </svg>
-        </div>
-        <div class="contact-info-text">
-          <span class="contact-info-label">Email</span>
-          <span class="contact-info-value">{{ info.email }}</span>
-        </div>
-      </div>
+    <div class="contact-header">
+        <h1>CONTACT US</h1>
+        <p class="contact-tagline">We'd love to hear from you</p>
+        <div class="contact-header-divider"></div>
     </div>
 
-    <!-- This is for the right column - contact form -->
-    <div class="contact-form-col">
-      <h2 class="contact-col-title">SEND US A MESSAGE</h2>
+    <div class="contact-body">
 
-      <!-- This is for the success message -->
-      {% if request.args.get('success') %}
-      <div class="contact-success">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                fill="white"/>
-        </svg>
-        Thank you! Your message has been sent successfully.
-      </div>
-      {% endif %}
+        <!-- Left column — contact info -->
+        <div class="contact-info-col">
+            <h2 class="contact-col-title">GET IN TOUCH</h2>
 
-      <form method="POST" action="https://formsubmit.co/marsadc55@gmail.com">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_test" value="true">
-        <input type="hidden" name="_next"
-               value="{{ url_for('general.contact_page', _external=True) }}?success=true">
+            <div class="contact-info-item">
+                <div class="contact-info-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#D4AF37"/>
+                    </svg>
+                </div>
+                <div class="contact-info-text">
+                    <span class="contact-info-label">Address</span>
+                    <span class="contact-info-value">{{ info.address }}</span>
+                </div>
+            </div>
 
-        <div class="contact-field">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" required>
+            <div class="contact-info-item">
+                <div class="contact-info-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#D4AF37"/>
+                    </svg>
+                </div>
+                <div class="contact-info-text">
+                    <span class="contact-info-label">Phone</span>
+                    <span class="contact-info-value">{{ info.phonenumber }}</span>
+                </div>
+            </div>
+
+            <div class="contact-info-item">
+                <div class="contact-info-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#D4AF37"/>
+                    </svg>
+                </div>
+                <div class="contact-info-text">
+                    <span class="contact-info-label">Email</span>
+                    <span class="contact-info-value">{{ info.email }}</span>
+                </div>
+            </div>
         </div>
 
-        <div class="contact-field">
-          <label for="email">Your Email</label>
-          <input type="email" id="email" name="email" required>
+        <!-- Right column — contact form -->
+        <div class="contact-form-col">
+            <h2 class="contact-col-title">SEND US A MESSAGE</h2>
+
+            {% if request.args.get('success') %}
+            <div class="contact-success">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+                </svg>
+                Thank you! Your message has been sent successfully.
+            </div>
+            {% endif %}
+
+            <form method="POST" action="https://formsubmit.co/marsadc55@gmail.com">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next"
+                       value="{{ url_for('general.contact_page', _external=True) }}?success=true">
+
+                <div class="contact-field">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="contact-field">
+                    <label for="email">Your Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="contact-field">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="6" required></textarea>
+                </div>
+
+                <button type="submit" class="contact-submit">Send Message</button>
+            </form>
         </div>
 
-        <div class="contact-field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="6" required></textarea>
-        </div>
-
-        <button type="submit" class="contact-submit">Send Message</button>
-      </form>
     </div>
-
-  </div>
 </div>
-<script>
-  // This is for the scroll animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.1 });
 
-  document.querySelectorAll(
-    '.contact-header, .contact-info-col, .contact-form-col, .contact-info-item'
-  ).forEach(el => observer.observe(el));
+{% block scripts %}
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll(
+        '.contact-header, .contact-info-item, .contact-form-col'
+    ).forEach(el => observer.observe(el));
 </script>
+{% endblock %}
+
 {% endblock %}

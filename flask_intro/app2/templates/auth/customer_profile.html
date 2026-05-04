@@ -1,58 +1,113 @@
-{% extends "base.html" %}
+{% extends "customer_base.html" %}
 
-{% block header %}
+{% block customer_content %}
+
+<h1 class="customer-page-title">Profile Settings</h1>
+
+<!-- Toast for success/error -->
+{% if success %}
+<div id="toast" class="customer-toast success show">
+    ✓ {{ success }}
+    <button class="customer-toast-close" onclick="this.parentElement.classList.remove('show')">✕</button>
+</div>
+{% endif %}
+
+{% if error %}
+<div id="toast2" class="customer-toast error show">
+    ⚠ {{ error }}
+    <button class="customer-toast-close" onclick="this.parentElement.classList.remove('show')">✕</button>
+</div>
+{% endif %}
+
+<div class="customer-card">
+    <div style="padding: 28px 32px;">
+        <form method="POST"
+              action="{{ url_for('customer_auth.update_profile') }}"
+              class="customer-profile-form"
+              id="profile-form">
+
+            <p class="customer-profile-section-title" style="margin-top: 0;">Account Information</p>
+
+            <div class="field-group">
+                <label>Full Name</label>
+                <input type="text" name="customer_fullname"
+                       value="{{ customer.customer_fullname }}" required>
+            </div>
+
+            <div class="field-group">
+                <label>Email Address</label>
+                <input type="email" name="customer_email"
+                       value="{{ customer.customer_email }}" required>
+            </div>
+
+            <div class="field-group">
+                <label>Phone Number</label>
+                <input type="tel" name="customer_phonenum"
+                       value="{{ customer.customer_phonenum }}"
+                       pattern="[0-9]{10,}" required>
+            </div>
+
+            <p class="customer-profile-section-title">Change Password (Optional)</p>
+
+            <div class="field-group">
+                <label>New Password</label>
+                <input type="password" name="new_password"
+                       placeholder="Leave blank to keep current password" minlength="6">
+            </div>
+
+            <div class="field-group">
+                <label>Confirm New Password</label>
+                <input type="password" name="confirm_password"
+                       placeholder="Re-enter new password">
+            </div>
+
+            <button type="button" class="customer-profile-submit"
+                    onclick="showConfirm()">
+                Update Profile
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<!-- Confirmation modal -->
+<div id="confirm-modal" class="customer-modal-overlay">
+    <div class="customer-modal-box">
+        <h3>Confirm Changes</h3>
+        <p>Are you sure you want to update your profile?</p>
+        <div class="customer-modal-actions">
+            <button onclick="closeConfirm()" class="customer-modal-cancel">Cancel</button>
+            <button onclick="document.getElementById('profile-form').submit()"
+                    class="customer-modal-confirm">Yes, Update</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
-{% block content %}
-<div class="menu-container">
-    <h1>PROFILE SETTINGS</h1>
+{% block scripts %}
+<script>
+    function showConfirm() {
+        document.getElementById('confirm-modal').classList.add('open');
+    }
 
-    {% if success %}
-    <p style="color: #28a745; text-align: center; background: #d4edda; padding: 15px;
-      border-radius: 8px; margin: 20px auto; max-width: 600px; border: 1px solid #28a745;">
-        {{ success }}
-    </p>
+    function closeConfirm() {
+        document.getElementById('confirm-modal').classList.remove('open');
+    }
+
+    document.getElementById('confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeConfirm();
+    });
+
+    {% if success or error %}
+    setTimeout(function() {
+        const toast = document.getElementById('toast');
+        if (toast) toast.classList.remove('show');
+    }, 4000);
     {% endif %}
-
-    {% if error %}
-    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
-      border-radius: 8px; margin: 20px auto; max-width: 600px;">
-        {{ error }}
-    </p>
-    {% endif %}
-
-    <form method="POST" action="{{ url_for('customer_auth.update_profile') }}"
-          onsubmit="return confirm('Do you want to confirm your changes? \
-          This cannot be undone.')">
-
-          style="max-width: 600px; margin: 40px auto;">
-        <h2 style="color: #8B0000; margin-bottom: 30px;">Account Information</h2>
-
-        <label>Full Name</label>
-        <input type="text" name="customer_fullname" value="{{ customer.customer_fullname }}" required>
-
-        <label>Email Address</label>
-        <input type="email" name="customer_email" value="{{ customer.customer_email }}" required>
-
-        <label>Phone Number</label>
-        <input type="tel" name="customer_phonenum" value="{{ customer.customer_phonenum }}"
-               pattern="[0-9]{10,}" required>
-
-        <h2 style="color: #8B0000; margin-top: 50px; margin-bottom: 30px;">Change Password (Optional)</h2>
-
-        <label>New Password</label>
-        <input type="password" name="new_password" placeholder="Leave blank to keep current password" minlength="6">
-
-        <label>Confirm New Password</label>
-        <input type="password" name="confirm_password" placeholder="Re-enter new password">
-
-        <input type="submit" value="UPDATE PROFILE">
-    </form>
-    <p style="text-align: center; margin-top: 30px;">
-        <a href="{{ url_for('customer_auth.customer_dashboard') }}"
-           style="color: #8B0000; text-decoration: none; font-weight: bold;">
-            ← Back to Dashboard
-        </a>
-    </p>
-</div>
+</script>
 {% endblock %}

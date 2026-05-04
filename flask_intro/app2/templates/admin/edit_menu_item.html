@@ -1,9 +1,5 @@
-{% extends "base.html" %}
-
-{% block header %}
-{% endblock %}
-
-{% block content %}
+{% extends "admin_base.html" %}
+{% block admin_content %}
 <div class="form-page-wrap">
     <h1>Edit Menu Item</h1>
     <a href="{{ url_for('admin.manage_menu') }}" class="back-link">← Back to Menu Management</a>

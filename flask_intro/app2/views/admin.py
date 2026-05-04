@@ -11,7 +11,7 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                add_about_section, delete_about_section, manage_tables,
                                                save_table_positions, add_table, delete_table, update_table,
                                                manage_staff, create_staff, edit_staff, disable_staff, manage_drivers,
-                                               driver_details)
+                                               driver_details, update_footer_about)
 
 from controllers.staff_controller import reset_staff_email, reset_staff_default
 from controllers.admin_reservations_controller import (edit_reservation, cancel_reservation)
@@ -39,6 +39,7 @@ admin_bp.route("/categories/delete/<int:category_id>", methods=["POST"])(delete_
 admin_bp.route("/image_manager", methods=["GET", "POST"])(image_manager)
 admin_bp.add_url_rule('/admin/manage-homepage', view_func=manage_homepage, methods=['GET'])
 admin_bp.add_url_rule('/admin/update-branding', view_func=update_branding_settings, methods=['POST'])
+admin_bp.route("/branding/footer-about", methods=["POST"])(update_footer_about)
 admin_bp.add_url_rule('/admin/update-review', view_func=update_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/add-review', view_func=add_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_review_item, methods=['POST'])

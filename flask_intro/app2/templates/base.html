@@ -4,557 +4,560 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ branding.restaurant_name }}</title>
+
+    <!-- This is the main stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
+
+    <!-- This is the Font Awesome stylesheet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- This is for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/
-          css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
+
     {% block extra_css %}{% endblock %}
+
     <style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-    /* This is the restaurant name heading */
-    .site-title {
-        text-align: center;
-        font-family: 'Playfair Display', Georgia, serif;
-        font-size: clamp(22px, 4vw, 32px);
-        font-weight: 700;
-        color: #1C1008;
-        letter-spacing: 3px;
-        margin: 0;
-        padding: 20px 80px 20px;
-        background: #FFFEF2;
-    }
+        /* This is the restaurant name heading */
+        .site-title {
+            text-align: center;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: 700;
+            color: #1C1008;
+            letter-spacing: 3px;
+            margin: 0;
+            padding: 20px 80px;
+            background: #FFFEF2;
+        }
 
-    /* This is the navbar styling for desktop users */
-    ul.navbar {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        background-color: #2C2416;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        animation: slideDown 0.5s ease forwards;
-        overflow: visible;
-        position: relative;
-        z-index: 998;
-    }
+        /* This is the navbar styling for desktop users */
+        ul.navbar {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: #2C2416;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.5s ease forwards;
+            overflow: visible;
+            position: relative;
+            z-index: 998;
+        }
 
-    ul.navbar li a {
-        display: block;
-        color: #FFFEF2;
-        padding: 18px 22px;
-        text-decoration: none;
-        font-family: Georgia, serif; /* NAVBAR NOW MATCHES FOOTER */
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        transition: background 0.2s, color 0.2s;
-        position: relative;
-    }
+        ul.navbar li a {
+            display: block;
+            color: #FFFEF2;
+            padding: 18px 22px;
+            text-decoration: none;
+            font-family: Georgia, serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
 
-    ul.navbar li a:hover {
-        background-color: #8B0000;
-        color: #FFD700;
-    }
+        ul.navbar li a:hover {
+            background-color: #8B0000;
+            color: #FFD700;
+        }
 
-    /* This highlights the active page in the navbar */
-    ul.navbar li a.active {
-        color: #D4AF37;
-        background: rgba(139,0,0,0.35);
-    }
+        /* This highlights the active page in the navbar */
+        ul.navbar li a.active {
+            color: #D4AF37;
+            background: rgba(139, 0, 0, 0.35);
+        }
 
-    /* Desktop navbar slide down animation */
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-100%); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
+        /* Desktop navbar slide down animation */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-100%); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-    /* This is the hamburger menu button that appears on mobile */
-    .hamburger {
-        display: none;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 15px;
-        position: absolute;
-        right: 20px;
-        top: 18px;
-        z-index: 1000;
-    }
+        /* This is the hamburger menu button that appears on mobile */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 15px;
+            position: absolute;
+            right: 20px;
+            top: 18px;
+            z-index: 1000;
+        }
 
-    .hamburger span {
-        display: block;
-        width: 26px;
-        height: 2px;
-        background: #2C2416;
-        margin: 6px 0;
-        transition: 0.3s;
-        border-radius: 2px;
-    }
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 2px;
+            background: #2C2416;
+            margin: 6px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
 
-    /* This is the account icon SVG button in the navbar */
-    .navbar-icon-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px 22px;
-        cursor: pointer;
-        color: #FFFEF2;
-        transition: background 0.2s, color 0.2s;
-    }
+        /* This is the account icon button in the navbar */
+        .navbar-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 22px;
+            cursor: pointer;
+            color: #FFFEF2;
+            transition: background 0.2s, color 0.2s;
+        }
 
-    .navbar-icon-btn:hover {
-        background-color: #8B0000;
-        color: #FFD700;
-    }
+        .navbar-icon-btn:hover {
+            background-color: #8B0000;
+            color: #FFD700;
+        }
 
-    /* This makes the footer grid responsive */
-    .footer-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 40px;
-    }
+        /* This is the footer styling */
+        .site-footer {
+            background: #2C2416;
+            color: #FFFEF2;
+            padding: 52px 40px 32px;
+            margin-top: 60px;
+            font-family: Georgia, serif;
+        }
 
-    /* This is the footer styling */
-    .site-footer {
-        background: #2C2416;
-        color: #FFFEF2;
-        padding: 52px 40px 32px;
-        margin-top: 60px;
-        font-family: Georgia, serif; /* FOOTER NOW MATCHES NAVBAR */
-    }
+        .site-footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .site-footer-inner {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+        /* This makes the footer grid responsive */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
 
-    .footer-col-title {
-        color: #D4AF37;
-        font-family: Georgia, serif;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin: 0 0 18px;
-    }
+        .footer-col-title {
+            color: #D4AF37;
+            font-family: Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0 0 18px;
+        }
 
-    .footer-text {
-        font-size: 14px;
-        color: rgba(255,254,242,0.75);
-        line-height: 1.9;
-        margin: 0;
-        font-family: Georgia, serif;
-    }
+        .footer-text {
+            font-size: 14px;
+            color: rgba(255, 254, 242, 0.75);
+            line-height: 1.9;
+            margin: 0;
+            font-family: Georgia, serif;
+        }
 
-    /* This is for the quick links in the footer */
-    .footer-links {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+        /* This is for the quick links in the footer */
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .footer-links a {
-        color: rgba(255,254,242,0.75);
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.2s;
-        font-family: Georgia, serif;
-    }
+        .footer-links a {
+            color: rgba(255, 254, 242, 0.75);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+            font-family: Georgia, serif;
+        }
 
-    .footer-links a:hover {
-        color: #D4AF37;
-    }
+        .footer-links a:hover {
+            color: #D4AF37;
+        }
 
-    /* This is for the newsletter form in the footer */
-    .footer-newsletter-text {
-        font-size: 13px;
-        color: rgba(255,254,242,0.65);
-        margin: 0 0 14px;
-        line-height: 1.6;
-        font-family: Georgia, serif;
-    }
+        /* This is for the opening hours rows in the footer */
+        .footer-hours-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 254, 242, 0.75);
+            font-family: Georgia, serif;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+        }
 
-    .footer-newsletter-form {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+        .footer-hours-day {
+            color: rgba(255, 254, 242, 0.6);
+            flex-shrink: 0;
+        }
 
-    .footer-newsletter-input {
-        padding: 10px 12px;
-        border: 1px solid rgba(212,175,55,0.3);
-        border-radius: 2px;
-        background: rgba(255,255,255,0.07);
-        color: #FFFEF2;
-        font-family: Georgia, serif;
-        font-size: 13px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
+        .footer-hours-time {
+            color: #D4AF37;
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+        }
 
-    .footer-newsletter-input::placeholder {
-        color: rgba(255,254,242,0.35);
-    }
+        /* This is for the newsletter form in the footer */
+        .footer-newsletter-text {
+            font-size: 13px;
+            color: rgba(255, 254, 242, 0.65);
+            margin: 0 0 14px;
+            line-height: 1.6;
+            font-family: Georgia, serif;
+        }
 
-    .footer-newsletter-input:focus {
-        border-color: #D4AF37;
-    }
+        .footer-newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    .footer-newsletter-btn {
-        padding: 10px 14px;
-        background: #8B0000;
-        color: #D4AF37;
-        border: none;
-        border-radius: 2px;
-        cursor: pointer;
-        font-family: Georgia, serif;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        transition: background 0.2s;
-    }
+        .footer-newsletter-input {
+            padding: 10px 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.07);
+            color: #FFFEF2;
+            font-family: Georgia, serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
 
-    .footer-newsletter-btn:hover {
-        background: #6B0000;
-    }
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 254, 242, 0.35);
+        }
 
-    /* This is for the social media icons in the footer */
-    .footer-social-title {
-        color: #D4AF37;
-        font-family: Georgia, serif;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin: 0 0 18px;
-        text-align: center;
-    }
+        .footer-newsletter-input:focus {
+            border-color: #D4AF37;
+        }
 
-    .footer-social-row {
-        display: flex;
-        justify-content: center;
-        gap: 14px;
-        flex-wrap: wrap;
-        margin-bottom: 32px;
-    }
+        .footer-newsletter-btn {
+            padding: 10px 14px;
+            background: #8B0000;
+            color: #D4AF37;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
 
-    .footer-social-link {
-        width: 46px;
-        height: 46px;
-        background: rgba(139,0,0,0.6);
-        border: 1.5px solid #D4AF37;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: background 0.2s, transform 0.2s, border-color 0.2s;
-    }
+        .footer-newsletter-btn:hover {
+            background: #6B0000;
+        }
 
-    .footer-social-link:hover {
-        background: #8B0000;
-        border-color: #FFD700;
-        transform: translateY(-4px);
-    }
+        /* This is for the social media icons in the footer */
+        .footer-social-title {
+            color: #D4AF37;
+            font-family: Georgia, serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 24px 0 14px;
+        }
 
-    .footer-social-link i {
-        font-size: 20px;
-        color: #D4AF37;
-    }
+        .footer-social-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-    .footer-divider {
-        height: 1px;
-        background: rgba(212,175,55,0.2);
-        margin-bottom: 24px;
-    }
+        .footer-social-link {
+            width: 38px;
+            height: 38px;
+            background: rgba(139, 0, 0, 0.6);
+            border: 1.5px solid #D4AF37;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s;
+        }
 
-    .footer-copyright {
-        font-size: 13px;
-        color: rgba(212,175,55,0.6);
-        margin: 0;
-        text-align: center;
-        font-family: Georgia, serif;
-    }
+        .footer-social-link:hover {
+            background: #8B0000;
+            border-color: #FFD700;
+            transform: translateY(-3px);
+        }
 
-    /* This makes the navbar responsive for mobile devices */
+        .footer-social-link i {
+            font-size: 16px;
+            color: #D4AF37;
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: rgba(212, 175, 55, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: rgba(212, 175, 55, 0.6);
+            margin: 0;
+            text-align: center;
+            font-family: Georgia, serif;
+        }
+
+        /* This makes the navbar responsive for mobile devices */
         @media (max-width: 768px) {
             ul.navbar {
                 flex-direction: column;
                 display: none;
                 width: 100%;
+                .footer-grid{
+                    grid-template-columns: 1fr;
+                    gap: 32;
+                    }\
+                }
                 animation: none;
             }
 
-        ul.navbar.active {
-            display: flex;
-            animation: slideIn 0.3s ease forwards;
+            ul.navbar.active {
+                display: flex;
+                animation: slideIn 0.3s ease forwards;
+            }
+
+            ul.navbar li {
+                width: 100%;
+                text-align: center;
+            }
+
+            ul.navbar li a {
+                padding: 15px;
+                border-bottom: 1px solid #1A1410;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .site-title {
+                padding: 18px 70px 18px 20px;
+                text-align: left;
+                font-size: 20px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 36px;
+            }
+
+            .site-footer {
+                padding: 40px 24px 28px;
+            }
         }
 
-        ul.navbar li {
-            width: 100%;
-            text-align: center;
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
         }
 
-        ul.navbar li a {
-            padding: 15px;
-            border-bottom: 1px solid #1A1410;
+        /* This is for mobile menu slide animation */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to   { opacity: 1; transform: translateX(0); }
         }
 
-        .hamburger {
-            display: block;
-        }
-
-        .site-title {
-            padding: 18px 70px 18px 20px;
-            text-align: left;
-            font-size: 20px;
-        }
-
-        .footer-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 36px;
-        }
-
-        .site-footer {
-            padding: 40px 24px 28px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 32px;
-        }
-    }
-
-    /* This is for mobile menu slide animation */
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateX(100%); }
-        to   { opacity: 1; transform: translateX(0); }
-    }
-
-    {% block styles %}{% endblock %}
+        {% block styles %}{% endblock %}
     </style>
+
+    {% block head %}{% endblock %}
 </head>
+
 <body>
 
-{% block header %}
-{% endblock %}
+    <!-- This is the restaurant name heading -->
+    <h1 class="site-title">
+        {{ branding.restaurant_name }}
+    </h1>
 
-<!-- This is the restaurant name heading -->
-<h2 class="site-title">{{ branding.restaurant_name }}</h2>
+    <!-- This is the hamburger menu button for mobile -->
+    <button class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 
-<!-- This is the hamburger button for mobile menu -->
-<button class="hamburger" onclick="toggleMenu()" aria-label="Toggle menu">
-    <span></span>
-    <span></span>
-    <span></span>
-</button>
+    <!-- This is the main navigation bar -->
+    <ul class="navbar" id="navbar">
 
-<!-- This is the navigation bar — changes based on who is logged in -->
-<ul class="navbar" id="navbar">
-    {% if session.get('staff_role') == 'kitchen' %}
-        <li><a href="{{ url_for('staff.kitchen_display') }}">Kitchen View</a></li>
-        <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
+        <!-- This is the Home link -->
+        <li><a href="/">Home</a></li>
 
-    {% elif session.get('staff_role') == 'driver' %}
-        <li><a href="{{ url_for('staff.driver_orders') }}">My Deliveries</a></li>
-        <li><a href="{{ url_for('staff.staff_logout') }}">Logout</a></li>
+        <!-- This is the Menu link -->
+        <li><a href="/menu">Menu</a></li>
 
-    {% elif session.get('staff_role') == 'admin' %}
-        <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('admin.view_all_orders') }}">Orders</a></li>
-        <li><a href="{{ url_for('admin.manage_menu') }}">Menu</a></li>
-        <li><a href="{{ url_for('admin.view_reservations') }}">Reservations</a></li>
-        <li><a href="{{ url_for('admin.manage_drivers') }}">Drivers</a></li>
-        <li><a href="{{ url_for('admin.logout') }}">Logout</a></li>
+        <!-- This is the Reservations link -->
+        <li><a href="/reservations">Reservations</a></li>
 
-    {% else %}
-        <!-- This is the public navbar for customers and guests -->
-        <li><a href="{{ url_for('general.home_page') }}">Home</a></li>
-        <li><a href="{{ url_for('menu.show_menu') }}">Menu</a></li>
-        <li><a href="{{ url_for('reservations.reservations_page') }}">Booking</a></li>
-        <li><a href="{{ url_for('general.about_page') }}">About Us</a></li>
-        <li><a href="{{ url_for('general.contact_page') }}">Contact</a></li>
-        <li><a href="{{ url_for('cart.order_now_menu') }}">Order Now</a></li>
-        <!-- This is the account dropdown -->
+        <!-- This is the Contact link -->
+        <li><a href="/contact">Contact</a></li>
+
+        <!-- This is the About link -->
+        <li><a href="/about">About</a></li>
+
+        <!-- This is the Account dropdown (only if logged in) -->
+        {% if current_user.is_authenticated %}
         <li class="dropdown">
-            <a href="#" class="navbar-icon-btn" aria-label="Account">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+            <a href="#">
+                <div class="navbar-icon-btn">
+                    <i class="fa-solid fa-user"></i>
+                </div>
             </a>
             <ul class="dropdown-menu">
-                {% if session.get('customer_id') %}
-                    <li><a href="{{ url_for('customer_auth.customer_dashboard') }}">My Account</a></li>
-                    <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
-                {% else %}
-                    <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
-                    <li><a href="{{ url_for('customer_auth.register') }}">Register</a></li>
-                {% endif %}
+                <!-- This is the Profile link -->
+                <li><a href="{{ url_for('customer_auth.customer_profile') }}">Profile</a></li>
+
+                <!-- This is the Logout link -->
+                <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
             </ul>
         </li>
-    {% endif %}
-</ul>
+        {% else %}
 
-{% block content %}{% endblock %}
-
-<!-- This is the footer section -->
-<footer class="site-footer">
-    <div class="site-footer-inner">
-
-        <!-- This hides the footer content for staff users -->
-        {% if not session.get('staff_role') %}
-
-        <!-- This creates the footer columns that stack on mobile -->
-        <div class="footer-grid">
-
-            <!-- Location section -->
-            <div>
-                <p class="footer-col-title">Location</p>
-                <p class="footer-text">
-                    {% if restaurant_address %}
-                        {% for part in restaurant_address.split(',') %}
-                            {{ part.strip() }}<br>
-                        {% endfor %}
-                    {% else %}
-                        123 Main Street<br>City<br>Post Code
-                    {% endif %}
-                </p>
-            </div>
-
-            <!-- Hours section -->
-            <div>
-                <p class="footer-col-title">Hours</p>
-                {% for day_data in restaurant_hours %}
-                <p class="footer-text" style="margin: 2px 0;">
-                    {% if not day_data.is_closed %}
-                        {{ day_data.day_of_week[:3] }}:
-                        {{ (day_data.opening_time|string)[:5] }} –
-                        {{ (day_data.closing_time|string)[:5] }}
-                    {% else %}
-                        {{ day_data.day_of_week[:3] }}: Closed
-                    {% endif %}
-                </p>
-                {% endfor %}
-            </div>
-
-            <!-- Quick links section -->
-            <div>
-                <p class="footer-col-title">Quick Links</p>
-                <div class="footer-links">
-                    <a href="{{ url_for('menu.show_menu') }}">Menu</a>
-                    <a href="{{ url_for('reservations.reservations_page') }}">Book a Table</a>
-                    <a href="{{ url_for('general.about_page') }}">About Us</a>
-                    <a href="{{ url_for('general.contact_page') }}">Contact</a>
-                    <a href="{{ url_for('cart.order_now_menu') }}">Order Now</a>
-                </div>
-            </div>
-
-            <!-- Newsletter section -->
-            <div>
-                <p class="footer-col-title">Newsletter</p>
-                <p class="footer-newsletter-text">Stay updated with our latest offers!</p>
-                <form method="POST" action="{{ url_for('general.newsletter_signup') }}"
-                      class="footer-newsletter-form">
-                    <input type="email" name="email" placeholder="Your email address"
-                           class="footer-newsletter-input" required>
-                    <button type="submit" class="footer-newsletter-btn">Subscribe</button>
-                </form>
-            </div>
-
-        </div>
-
-        <!-- Social media section -->
-        <p class="footer-social-title">Follow Us</p>
-        <div class="footer-social-row">
-            {% for link in social_links %}
-            <a href="{{ link.url }}" target="_blank" class="footer-social-link"
-               aria-label="{{ link.icon_class }}">
-                <i class="{{ link.icon_class }}"></i>
-            </a>
-            {% else %}
-            <p class="footer-text">No social links added yet.</p>
-            {% endfor %}
-        </div>
+        <!-- This is the Login link -->
+        <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
 
         {% endif %}
+    </ul>
 
-        <div class="footer-divider"></div>
-
-        <!-- Copyright section, this always shows for everyone -->
-        <p class="footer-copyright">
-            &copy; 2026 {{ branding.restaurant_name }}. All rights reserved.
-        </p>
-
+    <!-- This is where each page inserts its content -->
+    <div class="content">
+        {% block content %}{% endblock %}
     </div>
-</footer>
 
-<script>
-// This handles the mobile menu toggle
-function toggleMenu() {
-    const navbar = document.getElementById('navbar');
-    navbar.classList.toggle('active');
-}
+    <!-- This is the footer section -->
+    <footer class="site-footer">
+        <div class="site-footer-inner">
 
-// This handles the account dropdown toggle — only runs if dropdown exists
-const dropdownLink = document.querySelector('.dropdown > a');
-if (dropdownLink) {
-    dropdownLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.parentElement.classList.toggle('open');
-    });
+            <!-- This is the footer grid layout -->
+            <div class="footer-grid">
 
-    // This closes dropdown when clicking anywhere else on the page
-    document.addEventListener('click', function(e) {
-        const dropdown = document.querySelector('.dropdown');
-        if (dropdown && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('open');
+                <!-- This is the About column -->
+                <div class="footer-col">
+                    <h3 class="footer-col-title">About</h3>
+                    <p class="footer-text">
+                        {{ branding.footer_about }}
+                    </p>
+                </div>
+
+                <!-- This is the Quick Links column -->
+                <div class="footer-col">
+                    <h3 class="footer-col-title">Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="/">Home</a>
+                        <a href="/menu">Menu</a>
+                        <a href="/reservations">Reservations</a>
+                        <a href="/contact">Contact</a>
+                        <a href="/about">About</a>
+                    </div>
+                </div>
+
+                <!-- This is the Opening Hours column -->
+                <div class="footer-col">
+                    <h3 class="footer-col-title">Opening Hours</h3>
+                    {% for day in restaurant_hours %}
+                    <div class="footer-hours-row">
+                        <span class="footer-hours-day">{{ day.day_of_week }}</span>
+                        <span class="footer-hours-time">
+                            {% if day.is_closed %}
+                                Closed
+                            {% else %}
+                                {{ day.opening_time | string | replace(':00', '', 1) }}
+–
+                                {{ day.closing_time | string | replace(':00', '', 1) }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- This is the Newsletter and Social column -->
+                <div class="footer-col">
+                    <h3 class="footer-col-title">Newsletter</h3>
+                    <p class="footer-newsletter-text">
+                        {{ branding.footer_newsletter_text }}
+                    </p>
+
+                    <form class="footer-newsletter-form" method="POST" action="/subscribe">
+                        <input type="email"
+                               name="email"
+                               class="footer-newsletter-input"
+                               placeholder="Enter your email">
+                        <button type="submit" class="footer-newsletter-btn">
+                            Subscribe
+                        </button>
+                    </form>
+
+                    <!-- This is for the social media icons -->
+                    <h3 class="footer-social-title">Follow Us</h3>
+                    <div class="footer-social-row">
+                        {% for link in social_links %}
+                        <a href="{{ link.url }}" class="footer-social-link" target="_blank">
+                            <i class="{{ link.icon_class }}"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div> <!-- end footer-grid -->
+
+            <div class="footer-divider"></div>
+
+            <p class="footer-copyright">
+                &copy; {{ branding.restaurant_name }} — All Rights Reserved
+            </p>
+
+        </div> <!-- end site-footer-inner -->
+    </footer>
+
+    <!-- This is the JavaScript for the mobile menu -->
+    <script>
+        function toggleMenu() {
+            const navbar = document.getElementById("navbar");
+            navbar.classList.toggle("active");
         }
-    });
-}
+    </script>
 
-// This closes the menu when a non-dropdown link is clicked on mobile
-document.querySelectorAll('.navbar a').forEach(link => {
-    link.addEventListener('click', function() {
-        if (window.innerWidth <= 768 && !this.closest('.dropdown')) {
-            document.getElementById('navbar').classList.remove('active');
-        }
-    });
-});
+    <!-- This is for dropdown hover on desktop -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdown = document.querySelector(".dropdown");
 
-// This fixes navbar when resizing from mobile to desktop
-window.addEventListener('resize', () => {
-    const navbar = document.getElementById('navbar');
-    if (window.innerWidth > 768) {
-        navbar.classList.remove('active');
-    }
-});
+            if (dropdown) {
+                dropdown.addEventListener("mouseenter", function () {
+                    const menu = this.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "block";
+                });
 
-// This highlights the active page link in the navbar
-const currentPath = window.location.pathname;
-document.querySelectorAll('.navbar a').forEach(link => {
-    if (link.getAttribute('href') === currentPath) {
-        link.classList.add('active');
-    }
-});
-</script>
+                dropdown.addEventListener("mouseleave", function () {
+                    const menu = this.querySelector(".dropdown-menu");
+                    if (menu) menu.style.display = "none";
+                });
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

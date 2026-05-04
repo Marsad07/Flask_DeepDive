@@ -15,10 +15,8 @@ def reservations_page():
         guests = request.form.get("guests_num")
         table = request.form.get("table_num")
         special_requests = request.form.get("special_requests")
-
         db = get_db()
         cursor = db.cursor(dictionary=True)
-
         cursor.execute("""
             SELECT * FROM reservations_restaurant 
             WHERE table_number = %s 
@@ -26,27 +24,41 @@ def reservations_page():
               AND reservation_time = %s
               AND reservation_status != 'Cancelled'
         """, (table, resv_date, resv_time))
-
         existing_booking = cursor.fetchone()
-
         if existing_booking:
             cursor.close()
             db.close()
-            cursor2 = get_db().cursor(dictionary=True)
+            db2 = get_db()
+            cursor2 = db2.cursor(dictionary=True)
             cursor2.execute(
                 "SELECT * FROM restaurant_customer_tables "
                 "WHERE is_active = TRUE ORDER BY table_number ASC"
             )
             tables = cursor2.fetchall()
+            cursor2.execute("""
+                SELECT DISTINCT table_number, reservation_date, reservation_time
+                FROM reservations_restaurant
+                WHERE reservation_date >= %s
+                  AND reservation_status != 'Cancelled'
+            """, (date.today().isoformat(),))
+            booked_slots = [
+                {
+                    'table_num': r['table_number'],
+                    'date': r['reservation_date'].isoformat(),
+                    'time': str(r['reservation_time']).zfill(8)
+                }
+                for r in cursor2.fetchall()
+            ]
             cursor2.close()
+            db2.close()
             today = date.today().isoformat()
             return render_template(
                 "reservations.html",
                 today=today,
                 tables=tables,
+                booked_slots=booked_slots,
                 error="Sorry, this table is already booked for that time. Please select another table."
             )
-
         cursor.execute("""
             INSERT INTO reservations_restaurant 
             (customer_fullname, customer_email, customer_phonenum, reservation_date, 
@@ -55,19 +67,19 @@ def reservations_page():
         """, (name, email, phone, resv_date, resv_time, guests, table, special_requests))
         db.commit()
         reservation_id = cursor.lastrowid
-
         cursor.close()
         db.close()
-
-        socketio.emit('table_unavailable', {'table_num': table})
-
+        socketio.emit('table_unavailable', {
+            'table_num': int(table),
+            'date': resv_date,
+            'time': str(resv_time).zfill(8)
+        })
         try:
             cancel_url = url_for(
                 'reservations.cancel_page',
                 resv_id=reservation_id,
                 _external=True
             )
-
             view_url = url_for(
                 'reservations.guest_find_reservation',
                 _external=True
@@ -138,9 +150,7 @@ def reservations_page():
                                          border-right:1px solid #EDE4D3;">
                                 <p style="margin:0 0 4px; font-family:Arial,sans-serif;
                                            font-size:10px; font-weight:700; letter-spacing:2px;
-                                           text-transform:uppercase; color:#8B0000;">
-                                  Date
-                                </p>
+                                           text-transform:uppercase; color:#8B0000;">Date</p>
                                 <p style="margin:0; font-family:Georgia,serif;
                                            font-size:18px; font-weight:600; color:#1C1008;">
                                   {resv_date}
@@ -150,9 +160,7 @@ def reservations_page():
                                   style="padding:18px 22px; border-bottom:1px solid #EDE4D3;">
                                 <p style="margin:0 0 4px; font-family:Arial,sans-serif;
                                            font-size:10px; font-weight:700; letter-spacing:2px;
-                                           text-transform:uppercase; color:#8B0000;">
-                                  Time
-                                </p>
+                                           text-transform:uppercase; color:#8B0000;">Time</p>
                                 <p style="margin:0; font-family:Georgia,serif;
                                            font-size:18px; font-weight:600; color:#1C1008;">
                                   {resv_time}
@@ -161,25 +169,19 @@ def reservations_page():
                             </tr>
                             <tr>
                               <td width="50%"
-                                  style="padding:18px 22px;
-                                         border-right:1px solid #EDE4D3;">
+                                  style="padding:18px 22px; border-right:1px solid #EDE4D3;">
                                 <p style="margin:0 0 4px; font-family:Arial,sans-serif;
                                            font-size:10px; font-weight:700; letter-spacing:2px;
-                                           text-transform:uppercase; color:#8B0000;">
-                                  Guests
-                                </p>
+                                           text-transform:uppercase; color:#8B0000;">Guests</p>
                                 <p style="margin:0; font-family:Georgia,serif;
                                            font-size:18px; font-weight:600; color:#1C1008;">
                                   {guests}
                                 </p>
                               </td>
-                              <td width="50%"
-                                  style="padding:18px 22px;">
+                              <td width="50%" style="padding:18px 22px;">
                                 <p style="margin:0 0 4px; font-family:Arial,sans-serif;
                                            font-size:10px; font-weight:700; letter-spacing:2px;
-                                           text-transform:uppercase; color:#8B0000;">
-                                  Table
-                                </p>
+                                           text-transform:uppercase; color:#8B0000;">Table</p>
                                 <p style="margin:0; font-family:Georgia,serif;
                                            font-size:18px; font-weight:600; color:#1C1008;">
                                   {table}
@@ -193,7 +195,6 @@ def reservations_page():
                         <td style="padding:32px 44px 0;">
                           <table width="100%" cellpadding="0" cellspacing="0" border="0">
                             <tr>
-                              <!-- View / Modify -->
                               <td width="48%" align="center">
                                 <a href="{view_url}"
                                    style="display:block; background:#8B0000; color:#D4AF37;
@@ -206,7 +207,6 @@ def reservations_page():
                                 </a>
                               </td>
                               <td width="4%"></td>
-                              <!-- Cancel -->
                               <td width="48%" align="center">
                                 <a href="{cancel_url}"
                                    style="display:block; background:#ffffff; color:#8B0000;
@@ -226,8 +226,7 @@ def reservations_page():
                         <td style="padding:36px 44px 0;">
                           <div style="height:1px; background:linear-gradient(
                                       90deg,#D4AF37 0%,transparent 100%);
-                                      opacity:0.4;">
-                          </div>
+                                      opacity:0.4;"></div>
                         </td>
                       </tr>
                       <tr>
@@ -263,12 +262,10 @@ def reservations_page():
             )
             msg.content_subtype = 'html'
             msg.send()
-
         except Exception:
             import traceback
             print("Reservation Email Error:")
             traceback.print_exc()
-
         return render_template(
             "reservation_success.html",
             name=name,
@@ -278,7 +275,6 @@ def reservations_page():
             guests=guests,
             table=table
         )
-
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute(
@@ -286,28 +282,40 @@ def reservations_page():
         "WHERE is_active = TRUE ORDER BY table_number ASC"
     )
     tables = cursor.fetchall()
+    cursor.execute("""
+        SELECT DISTINCT table_number, reservation_date, reservation_time
+        FROM reservations_restaurant
+        WHERE reservation_date >= %s
+          AND reservation_status != 'Cancelled'
+    """, (date.today().isoformat(),))
+    booked_slots = [
+        {
+            'table_num': r['table_number'],
+            'date': r['reservation_date'].isoformat(),
+            'time': str(r['reservation_time']).zfill(8)
+        }
+        for r in cursor.fetchall()
+    ]
     cursor.close()
     db.close()
     today = date.today().isoformat()
-    return render_template("reservations.html", today=today, tables=tables)
+    return render_template("reservations.html", today=today, tables=tables, booked_slots=booked_slots)
 
 def my_reservations():
     if 'customer_id' not in session:
         return redirect(url_for('customer_auth.customer_login'))
 
     customer_id = session['customer_id']
-
     db = get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute("""
         SELECT * FROM reservations_restaurant
         WHERE customer_email = (
-            SELECT email FROM customer_accounts WHERE customer_id = %s
+            SELECT customer_email FROM customer_accounts WHERE customer_id = %s
         )
         ORDER BY reservation_date DESC, reservation_time DESC
     """, (customer_id,))
     reservations = cursor.fetchall()
-
     cursor.close()
     db.close()
     return render_template("auth/my_reservations.html", reservations=reservations)
@@ -315,26 +323,27 @@ def my_reservations():
 def cancel_reservation(resv_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM reservations_restaurant WHERE customer_id = %s", (resv_id,))
     r = cursor.fetchone()
-
     if not r:
         cursor.close()
         db.close()
         return render_template("auth/error_cancel.html", message="Reservation not found.")
-
     if r["reservation_status"] == "Cancelled":
         cursor.close()
         db.close()
         return render_template("auth/already_cancelled.html", r=r)
-
     cursor.execute("""
         UPDATE reservations_restaurant
         SET reservation_status = 'Cancelled'
         WHERE customer_id = %s
     """, (resv_id,))
     db.commit()
+    socketio.emit('table_available', {
+        'table_num': int(r['table_number']),
+        'date': r['reservation_date'].isoformat(),
+        'time': str(r['reservation_time']).zfill(8)
+    })
     email_html = f"""
        <!DOCTYPE html>
        <html>
@@ -342,15 +351,12 @@ def cancel_reservation(resv_id):
          <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px;
                      border: 1px solid #D4AF37;">
            <h2 style="color: #8B0000; text-align: center;">Reservation Cancelled</h2>
-
            <p style="font-size: 16px; color: #2C2416;">
              Hello <strong>{r['customer_fullname']}</strong>,
            </p>
-
            <p style="font-size: 16px; color: #2C2416;">
              Your reservation has been successfully cancelled.
            </p>
-
            <div style="margin-top: 20px; padding: 15px; background: #FFF8E6; border-left: 4px solid #8B0000;">
              <p style="margin: 0; font-size: 15px;">
                <strong>Date:</strong> {r['reservation_date']}<br>
@@ -359,19 +365,16 @@ def cancel_reservation(resv_id):
                <strong>Table:</strong> {r['table_number']}
              </p>
            </div>
-
            <p style="margin-top: 30px; font-size: 15px; color: #5C4033;">
              If this was a mistake, you can make a new reservation anytime.
            </p>
-
            <p style="margin-top: 20px; font-size: 14px; color: #8B0000; text-align: center;">
              Thank you for choosing our restaurant.
            </p>
          </div>
        </body>
        </html>
-       """
-
+    """
     msg = EmailMessage(
         subject="Your Reservation Has Been Cancelled",
         body=email_html,
@@ -379,12 +382,10 @@ def cancel_reservation(resv_id):
         to=[r["customer_email"]],
     )
     msg.content_subtype = "html"
-
     try:
         msg.send()
     except Exception as e:
         print("Email send error:", repr(e))
-
     cursor.close()
     db.close()
     return render_template("auth/reservation_cancelled.html", r=r)
@@ -397,48 +398,40 @@ def modify_reservation(resv_id):
         (resv_id,)
     )
     old = cursor.fetchone()
-
     if not old:
         cursor.close()
         db.close()
         flash("Reservation not found.", "danger")
         return redirect(url_for("reservations.my_reservations"))
-
     if request.method == "GET":
         cursor.close()
         db.close()
         return render_template("auth/modify_reservation.html", r=old)
-
     new_date = request.form.get("date")
     new_time = request.form.get("time")
     new_table = int(request.form.get("table"))
     new_guests = int(request.form.get("guests"))
-
     new_dt = datetime.strptime(f"{new_date} {new_time}", "%Y-%m-%d %H:%M")
     if new_dt < datetime.now():
         cursor.close()
         db.close()
         flash("You cannot choose a past date or time.", "danger")
         return redirect(url_for("reservations.modify_reservation", resv_id=resv_id))
-
     cursor.execute(
         "SELECT capacity FROM restaurant_customer_tables WHERE table_number = %s",
         (new_table,)
     )
     table_info = cursor.fetchone()
-
     if not table_info:
         cursor.close()
         db.close()
         flash("Invalid table number.", "danger")
         return redirect(url_for("reservations.modify_reservation", resv_id=resv_id))
-
     if new_guests > table_info["capacity"]:
         cursor.close()
         db.close()
         flash("Too many guests for this table.", "danger")
         return redirect(url_for("reservations.modify_reservation", resv_id=resv_id))
-
     cursor.execute("""
         SELECT * FROM reservations_restaurant
         WHERE table_number = %s
@@ -447,15 +440,11 @@ def modify_reservation(resv_id):
           AND customer_id != %s
           AND reservation_status != 'Cancelled'
     """, (new_table, new_date, new_time, resv_id))
-
-    conflict = cursor.fetchone()
-
-    if conflict:
+    if cursor.fetchone():
         cursor.close()
         db.close()
         flash("This table is already booked at that time.", "danger")
         return redirect(url_for("reservations.modify_reservation", resv_id=resv_id))
-
     cursor.execute("""
         UPDATE reservations_restaurant
         SET reservation_date = %s,
@@ -467,7 +456,16 @@ def modify_reservation(resv_id):
     db.commit()
     cursor.close()
     db.close()
-
+    socketio.emit('table_available', {
+        'table_num': int(old['table_number']),
+        'date': old['reservation_date'].isoformat(),
+        'time': str(old['reservation_time']).zfill(8)
+    })
+    socketio.emit('table_unavailable', {
+        'table_num': new_table,
+        'date': new_date,
+        'time': str(new_time).zfill(8)
+    })
     subject = "Your Reservation Has Been Updated"
     body = f"""
     Hello,
@@ -487,40 +485,30 @@ def modify_reservation(resv_id):
 def cancel_page(resv_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM reservations_restaurant WHERE customer_id = %s", (resv_id,))
     reservation = cursor.fetchone()
-
     cursor.close()
     db.close()
-
     if not reservation:
         flash("Reservation not found", "danger")
         return redirect(url_for('general.home_page'))
-
     return render_template("auth/cancel_confirm.html", r=reservation)
 
 def guest_find_reservation():
     if request.method == "GET":
         return render_template("auth/guest_find.html")
-
     email = request.form.get("email")
     phone = request.form.get("phone")
-
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("""
         SELECT * FROM reservations_restaurant
         WHERE customer_email = %s AND customer_phonenum = %s
         ORDER BY reservation_date DESC, reservation_time DESC
     """, (email, phone))
-
     results = cursor.fetchall()
-
     cursor.close()
     db.close()
-
     if not results:
         flash("No reservation found with those details.", "danger")
         return redirect(url_for("reservations.guest_find_reservation"))
@@ -530,52 +518,49 @@ def guest_find_reservation():
 def guest_view_reservation(resv_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM reservations_restaurant WHERE customer_id = %s", (resv_id,))
     reservation = cursor.fetchone()
-
     cursor.close()
     db.close()
-
     if not reservation:
         flash("Reservation not found.", "danger")
         return redirect(url_for("reservations.guest_find_reservation"))
-
     return render_template("auth/guest_view.html", r=reservation)
 
 def guest_modify_reservation(resv_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM reservations_restaurant WHERE customer_id = %s", (resv_id,))
     r = cursor.fetchone()
-
     if not r:
         cursor.close()
         db.close()
         flash("Reservation not found.", "danger")
         return redirect(url_for("reservations.guest_find_reservation"))
-
     if request.method == "POST":
         new_date = request.form.get("date")
         new_time = request.form.get("time")
         new_table = request.form.get("table")
         new_guests = request.form.get("guests")
-
         cursor.execute("""
             UPDATE reservations_restaurant
             SET reservation_date=%s, reservation_time=%s, table_number=%s, num_of_guests=%s
             WHERE customer_id=%s
         """, (new_date, new_time, new_table, new_guests, resv_id))
-
         db.commit()
         cursor.close()
         db.close()
-
+        socketio.emit('table_available', {
+            'table_num': int(r['table_number']),
+            'date': r['reservation_date'].isoformat(),
+            'time': str(r['reservation_time']).zfill(8)
+        })
+        socketio.emit('table_unavailable', {
+            'table_num': int(new_table),
+            'date': new_date,
+            'time': str(new_time).zfill(8)
+        })
         return redirect(url_for("reservations.guest_view_reservation", resv_id=resv_id))
-
     cursor.close()
     db.close()
     return render_template("auth/guest_modify_reservation.html", r=r)
-
-

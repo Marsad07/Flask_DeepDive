@@ -1,428 +1,432 @@
-{% extends "base.html" %}
+{% extends "admin_base.html" %}
 
-{% block content %}
+{% block admin_content %}
 <div class="dash-page">
-  <!-- This is the page header -->
-  <div class="dash-header">
-    <div>
-      <h1>Manage Tables</h1>
-      <p class="dash-welcome">Drag tables to reposition, then save the layout</p>
+
+    <!-- Page header -->
+    <div class="dash-header">
+        <div>
+            <h1>Manage Tables</h1>
+            <p class="dash-welcome">Drag tables to reposition, then save the layout</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
     </div>
-    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">
-      ← Back to Dashboard
-    </a>
-  </div>
 
-  <!-- This is the add new table card -->
-  <div class="dash-card" style="margin-bottom: 24px;">
-    <div class="dash-card-body">
-      <p class="dash-card-title">Add New Table</p>
-      <form action="{{ url_for('admin.add_table') }}" method="POST"
-            class="inline-form form-row">
-        <div class="form-group" style="min-width: 120px; max-width: 140px;">
-          <label class="form-label">Table Number</label>
-          <input type="number" name="table_number" min="1"
-                 class="form-input" required>
-        </div>
-        <div class="form-group" style="min-width: 120px; max-width: 140px;">
-          <label class="form-label">Seats</label>
-          <select name="seats" class="form-input">
-            <option value="2">2</option>
-            <option value="4">4</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
-          </select>
-        </div>
-        <div class="form-group" style="min-width: 140px; max-width: 180px;">
-          <label class="form-label">Location</label>
-          <input type="text" name="location" placeholder="e.g. Window"
-                 class="form-input">
-        </div>
-        <div class="form-group" style="min-width: 160px; max-width: 200px;">
-          <label class="form-label">Shape</label>
-          <select name="shape" class="form-input">
-            <option value="circle">Circle (2 seats)</option>
-            <option value="square">Square (4 seats)</option>
-            <option value="rect">Rectangle (6 seats)</option>
-            <option value="booth">Booth</option>
-            <option value="large">Large (8 seats)</option>
-          </select>
-        </div>
-        <div class="form-group"
-             style="min-width: auto; flex: 0; margin-bottom: 18px;">
-          <label class="form-label" style="opacity: 0;">Add</label>
-          <button type="submit" class="btn-danger">Add Table</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- This is the drag-and-drop layout editor -->
-  <div class="dash-card" style="margin-bottom: 24px;">
-    <div class="dash-card-body">
-      <div style="display: flex; justify-content: space-between;
-                  align-items: center; margin-bottom: 8px;">
-        <p class="dash-card-title" style="margin: 0; border: none;">
-          Layout Editor
-        </p>
-        <button onclick="savePositions()" class="btn-primary">
-          Save Layout
-        </button>
-      </div>
-      <p class="dash-subtext" style="margin-bottom: 16px;">
-        Click and drag tables to reposition them, then click Save Layout.
-      </p>
-
-      <!-- This is the canvas where tables are dragged -->
-      <div id="layout-canvas" class="table-canvas">
-        <div class="layout-label window-label">WINDOW SIDE</div>
-        <div class="layout-label entrance-label">ENTRANCE</div>
-
-        {% for table in tables %}
-        <div class="draggable-table"
-             data-id="{{ table.table_id }}"
-             data-table="{{ table.table_number }}"
-             style="position: absolute;
-                    left: {{ table.pos_x }}px;
-                    top: {{ table.pos_y }}px;
-                    {% if not table.is_active %}opacity: 0.4;{% endif %}">
-          <div class="table-{{ table.shape }}">
-            {{ table.table_number }}
-          </div>
-          <div class="draggable-table-info">
-            {{ table.seats }}s · {{ table.location }}
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-
-      <p id="save-status" class="save-status-msg">
-        ✓ Layout saved successfully
-      </p>
-    </div>
-  </div>
-
-  <!-- This is the all tables list -->
-  <div class="dash-card">
-    <div class="dash-card-body">
-      <p class="dash-card-title">All Tables</p>
-      <div style="overflow-x: auto;">
-        <table class="dash-table">
-          <thead>
-            <tr>
-              <th>Table #</th>
-              <th>Seats</th>
-              <th>Location</th>
-              <th>Shape</th>
-              <th>Active</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for table in tables %}
-            <tr>
-              <td data-label="Table #">{{ table.table_number }}</td>
-              <td data-label="Seats">{{ table.seats }}</td>
-              <td data-label="Location">{{ table.location }}</td>
-              <td data-label="Shape" style="text-transform: capitalize;">
-                {{ table.shape }}
-              </td>
-              <td data-label="Active">
-                {% if table.is_active %}
-                  <span class="dash-resv-badge"
-                        data-status="confirmed">Active</span>
-                {% else %}
-                  <span class="dash-resv-badge"
-                        data-status="cancelled">Inactive</span>
-                {% endif %}
-              </td>
-              <td data-label="Actions">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button class="btn-edit btn"
-                          onclick="openEditTable(
-                            {{ table.table_id }},
-                            {{ table.seats }},
-                            '{{ table.location }}',
-                            '{{ table.shape }}',
-                            {{ 1 if table.is_active else 0 }})">
-                    Edit
-                  </button>
-                  <form id="delete-table-{{ table.table_id }}"
-                        action="{{ url_for(
-                          'admin.delete_table',
-                          table_id=table.table_id) }}"
-                        method="POST" class="inline-form">
-                    <button type="button" class="btn-delete btn"
-                            onclick="showDeleteConfirm(
-                              {{ table.table_id }},
-                              {{ table.table_number }})">
-                      Remove
-                    </button>
-                  </form>
+    <!-- Add new table card -->
+    <div class="dash-card" style="margin-bottom: 24px;">
+        <div class="dash-card-body">
+            <p class="dash-card-title">Add New Table</p>
+            <form action="{{ url_for('admin.add_table') }}" method="POST" class="inline-form form-row">
+                <div class="form-group" style="min-width: 120px; max-width: 140px;">
+                    <label class="form-label">Table Number</label>
+                    <input type="number" name="table_number" min="1" class="form-input" required>
                 </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+                <div class="form-group" style="min-width: 120px; max-width: 140px;">
+                    <label class="form-label">Seats</label>
+                    <select name="seats" class="form-input">
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="form-group" style="min-width: 140px; max-width: 180px;">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" placeholder="e.g. Window" class="form-input">
+                </div>
+                <div class="form-group" style="min-width: 160px; max-width: 200px;">
+                    <label class="form-label">Shape</label>
+                    <select name="shape" class="form-input">
+                        <option value="circle">Circle (2 seats)</option>
+                        <option value="square">Square (4 seats)</option>
+                        <option value="rect">Rectangle (6 seats)</option>
+                        <option value="booth">Booth</option>
+                        <option value="large">Large (8 seats)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="min-width: auto; flex: 0; margin-bottom: 18px;">
+                    <label class="form-label" style="opacity: 0;">Add</label>
+                    <button type="button" class="btn-danger" onclick="confirmAddTable()">
+                        Add Table
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 
+    <!-- Layout editor card -->
+    <div class="dash-card" style="margin-bottom: 24px;">
+        <div class="dash-card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <p class="dash-card-title" style="margin: 0; border: none;">Layout Editor</p>
+                <button onclick="confirmSaveLayout()" class="btn-primary">Save Layout</button>
+            </div>
+            <p class="dash-subtext" style="margin-bottom: 16px;">
+                Click and drag tables to reposition them, then click Save Layout.
+            </p>
+
+            <!-- Drag canvas -->
+            <div id="layout-canvas" class="table-canvas">
+                <div class="layout-label window-label">WINDOW SIDE</div>
+                <div class="layout-label entrance-label">ENTRANCE</div>
+
+                {% for table in tables %}
+                <div class="draggable-table"
+                     data-id="{{ table.table_id }}"
+                     data-table="{{ table.table_number }}"
+                     style="left: {{ table.pos_x }}px; top: {{ table.pos_y }}px;
+                            {% if not table.is_active %}opacity: 0.4;{% endif %}">
+                    <div class="table-{{ table.shape }}">{{ table.table_number }}</div>
+                    <div class="draggable-table-info">{{ table.seats }}s · {{ table.location }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <p id="save-status" class="save-status-msg">✓ Layout saved successfully</p>
+        </div>
+    </div>
+
+    <!-- All tables list -->
+    <div class="dash-card">
+        <div class="dash-card-body">
+            <p class="dash-card-title">All Tables</p>
+            <div style="overflow-x: auto;">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Table #</th>
+                            <th>Seats</th>
+                            <th>Location</th>
+                            <th>Shape</th>
+                            <th>Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for table in tables %}
+                        <tr>
+                            <td data-label="Table #">{{ table.table_number }}</td>
+                            <td data-label="Seats">{{ table.seats }}</td>
+                            <td data-label="Location">{{ table.location }}</td>
+                            <td data-label="Shape" style="text-transform: capitalize;">{{ table.shape }}</td>
+                            <td data-label="Active">
+                                {% if table.is_active %}
+                                    <span class="dash-resv-badge" data-status="confirmed">Active</span>
+                                {% else %}
+                                    <span class="dash-resv-badge" data-status="cancelled">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td data-label="Actions">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="btn-edit btn"
+                                            onclick="openEditTable(
+                                                {{ table.table_id }},
+                                                {{ table.seats }},
+                                                '{{ table.location }}',
+                                                '{{ table.shape }}',
+                                                {{ 1 if table.is_active else 0 }})">
+                                        Edit
+                                    </button>
+                                    <form id="delete-table-{{ table.table_id }}"
+                                          action="{{ url_for('admin.delete_table', table_id=table.table_id) }}"
+                                          method="POST" class="inline-form">
+                                    </form>
+                                    <button type="button" class="btn-delete btn"
+                                            onclick="showDeleteConfirm({{ table.table_id }}, {{ table.table_number }})">
+                                        Remove
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- This is the save success modal -->
+<!-- Add table confirmation modal -->
+<div id="add-table-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Add Table</h3>
+        <p class="modal-message">Are you sure you want to add this new table?</p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('add-table-modal')">Cancel</button>
+            <button class="modal-btn-confirm" id="add-table-confirm-btn">Yes, Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Save layout confirmation modal -->
+<div id="save-layout-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Save Layout</h3>
+        <p class="modal-message">Are you sure you want to save the current table layout?</p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('save-layout-modal')">Cancel</button>
+            <button class="modal-btn-confirm" onclick="savePositions()">Yes, Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Save success modal -->
 <div id="save-success-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 class="modal-title">Layout Saved</h3>
-    <p class="modal-message">
-      Your table layout has been saved and will now reflect on the
-      reservations page.
-    </p>
-    <div class="modal-actions">
-      <button class="modal-btn-confirm"
-              onclick="closeSaveModal()">OK</button>
+    <div class="modal-box">
+        <h3 class="modal-title">Layout Saved</h3>
+        <p class="modal-message">Your table layout has been saved successfully.</p>
+        <div class="modal-actions">
+            <button class="modal-btn-confirm" onclick="closeModal('save-success-modal')">OK</button>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- This is the edit table modal -->
+<!-- Edit table modal -->
 <div id="edit-table-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 class="modal-title">Edit Table</h3>
-    <form id="edit-table-form" method="POST" class="inline-form">
-      <div class="form-group">
-        <label class="form-label">Seats</label>
-        <select id="edit-seats" name="seats" class="form-input">
-          <option value="2">2</option>
-          <option value="4">4</option>
-          <option value="6">6</option>
-          <option value="8">8</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Location</label>
-        <input type="text" id="edit-location" name="location"
-               class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Shape</label>
-        <select id="edit-shape" name="shape" class="form-input">
-          <option value="circle">Circle</option>
-          <option value="square">Square</option>
-          <option value="rect">Rectangle</option>
-          <option value="booth">Booth</option>
-          <option value="large">Large</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Active</label>
-        <select id="edit-active" name="is_active" class="form-input">
-          <option value="1">Yes</option>
-          <option value="0">No</option>
-        </select>
-      </div>
-      <div class="modal-actions" style="margin-top: 8px;">
-        <button type="button" class="modal-btn-cancel"
-                onclick="closeEditModal()">Cancel</button>
-        <button type="submit" class="modal-btn-confirm">
-          Save Changes
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-<!-- This is the delete confirmation modal -->
-<div id="delete-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 class="modal-title">Remove Table</h3>
-    <p id="delete-modal-msg" class="modal-message"></p>
-    <div class="modal-actions">
-      <button class="modal-btn-cancel"
-              onclick="closeDeleteModal()">Cancel</button>
-      <button id="delete-confirm-btn"
-              class="modal-btn-confirm">Yes, Remove</button>
+    <div class="modal-box">
+        <h3 class="modal-title">Edit Table</h3>
+        <form id="edit-table-form" method="POST">
+            <div class="form-group">
+                <label class="form-label">Seats</label>
+                <select id="edit-seats" name="seats" class="form-input">
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                    <option value="8">8</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" id="edit-location" name="location" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Shape</label>
+                <select id="edit-shape" name="shape" class="form-input">
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="rect">Rectangle</option>
+                    <option value="booth">Booth</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Active</label>
+                <select id="edit-active" name="is_active" class="form-input">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <div class="modal-actions" style="margin-top: 8px;">
+                <button type="button" class="modal-btn-cancel"
+                        onclick="closeModal('edit-table-modal')">Cancel</button>
+                <button type="button" class="modal-btn-confirm"
+                        onclick="confirmEditTable()">Save Changes</button>
+            </div>
+        </form>
     </div>
-  </div>
 </div>
+
+<!-- Edit confirmation modal -->
+<div id="edit-confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Confirm Edit</h3>
+        <p class="modal-message">Are you sure you want to save changes to this table?</p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('edit-confirm-modal')">Cancel</button>
+            <button class="modal-btn-confirm" id="edit-confirm-btn">Yes, Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="delete-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Remove Table</h3>
+        <p id="delete-modal-msg" class="modal-message"></p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal('delete-modal')">Cancel</button>
+            <button id="delete-confirm-btn" class="modal-btn-confirm">Yes, Remove</button>
+        </div>
+    </div>
+</div>
+
 <script>
-  // Drag and drop logic
-  const canvas = document.getElementById('layout-canvas');
-  let dragging = null;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  document.querySelectorAll('.draggable-table').forEach(el => {
-    el.addEventListener('mousedown', function (e) {
-      dragging = this;
-      dragging.style.cursor = 'grabbing';
-      dragging.style.zIndex = 1000;
-      const rect = dragging.getBoundingClientRect();
-      const canvasRect = canvas.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-      e.preventDefault();
-    });
-
-    // Touch support
-    el.addEventListener('touchstart', function (e) {
-      dragging = this;
-      dragging.style.zIndex = 1000;
-      const touch = e.touches[0];
-      const rect = dragging.getBoundingClientRect();
-      offsetX = touch.clientX - rect.left;
-      offsetY = touch.clientY - rect.top;
-      e.preventDefault();
-    }, { passive: false });
-  });
-
-  document.addEventListener('mousemove', function (e) {
-    if (!dragging) return;
-    moveTable(e.clientX, e.clientY);
-  });
-
-  document.addEventListener('touchmove', function (e) {
-    if (!dragging) return;
-    moveTable(e.touches[0].clientX, e.touches[0].clientY);
-    e.preventDefault();
-  }, { passive: false });
-
-  function moveTable(clientX, clientY) {
-    const canvasRect = canvas.getBoundingClientRect();
-    let x = clientX - canvasRect.left - offsetX;
-    let y = clientY - canvasRect.top - offsetY;
-    x = Math.max(0, Math.min(x, canvasRect.width - 80));
-    y = Math.max(0, Math.min(y, canvasRect.height - 80));
-    dragging.style.left = x + 'px';
-    dragging.style.top  = y + 'px';
-  }
-
-  document.addEventListener('mouseup', function () {
-    if (dragging) {
-      dragging.style.cursor = 'grab';
-      dragging.style.zIndex = '';
-      dragging = null;
-    }
-  });
-
-  document.addEventListener('touchend', function () {
-    if (dragging) {
-      dragging.style.zIndex = '';
-      dragging = null;
-    }
-  });
-
-  // Save positions
-  function savePositions() {
-    const positions = [];
-    document.querySelectorAll('.draggable-table').forEach(t => {
-      // Parse left/top — fall back to 0 if not yet set as inline style
-      const rawLeft = t.style.left;
-      const rawTop  = t.style.top;
-      const x = rawLeft ? parseInt(rawLeft) : t.offsetLeft;
-      const y = rawTop  ? parseInt(rawTop)  : t.offsetTop;
-      positions.push({
-        id: parseInt(t.dataset.id),
-        x: isNaN(x) ? 0 : x,
-        y: isNaN(y) ? 0 : y
-      });
-    });
-
-    const saveBtn = document.querySelector(
-      'button[onclick="savePositions()"]'
-    );
-    if (saveBtn) {
-      saveBtn.textContent = 'Saving...';
-      saveBtn.disabled = true;
+    // Generic close modal
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
     }
 
-    fetch('{{ url_for("admin.save_table_positions") }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ positions: positions })
-    })
-    .then(r => {
-      if (!r.ok) {
-        return r.text().then(txt => {
-          throw new Error('Server error ' + r.status + ': ' + txt);
+    // Generic open modal
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+    }
+
+    // Close on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
         });
-      }
-      return r.json();
-    })
-    .then(data => {
-      if (data.success) {
-        document.getElementById('save-success-modal')
-          .classList.add('open');
-      } else {
-        alert('Save failed: ' + (data.message || 'Unknown error'));
-      }
-    })
-    .catch(err => {
-      alert('Could not save layout.\n\n' + err.message);
-    })
-    .finally(() => {
-      if (saveBtn) {
-        saveBtn.textContent = 'Save Layout';
-        saveBtn.disabled = false;
-      }
-    });
-  }
-
-  function closeSaveModal() {
-    document.getElementById('save-success-modal')
-      .classList.remove('open');
-  }
-
-  // Edit table modal
-  function openEditTable(id, seats, location, shape, isActive) {
-    document.getElementById('edit-seats').value    = seats;
-    document.getElementById('edit-location').value = location;
-    document.getElementById('edit-shape').value    = shape;
-    document.getElementById('edit-active').value   = isActive;
-    document.getElementById('edit-table-form').action =
-      '/admin/tables/update/' + id;
-    document.getElementById('edit-table-modal').classList.add('open');
-  }
-
-  function closeEditModal() {
-    document.getElementById('edit-table-modal').classList.remove('open');
-  }
-
-  document.getElementById('edit-table-modal')
-    .addEventListener('click', function (e) {
-      if (e.target === this) closeEditModal();
     });
 
-  // Delete confirmation modal
-    document.getElementById('delete-modal-msg').textContent =
-      'Are you sure you want to remove Table ' + tableNum +
-      '? This cannot be undone.';
-    document.getElementById('delete-confirm-btn').onclick = function () {
-      document.getElementById('delete-table-' + id).submit();
-    };
-    document.getElementById('delete-modal').classList.add('open');
-  }
-
-  function closeDeleteModal() {
-    document.getElementById('delete-modal').classList.remove('open');
-  }
-
-  document.getElementById('delete-modal')
-    .addEventListener('click', function (e) {
-      if (e.target === this) closeDeleteModal();
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+                m.classList.remove('open');
+            });
+        }
     });
 
-  document.getElementById('save-success-modal')
-    .addEventListener('click', function (e) {
-      if (e.target === this) closeSaveModal();
-    });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-      closeSaveModal();
-      closeEditModal();
-      closeDeleteModal();
+    // Add table confirmation
+    function confirmAddTable() {
+        const form = document.querySelector('form[action="{{ url_for("admin.add_table") }}"]');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        document.getElementById('add-table-confirm-btn').onclick = function() {
+            form.submit();
+        };
+        openModal('add-table-modal');
     }
-  });
+
+    // Save layout confirmation
+    function confirmSaveLayout() {
+        openModal('save-layout-modal');
+    }
+
+    // Drag and drop
+    const canvas = document.getElementById('layout-canvas');
+    let dragging = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    document.querySelectorAll('.draggable-table').forEach(function(el) {
+        el.addEventListener('mousedown', function(e) {
+            dragging = this;
+            dragging.style.cursor = 'grabbing';
+            dragging.style.zIndex = 1000;
+            const rect = dragging.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            e.preventDefault();
+        });
+
+        el.addEventListener('touchstart', function(e) {
+            dragging = this;
+            dragging.style.zIndex = 1000;
+            const touch = e.touches[0];
+            const rect = dragging.getBoundingClientRect();
+            offsetX = touch.clientX - rect.left;
+            offsetY = touch.clientY - rect.top;
+            e.preventDefault();
+        }, { passive: false });
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        moveTable(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchmove', function(e) {
+        if (!dragging) return;
+        moveTable(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    }, { passive: false });
+
+    function moveTable(clientX, clientY) {
+        const canvasRect = canvas.getBoundingClientRect();
+        let x = clientX - canvasRect.left - offsetX;
+        let y = clientY - canvasRect.top - offsetY;
+        x = Math.max(0, Math.min(x, canvasRect.width - 80));
+        y = Math.max(0, Math.min(y, canvasRect.height - 80));
+        dragging.style.left = x + 'px';
+        dragging.style.top  = y + 'px';
+    }
+
+    document.addEventListener('mouseup', function() {
+        if (dragging) {
+            dragging.style.cursor = 'grab';
+            dragging.style.zIndex = '';
+            dragging = null;
+        }
+    });
+
+    document.addEventListener('touchend', function() {
+        if (dragging) {
+            dragging.style.zIndex = '';
+            dragging = null;
+        }
+    });
+
+    // Save positions
+    function savePositions() {
+        closeModal('save-layout-modal');
+
+        const positions = [];
+        document.querySelectorAll('.draggable-table').forEach(function(t) {
+            const x = t.style.left ? parseInt(t.style.left) : t.offsetLeft;
+            const y = t.style.top  ? parseInt(t.style.top)  : t.offsetTop;
+            positions.push({
+                id: parseInt(t.dataset.id),
+                x: isNaN(x) ? 0 : x,
+                y: isNaN(y) ? 0 : y
+            });
+        });
+
+        const saveBtn = document.querySelector('button[onclick="confirmSaveLayout()"]');
+        if (saveBtn) { saveBtn.textContent = 'Saving...'; saveBtn.disabled = true; }
+
+        fetch('{{ url_for("admin.save_table_positions") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ positions: positions })
+        })
+        .then(function(r) {
+            if (!r.ok) return r.text().then(function(txt) { throw new Error('Server error ' + r.status + ': ' + txt); });
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                openModal('save-success-modal');
+            } else {
+                alert('Save failed: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(function(err) {
+            alert('Could not save layout.\n\n' + err.message);
+        })
+        .finally(function() {
+            if (saveBtn) { saveBtn.textContent = 'Save Layout'; saveBtn.disabled = false; }
+        });
+    }
+
+    // Edit table modal
+    function openEditTable(id, seats, location, shape, isActive) {
+        document.getElementById('edit-seats').value    = seats;
+        document.getElementById('edit-location').value = location;
+        document.getElementById('edit-shape').value    = shape;
+        document.getElementById('edit-active').value   = isActive;
+        document.getElementById('edit-table-form').action = '/admin/tables/update/' + id;
+        openModal('edit-table-modal');
+    }
+
+    function confirmEditTable() {
+        closeModal('edit-table-modal');
+        document.getElementById('edit-confirm-btn').onclick = function() {
+            document.getElementById('edit-table-form').submit();
+        };
+        openModal('edit-confirm-modal');
+    }
+
+    // Delete confirmation
+    function showDeleteConfirm(id, tableNum) {
+        document.getElementById('delete-modal-msg').textContent =
+            'Are you sure you want to remove Table ' + tableNum + '? This cannot be undone.';
+        document.getElementById('delete-confirm-btn').onclick = function() {
+            document.getElementById('delete-table-' + id).submit();
+        };
+        openModal('delete-modal');
+    }
 </script>
 {% endblock %}

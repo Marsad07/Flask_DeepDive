@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "admin_base.html" %}
 
-{% block content %}
+{% block admin_content %}
 {% if session.get('toast_message') %}
 <div class="toast" style="
     position:fixed;
@@ -133,3 +133,7 @@ document.getElementById('confirm-modal').addEventListener('click', function(e) {
 });
 </script>
 {% endblock %}
+
+
+
+

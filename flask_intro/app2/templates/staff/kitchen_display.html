@@ -1,189 +1,144 @@
-{% extends "base.html" %}
+{% extends "staff_base.html" %}
 
-{% block header %}{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kitchen.css') }}">
+{% endblock %}
 
-{% block content %}
-<div class="dash-page">
-    <!-- This is for the top header row -->
-    <div class="dash-header">
+{% block staff_content %}
+
+<div class="kitchen-header">
+    <div>
         <h1>Kitchen Dashboard</h1>
-        <p class="dash-welcome">Welcome, <span>{{ staff_name }}</span></p>
+        <p class="kitchen-welcome">Active orders requiring attention</p>
     </div>
-    {% if orders %}
-        <!-- This is for the active orders header -->
-        <p class="dash-section-title">Active Orders</p>
-
-        {% for order in orders %}
-        <div class="dash-card" style=
-                "border-left: 5px solid {{ '#FFD700' if order.order_status == 'preparing' else '#8B0000' }};">
-            <div class="dash-card-body">
-
-                <!-- This is the order header -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 class="dash-card-title" style="margin:0;">{{ order.order_ref }}</h3>
-
-                    <div style="display:flex; gap:8px; align-items:center;">
-
-                        <!-- This is for the staff to see the order type -->
-                        <span style="
-                            background: {{ '#8B0000' if order.order_type == 'delivery' else '#FFD700' }};
-                            color: {{ '#FFD700' if order.order_type == 'delivery' else '#2C2416' }};
-                            padding: 5px 12px;
-                            border-radius: 20px;
-                            font-size: 12px;
-                            font-weight: bold;">
-                            {{ order.order_type | capitalize }}
-                        </span>
-
-                        <!-- This shows the item count -->
-                        <span style="
-                            background:#2C2416;
-                            color:#FFFEF2;
-                            padding:5px 12px;
-                            border-radius:20px;
-                            font-size:12px;
-                            font-weight:bold;">
-                            {{ order.order_items | length }} items
-                        </span>
-
-                        <!-- This shows the order timer -->
-                        <span class="order-timer"
-                              data-created="{{ order.created_at }}"
-                              style="
-                                background:#E0D8C8;
-                                color:#2C2416;
-                                padding:5px 12px;
-                                border-radius:20px;
-                                font-size:12px;
-                                font-weight:bold;">
-                            --
-                        </span>
-                    </div>
-                </div>
-
-                <!-- This is the collapsible items toggle -->
-                <button onclick="toggleItems('items-{{ order.order_id }}')"
-                        class="btn-primary"
-                        style="background:none; border:1px solid #D4AF37;
-                         color:#2C2416; padding:6px 14px; margin-bottom:10px;">
-                    👁 View Items ({{ order.order_items | length }})
-                </button>
-
-                <!-- This is the collapsible items list -->
-                <ul id="items-{{ order.order_id }}" style="list-style:none;
-                 padding:0; margin:0 0 15px 0; display:none;">
-                    {% for item in order.order_items %}
-                    <li style="
-                        padding:8px 0;
-                        border-bottom:1px dotted #D4AF37;
-                        display:flex;
-                        justify-content:space-between;
-                        font-size:15px;">
-                        <span>{{ item.item_name }}</span>
-                        <span style="font-weight:bold;">x{{ item.quantity }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                <!-- This is for special instructions -->
-                {% if order.special_instructions %}
-                <div style="
-                    background:#FFF8E7;
-                    border-left:3px solid #FFD700;
-                    padding:10px;
-                    border-radius:4px;
-                    margin-bottom:15px;
-                    font-size:14px;">
-                    ⚠ {{ order.special_instructions }}
-                </div>
-                {% endif %}
-
-                <!-- This is for the action button -->
-                <form method="POST"
-                      id="kitchen-form-{{ order.order_id }}"
-                      action="{{ url_for('staff.kitchen_update_order_status', order_id=order.order_id) }}">
-
-                    {% if order.order_status == 'confirmed' %}
-                        <input type="hidden" name="status" value="preparing">
-                        <button type="button"
-                                class="btn-primary"
-                                style="width:100%;"
-                                onclick="confirmKitchenAction('{{ order.order_id }}', 'Start preparing this order?')">
-                            START PREPARING
-                        </button>
-
-                    {% elif order.order_status == 'preparing' %}
-                        <input type="hidden" name="status" value="ready">
-                        <button type="button"
-                                class="btn-primary"
-                                style="width:100%; background:#2C2416;"
-                                onclick="confirmKitchenAction('{{ order.order_id }}', 'Mark this order as ready?')">
-                            MARK AS READY ✅
-                        </button>
-                    {% endif %}
-
-                </form>
-
-            </div>
-        </div>
-        {% endfor %}
-
-    {% else %}
-
-        <!-- This is for when there are no active orders -->
-        <div style="text-align:center; padding:60px 20px;">
-            <p style="font-size:20px;">✅ No active orders right now</p>
-            <p style="font-size:14px;">New orders will appear here automatically</p>
-        </div>
-
-    {% endif %}
 </div>
 
-<!-- This is for the confirmation modal -->
+{% if orders %}
+
+    <p class="dash-section-title">Active Orders</p>
+
+    {% for order in orders %}
+    <div class="kitchen-card">
+        <div class="kitchen-card-accent {{ 'preparing' if order.order_status == 'preparing' else '' }}"></div>
+        <div class="kitchen-card-body">
+
+            <!-- Order top row -->
+            <div class="kitchen-card-top">
+                <h3 class="kitchen-order-ref">{{ order.order_ref }}</h3>
+                <div class="kitchen-badges">
+                    <span class="badge {{ 'badge-delivery' if order.order_type ==
+                     'delivery' else 'badge-collection' }}">
+                        {{ order.order_type | capitalize }}
+                    </span>
+                    <span class="badge badge-count">
+                        {{ order.order_items | length }} items
+                    </span>
+                    <span class="badge badge-timer order-timer"
+                          data-created="{{ order.created_at }}">
+                        --
+                    </span>
+                </div>
+            </div>
+
+            <!-- Toggle items button -->
+            <button class="kitchen-toggle-btn"
+                    onclick="toggleItems('items-{{ order.order_id }}')">
+                👁 View Items ({{ order.order_items | length }})
+            </button>
+
+            <!-- Items list -->
+            <ul class="kitchen-items-list" id="items-{{ order.order_id }}">
+                {% for item in order.order_items %}
+                <li>
+                    <span>{{ item.item_name }}</span>
+                    <span class="kitchen-item-qty">x{{ item.quantity }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Special instructions -->
+            {% if order.special_instructions %}
+            <div class="kitchen-instructions">
+                ⚠ {{ order.special_instructions }}
+            </div>
+            {% endif %}
+
+            <!-- Action form -->
+            <form method="POST"
+                  id="kitchen-form-{{ order.order_id }}"
+                  action="{{ url_for('staff.kitchen_update_order_status', order_id=order.order_id) }}">
+
+                {% if order.order_status == 'confirmed' %}
+                    <input type="hidden" name="status" value="preparing">
+                    <button type="button"
+                            class="kitchen-action-btn start"
+                            onclick="confirmKitchenAction('{{ order.order_id }}', 'Start preparing this order?')">
+                        Start Preparing
+                    </button>
+
+                {% elif order.order_status == 'preparing' %}
+                    <input type="hidden" name="status" value="ready">
+                    <button type="button"
+                            class="kitchen-action-btn ready"
+                            onclick="confirmKitchenAction('{{ order.order_id }}', 'Mark this order as ready?')">
+                        Mark as Ready ✅
+                    </button>
+                {% endif %}
+
+            </form>
+
+        </div>
+    </div>
+    {% endfor %}
+
+{% else %}
+
+    <div class="kitchen-empty">
+        <p>✅ No active orders right now</p>
+        <p>New orders will appear here automatically</p>
+    </div>
+
+{% endif %}
+
+<!-- Confirmation modal -->
 <div id="confirm-modal" class="modal-overlay">
     <div class="modal-box">
         <h3 id="modal-title" class="modal-title"></h3>
         <p id="modal-message" class="modal-message"></p>
-
         <div class="modal-actions">
             <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
             <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
 <script>
-
-    // This opens the confirmation modal for kitchen actions
     function confirmKitchenAction(orderId, message) {
         document.getElementById("modal-title").innerText = "Confirm Action";
         document.getElementById("modal-message").innerText = message;
-
-        const confirmBtn = document.getElementById("modal-confirm-btn");
-        confirmBtn.onclick = function () {
+        document.getElementById("modal-confirm-btn").onclick = function() {
             document.getElementById(`kitchen-form-${orderId}`).submit();
         };
-
         document.getElementById("confirm-modal").style.display = "flex";
     }
 
-    // This closes the modal
     function closeModal() {
         document.getElementById("confirm-modal").style.display = "none";
     }
 
-    // Close modal when clicking outside
     document.getElementById("confirm-modal").addEventListener("click", function(e) {
         if (e.target === this) closeModal();
     });
 
-    // This toggles the items list open and closed
     function toggleItems(id) {
         const list = document.getElementById(id);
         list.style.display = list.style.display === "none" ? "block" : "none";
     }
 
-    // SOCKET.IO — same as your original
     const socket = io();
     socket.emit('join_kitchen');
 
@@ -211,24 +166,17 @@
         setTimeout(() => location.reload(), 1500);
     });
 
-    // This updates all order timers every second
     function updateTimers() {
-        const timers = document.querySelectorAll('.order-timer');
         const now = new Date();
-
-        timers.forEach(timer => {
+        document.querySelectorAll('.order-timer').forEach(timer => {
             const created = new Date(timer.getAttribute('data-created'));
             const diffMs = now - created;
             const diffMins = Math.floor(diffMs / 60000);
             const diffSecs = Math.floor((diffMs % 60000) / 1000);
 
-            if (diffMins >= 15) {
-                timer.style.background = '#8B0000';
-                timer.style.color = '#FFD700';
-            } else if (diffMins >= 10) {
-                timer.style.background = '#FF8C00';
-                timer.style.color = 'white';
-            }
+            timer.classList.remove('warning', 'urgent');
+            if (diffMins >= 15) timer.classList.add('urgent');
+            else if (diffMins >= 10) timer.classList.add('warning');
 
             timer.textContent = diffMins > 0
                 ? `${diffMins}m ${diffSecs}s`

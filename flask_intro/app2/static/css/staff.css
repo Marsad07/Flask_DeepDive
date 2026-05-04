@@ -1,0 +1,393 @@
+/* Driver page header */
+.driver-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.driver-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 4px;
+}
+
+.driver-header p {
+    font-size: 14px;
+    color: #9E8C78;
+    margin: 0;
+}
+
+/* Availability toggle */
+.availability-card {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(139,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.availability-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 10px;
+}
+
+.availability-badge {
+    display: inline-block;
+    padding: 7px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.availability-badge.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.availability-badge.unavailable {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.availability-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.availability-btn.go-unavailable {
+    background: #8B0000;
+    color: #fff;
+}
+
+.availability-btn.go-unavailable:hover { background: #6B0000; }
+
+.availability-btn.go-available {
+    background: #1A5C3A;
+    color: #fff;
+}
+
+.availability-btn.go-available:hover { background: #144830; }
+
+/* Empty state */
+.driver-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9E8C78;
+    font-size: 18px;
+}
+
+/* Section title */
+.driver-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(139,0,0,0.15);
+}
+
+/* Order card */
+.driver-card {
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid rgba(139,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.driver-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #8B0000;
+    margin: 0 0 16px;
+}
+
+.driver-info-row {
+    font-size: 14px;
+    color: #2C2416;
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.driver-info-row strong {
+    color: #1C1008;
+}
+
+.driver-divider {
+    height: 1px;
+    background: rgba(212,175,55,0.2);
+    margin: 16px 0;
+}
+
+/* Items list */
+.driver-items-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 10px;
+}
+
+.driver-items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+}
+
+.driver-items-list li {
+    font-size: 14px;
+    color: #5C4033;
+    padding: 4px 0;
+    border-bottom: 1px dotted rgba(212,175,55,0.2);
+}
+
+.driver-items-list li:last-child { border-bottom: none; }
+
+.driver-total {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 8px 0 0;
+}
+
+/* Status badge */
+.driver-status {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+}
+
+.driver-status.out-for-delivery { background: rgba(40,167,69,0.15); color: #28a745; }
+.driver-status.ready            { background: rgba(212,175,55,0.15); color: #B8960C; }
+.driver-status.confirmed        { background: rgba(212,175,55,0.15); color: #B8960C; }
+.driver-status.completed        { background: rgba(40,167,69,0.15); color: #28a745; }
+.driver-status.default          { background: rgba(139,0,0,0.1); color: #8B0000; }
+
+/* Action buttons */
+.driver-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    max-width: 300px;
+}
+
+.driver-action-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.driver-action-btn.pickup {
+    background: #D4AF37;
+    color: #2C2416;
+}
+
+.driver-action-btn.pickup:hover { background: #B8960C; }
+
+.driver-action-btn.delivered {
+    background: #8B0000;
+    color: #fff;
+}
+
+.driver-action-btn.delivered:hover { background: #6B0000; }
+
+.driver-action-btn.disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Offer toast */
+.offer-toast {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: #fff;
+    border-left: 5px solid #8B0000;
+    border-radius: 4px;
+    padding: 18px 20px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    z-index: 9999;
+    animation: toastSlideIn 0.35s ease-out;
+    font-family: 'Lato', sans-serif;
+}
+
+.offer-toast-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #8B0000;
+    margin: 0 0 10px;
+}
+
+.offer-toast-detail {
+    font-size: 13px;
+    color: #5C4033;
+    margin: 4px 0;
+}
+
+.offer-toast-total {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 8px 0 14px;
+}
+
+.offer-toast-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.offer-toast-btn {
+    flex: 1;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.offer-toast-btn.accept {
+    background: #1A5C3A;
+    color: #fff;
+}
+
+.offer-toast-btn.accept:hover { background: #144830; }
+
+.offer-toast-btn.decline {
+    background: #8B0000;
+    color: #fff;
+}
+
+.offer-toast-btn.decline:hover { background: #6B0000; }
+
+/* Confirmation modal */
+.driver-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.driver-modal-overlay.open { display: flex; }
+
+.driver-modal-box {
+    background: #fff;
+    border-radius: 4px;
+    padding: 36px 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    border-top: 4px solid #8B0000;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+
+.driver-modal-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #1C1008;
+    margin: 0 0 12px;
+}
+
+.driver-modal-box p {
+    font-size: 14px;
+    color: #5C4033;
+    margin: 0 0 24px;
+    line-height: 1.6;
+}
+
+.driver-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.driver-modal-cancel {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1.5px solid #2C2416;
+    color: #2C2416;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    transition: background 0.2s;
+}
+
+.driver-modal-cancel:hover { background: #F5F0E8; }
+
+.driver-modal-confirm {
+    padding: 10px 24px;
+    background: #8B0000;
+    border: none;
+    color: #fff;
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    transition: background 0.2s;
+}
+
+.driver-modal-confirm:hover { background: #6B0000; }
+
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 560px) {
+    .driver-actions { max-width: 100%; }
+    .offer-toast { right: 12px; left: 12px; width: auto; }
+}

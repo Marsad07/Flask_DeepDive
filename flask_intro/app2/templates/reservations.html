@@ -1,244 +1,262 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reservations.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="resv-page">
-  <h1>Reserve a Table</h1>
-  <h3>
-    Join us here at {{ branding.restaurant_name }} for an unforgettable experience
-  </h3>
 
-  <div class="resv-form-card">
-    <form method="POST" id="reservation-form">
+    <h1>Reserve a Table</h1>
+    <h3>Join us at {{ branding.restaurant_name }} for an unforgettable experience</h3>
 
-      <!-- This is the main fields grid -->
-      <div class="field-grid">
-        <div class="field-group">
-          <label for="fullname">Full Name</label>
-          <input type="text" id="fullname" name="fullname" required>
-        </div>
+    <div class="resv-form-card">
+        <form method="POST" id="reservation-form">
 
-        <div class="field-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
-        </div>
+            <div class="field-grid">
+                <div class="field-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" required>
+                </div>
+                <div class="field-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="field-group">
+                    <label for="phoneNum">Phone Number</label>
+                    <input type="text" id="phoneNum" name="phoneNum" pattern="[0-9]{10,}" required>
+                </div>
+                <div class="field-group">
+                    <label for="resv_date">Date of Reservation</label>
+                    <input type="date" id="resv_date" name="resv_date" min="{{ today }}" required>
+                </div>
+                <div class="field-group">
+                    <label for="resv_time">Time of Reservation</label>
+                    <select id="resv_time" name="resv_time" required>
+                        <option value="">Select a time...</option>
+                        <option value="17:00:00">5:00 PM</option>
+                        <option value="17:30:00">5:30 PM</option>
+                        <option value="18:00:00">6:00 PM</option>
+                        <option value="18:30:00">6:30 PM</option>
+                        <option value="19:00:00">7:00 PM</option>
+                        <option value="19:30:00">7:30 PM</option>
+                        <option value="20:00:00">8:00 PM</option>
+                        <option value="20:30:00">8:30 PM</option>
+                        <option value="21:00:00">9:00 PM</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="guests_num">Number of Guests</label>
+                    <select id="guests_num" name="guests_num" required>
+                        <option value="">Select number...</option>
+                        <option value="2">2 Guests</option>
+                        <option value="4">4 Guests</option>
+                        <option value="6">6 Guests</option>
+                        <option value="8">8 Guests</option>
+                    </select>
+                </div>
+            </div>
 
-        <div class="field-group">
-          <label for="phoneNum">Phone Number</label>
-          <input type="text" id="phoneNum" name="phoneNum"
-                 pattern="[0-9]{10,}" required>
-        </div>
+            <p class="section-label">Select Your Table</p>
 
-        <div class="field-group">
-          <label for="resv_date">Date of Reservation</label>
-          <input type="date" id="resv_date" name="resv_date"
-                 min="{{ today }}" required>
-        </div>
+            <div class="restaurant-layout" id="table-canvas">
+                <div class="layout-label window-label">WINDOW SIDE</div>
+                <div class="layout-label entrance-label">ENTRANCE</div>
 
-        <div class="field-group">
-          <label for="resv_time">Time of Reservation</label>
-          <select id="resv_time" name="resv_time" required>
-            <option value="">Select a time...</option>
-            <option value="17:00">5:00 PM</option>
-            <option value="17:30">5:30 PM</option>
-            <option value="18:00">6:00 PM</option>
-            <option value="18:30">6:30 PM</option>
-            <option value="19:00">7:00 PM</option>
-            <option value="19:30">7:30 PM</option>
-            <option value="20:00">8:00 PM</option>
-            <option value="20:30">8:30 PM</option>
-            <option value="21:00">9:00 PM</option>
-          </select>
-        </div>
+                {% for table in tables %}
+                <div class="table-item"
+                     data-table="{{ table.table_number }}"
+                     data-seats="{{ table.seats }}"
+                     data-px="{{ table.pos_x }}"
+                     data-py="{{ table.pos_y }}">
+                    <div class="table-{{ table.shape }}">{{ table.table_number }}</div>
+                    <div class="table-info">{{ table.seats }} seats</div>
+                </div>
+                {% endfor %}
+            </div>
 
-        <div class="field-group">
-          <label for="guests_num">Number of Guests</label>
-          <select id="guests_num" name="guests_num" required>
-            <option value="">Select number...</option>
-            <option value="2">2 Guests</option>
-            <option value="4">4 Guests</option>
-            <option value="6">6 Guests</option>
-            <option value="8">8 Guests</option>
-          </select>
-        </div>
-      </div>
+            <div class="table-legend">
+                <div class="table-legend-item">
+                    <div class="table-legend-dot legend-available"></div>
+                    Available
+                </div>
+                <div class="table-legend-item">
+                    <div class="table-legend-dot legend-selected"></div>
+                    Selected
+                </div>
+                <div class="table-legend-item">
+                    <div class="table-legend-dot legend-unavailable"></div>
+                    Unavailable
+                </div>
+            </div>
 
-      <!-- This is for the table selector -->
-      <p class="section-label">Select Your Table</p>
+            <p id="table-error">Please select a table</p>
 
-      <div class="restaurant-layout" id="table-canvas">
-        <!-- Room labels -->
-        <div class="layout-label window-label">WINDOW SIDE</div>
-        <div class="layout-label entrance-label">ENTRANCE</div>
+            <input type="hidden" id="table_num" name="table_num" required>
 
-        <!-- This loops through each table and renders the correct shape -->
-        {% for table in tables %}
-        <div class="table-item"
-             data-table="{{ table.table_number }}"
-             data-seats="{{ table.seats }}"
-             data-px="{{ table.pos_x }}"
-             data-py="{{ table.pos_y }}">
-          <div class="table-{{ table.shape }}">
-            {{ table.table_number }}
-          </div>
-          <div class="table-info">{{ table.seats }} seats</div>
-        </div>
-        {% endfor %}
-      </div>
+            <div class="field-group field-group-spaced">
+                <label for="special_requests">Special Requests (Optional)</label>
+                <textarea id="special_requests" name="special_requests"
+                          placeholder="Dietary restrictions, celebrations..."></textarea>
+            </div>
 
-      <input type="hidden" id="table_num" name="table_num" required>
-      <p id="table-error">Please select a table</p>
+            <button type="button" class="btn-confirm" onclick="showReservationConfirm()">
+                Confirm Reservation
+            </button>
 
-      <!-- This is for special requests -->
-      <div class="field-group field-group-spaced">
-        <label for="special_requests">Special Requests (Optional)</label>
-        <textarea id="special_requests" name="special_requests"
-                  placeholder="Dietary restrictions, celebrations...">
-        </textarea>
-      </div>
-
-      <button type="button" class="btn-confirm"
-              onclick="showReservationConfirm()">
-        Confirm Reservation
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- This is the confirmation modal -->
-<div id="reservation-confirm-modal" class="modal-backdrop"
-     role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <h3>Confirm Reservation</h3>
-    <p>Are you sure you want to confirm this reservation?</p>
-    <div class="modal-actions">
-      <button class="btn-modal-cancel"
-              onclick="closeReservationConfirm()">Cancel</button>
-      <button class="btn-modal-confirm"
-              onclick="submitReservationForm()">Yes, Confirm</button>
+        </form>
     </div>
-  </div>
 </div>
+
+<!-- Confirmation modal -->
+<div id="reservation-confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <h3>Confirm Reservation</h3>
+        <p>Are you sure you want to confirm this reservation?</p>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeReservationConfirm()">Cancel</button>
+            <button class="btn-modal-confirm" onclick="submitReservationForm()">Yes, Confirm</button>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-  // Position tables: converts stored px values to % so the layout
-  //    is consistent on every screen size. Runs on load and on resize.
-  function positionTables() {
-    const canvas = document.getElementById('table-canvas');
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
-    document.querySelectorAll('.table-item').forEach(el => {
-      const px = parseFloat(el.dataset.px);
-      const py = parseFloat(el.dataset.py);
-      el.style.left = (px / w * 100) + '%';
-      el.style.top  = (py / h * 100) + '%';
-    });
-  }
+    function positionTables() {
+        const canvas = document.getElementById('table-canvas');
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        document.querySelectorAll('.table-item').forEach(el => {
+            el.style.left = (parseFloat(el.dataset.px) / w * 100) + '%';
+            el.style.top  = (parseFloat(el.dataset.py) / h * 100) + '%';
+        });
+    }
 
-  positionTables();
-  window.addEventListener('resize', positionTables);
-
-  // Socket.io: handles real-time table position and availability updates
-  const socket = io();
-
-  socket.on('tables_updated', (positions) => {
-    positions.forEach(pos => {
-      const el = document.querySelector(
-        `.table-item[data-table="${pos.id}"]`
-      );
-      if (el) {
-        el.dataset.px = pos.x;
-        el.dataset.py = pos.y;
-      }
-    });
     positionTables();
-  });
+    window.addEventListener('resize', positionTables);
 
-  socket.on('table_unavailable', (data) => {
-    const el = document.querySelector(
-      `.table-item[data-table="${data.table_num}"]`
-    );
-    if (el) {
-      el.classList.add('unavailable');
-      el.classList.remove('selected');
+    const tables       = document.querySelectorAll('.table-item');
+    const tableInput   = document.getElementById('table_num');
+    const guestsSelect = document.getElementById('guests_num');
+    const tableError   = document.getElementById('table-error');
+
+    const bookedSlots = {{ booked_slots | tojson }}.map(s => ({
+        table_num: String(s.table_num),
+        date: s.date,
+        time: s.time
+    }));
+
+    function refreshTableAvailability() {
+        const selectedDate = document.getElementById('resv_date').value;
+        const selectedTime = document.getElementById('resv_time').value;
+        const guests = parseInt(guestsSelect.value) || 0;
+
+        tables.forEach(el => el.classList.remove('unavailable'));
+
+        if (selectedDate && selectedTime) {
+            bookedSlots.forEach(slot => {
+                if (slot.date === selectedDate && slot.time === selectedTime) {
+                    const el = document.querySelector(`.table-item[data-table="${slot.table_num}"]`);
+                    if (el) {
+                        el.classList.add('unavailable');
+                        el.classList.remove('selected');
+                        if (String(tableInput.value) === slot.table_num) tableInput.value = '';
+                    }
+                }
+            });
+        }
+
+        if (guests > 0) {
+            tables.forEach(t => {
+                if (parseInt(t.dataset.seats) < guests) {
+                    t.classList.add('unavailable');
+                    t.classList.remove('selected');
+                    if (tableInput.value === t.dataset.table) tableInput.value = '';
+                }
+            });
+        }
     }
-  });
 
-  socket.on('table_available', (data) => {
-    const el = document.querySelector(
-      `.table-item[data-table="${data.table_num}"]`
-    );
-    if (el) el.classList.remove('unavailable');
-  });
+    document.getElementById('resv_date').addEventListener('change', refreshTableAvailability);
+    document.getElementById('resv_time').addEventListener('change', refreshTableAvailability);
+    guestsSelect.addEventListener('change', function() {
+        tableInput.value = '';
+        refreshTableAvailability();
+    });
 
-  // Table selection logic
-  const tables       = document.querySelectorAll('.table-item');
-  const tableInput   = document.getElementById('table_num');
-  const guestsSelect = document.getElementById('guests_num');
-  const tableError   = document.getElementById('table-error');
+    const socket = io();
 
-  guestsSelect.addEventListener('change', function () {
-    const guests = parseInt(this.value);
+    socket.on('tables_updated', (positions) => {
+        positions.forEach(pos => {
+            const el = document.querySelector(`.table-item[data-table="${pos.id}"]`);
+            if (el) { el.dataset.px = pos.x; el.dataset.py = pos.y; }
+        });
+        positionTables();
+    });
+
+    socket.on('table_unavailable', (data) => {
+        bookedSlots.push({ table_num: String(data.table_num), date: data.date, time: data.time });
+        const selectedDate = document.getElementById('resv_date').value;
+        const selectedTime = document.getElementById('resv_time').value;
+        if (data.date === selectedDate && data.time === selectedTime) {
+            const el = document.querySelector(`.table-item[data-table="${String(data.table_num)}"]`);
+            if (el) {
+                el.classList.add('unavailable');
+                el.classList.remove('selected');
+                if (String(tableInput.value) === String(data.table_num)) tableInput.value = '';
+            }
+        }
+    });
+
+    socket.on('table_available', (data) => {
+        const idx = bookedSlots.findIndex(
+            s => s.table_num === String(data.table_num) && s.date === data.date && s.time === data.time
+        );
+        if (idx !== -1) bookedSlots.splice(idx, 1);
+        const selectedDate = document.getElementById('resv_date').value;
+        const selectedTime = document.getElementById('resv_time').value;
+        if (data.date === selectedDate && data.time === selectedTime) refreshTableAvailability();
+    });
+
     tables.forEach(t => {
-      const seats = parseInt(t.dataset.seats);
-      if (seats >= guests) {
-        t.classList.remove('unavailable');
-      } else {
-        t.classList.add('unavailable');
-        t.classList.remove('selected');
-      }
+        t.addEventListener('click', function() {
+            if (this.classList.contains('unavailable')) return;
+            tables.forEach(x => x.classList.remove('selected'));
+            this.classList.add('selected');
+            tableInput.value = this.dataset.table;
+            tableError.style.display = 'none';
+        });
     });
-    tableInput.value = '';
-  });
 
-  tables.forEach(t => {
-    t.addEventListener('click', function () {
-      if (this.classList.contains('unavailable')) return;
-      tables.forEach(x => x.classList.remove('selected'));
-      this.classList.add('selected');
-      tableInput.value = this.dataset.table;
-      tableError.style.display = 'none';
+    const modal = document.getElementById('reservation-confirm-modal');
+
+    function showReservationConfirm() {
+        if (!tableInput.value) {
+            tableError.style.display = 'block';
+            tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReservationConfirm() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function submitReservationForm() {
+        document.getElementById('reservation-form').submit();
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeReservationConfirm();
     });
-  });
 
-  document.querySelector('form').addEventListener('submit', function (e) {
-    if (!tableInput.value) {
-      e.preventDefault();
-      tableError.style.display = 'block';
-      tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  });
-
-  // Reservation confirmation modal
-  const modal = document.getElementById('reservation-confirm-modal');
-
-  function showReservationConfirm() {
-    if (!tableInput.value) {
-      tableError.style.display = 'block';
-      tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeReservationConfirm() {
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function submitReservationForm() {
-    document.getElementById('reservation-form').submit();
-  }
-
-  modal.addEventListener('click', function (e) {
-    if (e.target === this) closeReservationConfirm();
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeReservationConfirm();
-  });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeReservationConfirm();
+    });
 </script>
+{% endblock %}
 {% endblock %}

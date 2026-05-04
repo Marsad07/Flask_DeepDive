@@ -403,7 +403,7 @@ def update_order_status(order_id):
     socketio.emit('kitchen_update', {
         'order_id': order_id,
         'new_status': new_status
-    }, room='kitchen')
+    }, room='kitchen.css')
     return redirect(url_for('admin.view_all_orders'))
 
 def get_delivery_minutes(delivery_address):
@@ -1080,6 +1080,23 @@ def driver_details(driver_id):
 
     cursor.close()
     return render_template("admin/driver_details.html", driver=driver, orders=orders)
+
+def update_footer_about():
+    if request.method == "POST":
+        footer_about = request.form['footer_about']
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(
+            "UPDATE branding SET footer_about = %s",
+            (footer_about,)
+        )
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.dashboard'))
 
 
 

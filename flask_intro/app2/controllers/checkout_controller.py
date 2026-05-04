@@ -74,8 +74,8 @@ def process_order():
 
     db.commit()
 
-    # This emits new order to kitchen
-    socketio.emit('new_order', {'order_id': order_id}, room='kitchen')
+    # This emits new order to kitchen.css
+    socketio.emit('new_order', {'order_id': order_id}, room='kitchen.css')
 
     # This sends confirmation email
     try:
