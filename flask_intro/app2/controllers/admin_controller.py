@@ -1088,7 +1088,7 @@ def update_footer_about():
         db = get_db()
         cursor = db.cursor()
         cursor.execute(
-            "UPDATE branding SET footer_about = %s",
+            "UPDATE restaurant_branding SET footer_about = %s",
             (footer_about,)
         )
         db.commit()

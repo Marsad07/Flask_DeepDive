@@ -3,6 +3,7 @@ import requests
 from app2.database import get_db
 from flask_socketio import join_room
 from app2 import socketio
+import time
 
 def track_order(order_number):
     db = get_db()
@@ -107,19 +108,29 @@ def track_order(order_number):
 
 def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_key):
     try:
-        # Geocode the delivery address
-        geocode_response = requests.get(
-            'https://nominatim.openstreetmap.org/search',
-            params={
-                'q': delivery_address,
-                'format': 'json',
-                'limit': 1,
-                'countrycodes': 'gb'
-            },
-            headers={'User-Agent': 'RestaurantApp/1.0'}
-        )
-        geocode_data = geocode_response.json()
-        print(f"Nominatim result: {geocode_data}")
+        addresses_to_try = [
+            delivery_address,
+            ', '.join(delivery_address.split(', ')[1:]) if len(delivery_address.split(', ')) > 1 else ''
+        ]
+        geocode_data = []
+        for addr in addresses_to_try:
+            if not addr.strip():
+                continue
+            time.sleep(1)
+            geocode_response = requests.get(
+                'https://nominatim.openstreetmap.org/search',
+                params={
+                    'q': addr,
+                    'format': 'json',
+                    'limit': 1,
+                    'countrycodes': 'gb'
+                },
+                headers={'User-Agent': 'RestaurantApp/1.0'}
+            )
+            geocode_data = geocode_response.json()
+            print(f"Nominatim tried '{addr}': {geocode_data}")
+            if geocode_data:
+                break
 
         if not geocode_data:
             print("Nominatim found nothing")
@@ -128,7 +139,6 @@ def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_
         customer_lat = float(geocode_data[0]['lat'])
         customer_lng = float(geocode_data[0]['lon'])
 
-        # Get driving route
         directions_response = requests.post(
             'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
             json={'coordinates': [[restaurant_lng, restaurant_lat], [customer_lng, customer_lat]]},
@@ -141,7 +151,7 @@ def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_
 
         if 'features' not in directions_data:
             print(f"Directions failed: {directions_data}")
-            return None, None, None
+            return None, customer_lat, customer_lng
 
         route_coords = directions_data['features'][0]['geometry']['coordinates']
         route_coords = [[c[1], c[0]] for c in route_coords]
@@ -150,7 +160,6 @@ def get_route_coordinates(restaurant_lat, restaurant_lng, delivery_address, api_
     except Exception as e:
         print(f"Route error: {e}")
         return None, None, None
-
 
 @socketio.on('join_order')
 def handle_join(data):

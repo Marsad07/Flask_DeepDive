@@ -1,0 +1,183 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<div class="dash-page">
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <h1>Newsletter</h1>
+      <p class="dash-welcome">Manage subscribers and send campaigns</p>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <a href="{{ url_for('admin.export_subscribers') }}" class="btn-gold btn-primary">
+        Export CSV
+      </a>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="dash-stats dash-stats-3" style="margin-bottom:32px;">
+    <div class="stat-card stat-card-dark">
+      <div class="stat-number">{{ subscribers|length }}</div>
+      <div class="stat-label">Total Subscribers</div>
+    </div>
+    <div class="stat-card stat-card-red">
+      <div class="stat-number">
+        {{ subscribers|selectattr('status', 'equalto', 'ACTIVE')|list|length }}
+      </div>
+      <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card stat-card-gold">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Emails Sent This Month</div>
+    </div>
+  </div>
+
+  <!-- Success/error banners -->
+  {% if request.args.get('sent') %}
+  <div class="info-banner" style="margin-bottom:24px;">
+    ✓ Newsletter sent to {{ request.args.get('sent') }} subscriber(s).
+    {% if request.args.get('failed') != '0' %}
+      {{ request.args.get('failed') }} failed.
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Send Newsletter -->
+  <p class="dash-section-title">Send Newsletter</p>
+  <div class="dash-card">
+    <div class="dash-card-body">
+      <form method="POST" action="{{ url_for('admin.send_newsletter') }}" id="send-form">
+
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" name="subject" class="form-input"
+                 placeholder="e.g. This week's specials" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Message Body (HTML supported)</label>
+          <textarea name="body" class="form-textarea" rows="8"
+                    placeholder="Write your newsletter content here..." required></textarea>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="confirmSend()">
+          Send to All Subscribers
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Subscriber List -->
+  <p class="dash-section-title" style="margin-top:48px;">
+    Subscribers
+    <span style="font-size:14px; font-weight:400; color:#9E8C78; margin-left:10px;">
+      {{ subscribers|length }} total
+    </span>
+  </p>
+
+  <div class="dash-card" style="padding:0;">
+    {% if subscribers %}
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Subscribed At</th>
+          <th>Status</th>
+          <th class="center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in subscribers %}
+        <tr>
+          <td style="color:#9E8C78;">{{ loop.index }}</td>
+          <td>{{ sub.customer_email }}</td>
+          <td style="color:#9E8C78;">{{ sub.subscribe_time }}</td>
+          <td>{{ sub.status }}</td>
+
+          <td class="center">
+            <form method="POST"
+                  action="{{ url_for('admin.delete_newsletter_subscriber', email=sub.customer_email) }}"
+                  id="del-sub-{{ loop.index }}"
+                  class="inline-form">
+              <button type="button" class="btn-delete"
+                      onclick="confirmDeleteSub({{ loop.index }}, '{{ sub.customer_email }}')">
+                Remove
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="dash-empty">No subscribers yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Send confirm modal -->
+<div id="send-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="modal-title">Send Newsletter?</h3>
+    <p class="modal-message">
+      This will send your newsletter to all
+      <strong>{{ subscribers|length }}</strong> subscriber(s). This cannot be undone.
+    </p>
+    <div class="modal-actions">
+      <button onclick="closeSendModal()" class="modal-btn-cancel">Cancel</button>
+      <button onclick="document.getElementById('send-form').submit()"
+              class="modal-btn-confirm">Yes, Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete subscriber confirm modal -->
+<div id="del-sub-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="modal-title">Remove Subscriber?</h3>
+    <p class="modal-message">Remove <strong id="del-sub-email"></strong> from the list?</p>
+    <div class="modal-actions">
+      <button onclick="closeDelSubModal()" class="modal-btn-cancel">Cancel</button>
+      <button id="del-sub-confirm-btn" class="modal-btn-confirm">Yes, Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Send modal
+  function confirmSend() {
+    document.getElementById('send-modal').classList.add('open');
+  }
+  function closeSendModal() {
+    document.getElementById('send-modal').classList.remove('open');
+  }
+
+  // Delete subscriber modal
+  function confirmDeleteSub(index, email) {
+    document.getElementById('del-sub-email').textContent = email;
+    document.getElementById('del-sub-confirm-btn').onclick = function () {
+      document.getElementById('del-sub-' + index).submit();
+    };
+    document.getElementById('del-sub-modal').classList.add('open');
+  }
+  function closeDelSubModal() {
+    document.getElementById('del-sub-modal').classList.remove('open');
+  }
+
+  // Close on outside click
+  document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    }
+  });
+</script>
+{% endblock %}

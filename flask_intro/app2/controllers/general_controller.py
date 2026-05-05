@@ -33,16 +33,27 @@ def contact_page():
 
     return render_template("contact.html", info=info)
 
-@staff_redirect
 def newsletter_signup():
     if request.method == "POST":
-        email = request.form.get("email")
+        email = request.form.get("email").strip().lower()
 
         db = get_db()
         cursor = db.cursor()
+
+        # Check if already subscribed
+        cursor.execute(
+            "SELECT 1 FROM newsletter_subs WHERE customer_email = %s", (email,)
+        )
+        already_exists = cursor.fetchone()
+
+        if already_exists:
+            cursor.close()
+            db.close()
+            return redirect(url_for('general.home_page') + '?newsletter=exists')
+
         try:
             cursor.execute(
-                "INSERT INTO newsletter_subs (customer_email) VALUES (%s)",
+                "INSERT INTO newsletter_subs (customer_email, status) VALUES (%s, 'ACTIVE')",
                 (email,)
             )
             db.commit()

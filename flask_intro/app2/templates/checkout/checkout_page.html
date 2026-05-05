@@ -1,87 +1,71 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block header %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
 {% endblock %}
 
 {% block content %}
 
 <!-- This is the loading overlay shown during payment processing -->
-<div id="payment-loading" style="
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(44, 36, 22, 0.85);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;">
-    <div style="
-        width: 60px; height: 60px;
-        border: 5px solid #D4AF37;
-        border-top-color: #8B0000;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin-bottom: 20px;">
-    </div>
-    <p style="color: #FFD700; font-family: Georgia, serif; font-size: 18px; letter-spacing: 2px;">
-        Processing Payment...
-    </p>
+<div id="payment-loading" class="payment-loading">
+    <div class="payment-loading-spinner"></div>
+    <p class="payment-loading-text">Processing Payment...</p>
 </div>
-<style>
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-@media (max-width: 768px) {
-    .checkout-grid { grid-template-columns: 1fr !important; }
-    .checkout-grid > div:first-child { order: 2 !important; }
-    .checkout-grid > div:last-child { order: 1 !important; }
-}
-</style>
 <div class="menu-container">
     <h1>CHECKOUT</h1>
-    <div class="checkout-grid" style="max-width: 1200px; margin: 0 auto; display: grid;
-     grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div class="checkout-grid">
+        <!-- This is the order summary panel shown on the right on desktop and top on mobile -->
+        <div class="checkout-summary-col">
+            <div class="order-summary-sticky">
+                <div class="order-summary-card">
+                    <h2>Order Summary</h2>
 
-        <!-- Left Side - Order Summary -->
-        <div style="order: 2;">
-            <div style="background: white; padding: 25px; border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 20px;">
-                <h2 style="margin-top: 0; font-size: 24px; border-bottom: 2px solid #D4AF37; padding-bottom: 15px;">
-                    Order Summary
-                </h2>
-                {% if cart %}
-                    {% for item_id, item in cart.items() %}
-                    <div style="display: flex; justify-content: space-between;
-                     padding: 12px 0; border-bottom: 1px solid #eee;">
-                        <div>
-                            <p style="margin: 0; font-weight: bold; color: #2C2416;">{{ item.name }}</p>
-                            <p style="margin: 5px 0 0 0; font-size: 14px; color: #5C4033;">Qty: {{ item.quantity }}</p>
+                    {% if cart %}
+                        {% for item_id, item in cart.items() %}
+                        <div class="order-item-row">
+                            <div>
+                                <p class="order-item-name">{{ item.name }}</p>
+                                <p class="order-item-qty">Qty: {{ item.quantity }}</p>
+                            </div>
+                            <p class="order-item-price">
+                                £{{ "%.2f"|format(item.price * item.quantity) }}
+                            </p>
                         </div>
-                        <p style="margin: 0; font-weight: bold; color: #8B0000;">
-                            £{{ "%.2f"|format(item.price * item.quantity) }}</p>
-                    </div>
-                    {% endfor %}
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid #8B0000;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0; font-size: 24px; font-weight: bold; color: #2C2416;">Total</p>
-                            <p style="margin: 0; font-size: 28px; font-weight: bold; color: #8B0000;">
-                                £{{ "%.2f"|format(total) }}</p>
+                        {% endfor %}
+
+                        <!-- This shows the discount row when a coupon is applied -->
+                        <div id="discount-row" class="discount-row">
+                            <span id="discount-label">Discount</span>
+                            <span id="discount-amount">-£0.00</span>
                         </div>
-                    </div>
-                {% endif %}
+
+                        <!-- This is the order total section -->
+                        <div class="order-total-row">
+                            <p class="order-total-label">Total</p>
+                            <div class="order-total-prices">
+                                <!-- This shows the original price struck through when a coupon is applied -->
+                                <p id="original-price" class="order-original-price">
+                                    £{{ "%.2f"|format(total) }}
+                                </p>
+                                <p id="final-price" class="order-final-price">
+                                    £{{ "%.2f"|format(total) }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
+        <!-- This is the checkout form shown on the left on desktop and bottom on mobile -->
+        <div class="checkout-form-col">
+            <form id="checkout-form" method="POST"
+                  action="{{ url_for('checkout.process_order') }}">
 
-        <!-- Right Side - Checkout Form -->
-        <div style="order: 1;">
-            <form id="checkout-form" method="POST" action="{{ url_for('checkout.process_order') }}"
-                  style="max-width: none; margin: 0;">
-
-                <!-- This is where the customer enters their contact Information -->
-                <div style="background: white; padding: 25px; border-radius: 12px;
-                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Contact Information</h2>
+                <!-- This is where the customer enters their contact information -->
+                <div class="checkout-card">
+                    <h2>Contact Information</h2>
                     <label>Full Name</label>
                     <input type="text" name="full_name" id="full_name" required>
                     <label>Email</label>
@@ -90,32 +74,34 @@
                     <input type="tel" name="phone" pattern="[0-9]{10,}" required>
                 </div>
 
-                <!-- This is where the customer chooses order type -->
-                <div style="background: white; padding: 25px; border-radius: 12px;
-                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Order Type</h2>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <!-- This is where the customer chooses their order type -->
+                <div class="checkout-card">
+                    <h2>Order Type</h2>
+                    <div class="order-type-grid">
                         <label style="cursor: pointer;">
-                            <input type="radio" name="order_type" value="collection" checked onchange="toggleAddress()">
-                            <div style="border: 2px solid #D4AF37; padding: 20px; border-radius: 8px;
-                             text-align: center;" class="order-type-option">
-                                <p style="margin: 0; font-size: 18px; font-weight: bold;">🏪 Collection</p>
+                            <input type="radio" name="order_type" value="collection"
+                                   checked onchange="toggleAddress()">
+                            <div class="order-type-option">
+                                <p>🏪 Collection</p>
                             </div>
                         </label>
                         <label style="cursor: pointer;">
-                            <input type="radio" name="order_type" value="delivery" onchange="toggleAddress()">
-                            <div style="border: 2px solid #D4AF37; padding: 20px; border-radius: 8px;
-                             text-align: center;" class="order-type-option">
-                                <p style="margin: 0; font-size: 18px; font-weight: bold;">🚗 Delivery</p>
+                            <input type="radio" name="order_type" value="delivery"
+                                   onchange="toggleAddress()">
+                            <div class="order-type-option">
+                                <p>🚗 Delivery</p>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- This is where the customer enters delivery Address -->
-                <div id="delivery-address" style="display: none; background: white; padding: 25px;
-                 border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Delivery Address</h2>
+                <!-- This is where the customer enters their delivery address -->
+                <div id="delivery-address" class="checkout-card" style="display: none;">
+                    <h2>Delivery Address</h2>
+                    <p style="font-size: 12px; color: #9E8C78; margin: 4px 0 16px;
+                              font-family: 'Lato', sans-serif;">
+                        Please include your house number for accurate delivery tracking.
+                    </p>
                     <label>Address Line 1</label>
                     <input type="text" name="address_line1" id="address1">
                     <label>Address Line 2</label>
@@ -126,60 +112,103 @@
                     <input type="text" name="postcode" id="postcode">
                 </div>
 
-                <!-- This is the payment Method -->
-                <div style="background: white; padding: 25px; border-radius: 12px;
-                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                    <h2 style="margin-top: 0; font-size: 20px; color: #8B0000;">Payment Method</h2>
-
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #D4AF37;
-                         border-radius: 8px; cursor: pointer;" class="payment-option">
-                            <input type="radio" name="payment_method" value="cash" id="pay_cash"
-                                   checked style="margin-right: 12px;" onchange="togglePaymentSection()">
-                            <span style="font-size: 16px; font-weight: bold;">💵 Cash on Collection/Delivery</span>
-                        </label>
-
-                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #D4AF37;
-                         border-radius: 8px; cursor: pointer;" class="payment-option">
-                            <input type="radio" name="payment_method" value="card_online" id="pay_online"
-                                   style="margin-right: 12px;" onchange="togglePaymentSection()">
-                            <span style="font-size: 16px; font-weight: bold;">
-                                💳 Pay Online (Card / Apple Pay / Google Pay)</span>
-                        </label>
+                <!-- This is where the customer enters a discount coupon code -->
+                <div class="checkout-card">
+                    <h2>Discount Code</h2>
+                    <div class="coupon-row">
+                        <input type="text" id="coupon-input"
+                               placeholder="Enter code e.g. SUMMER20"
+                               style="text-transform: uppercase;">
+                        <button type="button" class="btn-apply" onclick="applyCoupon()">
+                            Apply
+                        </button>
                     </div>
+                    <!-- This shows a success message when a valid coupon is applied -->
+                    <div id="coupon-success" class="coupon-success"></div>
+                    <!-- This shows an error message when a coupon is invalid or expired -->
+                    <div id="coupon-error" class="coupon-error"></div>
+                </div>
 
-                    <!-- This is the stripe payment Element which shows card, Apple Pay, Google Pay -->
-                    <div id="stripe-section" style="display: none; margin-top: 20px;">
-                        <div id="payment-element" style="margin-bottom: 15px;"></div>
-                        <div id="payment-errors" style="color: #8B0000; font-size: 14px; margin-bottom: 10px;"></div>
+                <!-- This is where the customer selects their payment method -->
+                <div class="checkout-card">
+                    <h2>Payment Method</h2>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="cash"
+                               id="pay_cash" checked onchange="togglePaymentSection()">
+                        <span>💵 Cash on Collection/Delivery</span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment_method" value="card_online"
+                               id="pay_online" onchange="togglePaymentSection()">
+                        <span>💳 Pay Online (Card / Apple Pay / Google Pay)</span>
+                    </label>
+
+                    <!-- This is the Stripe payment element which shows card, Apple Pay, Google Pay -->
+                    <div id="stripe-section" style="display: none;">
+                        <div id="payment-element"></div>
+                        <div id="payment-errors"></div>
                     </div>
                 </div>
 
-                <!-- This is the special instructions part -->
-                <div style="background: white; padding: 25px; border-radius: 12px;
-                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <!-- This is where the customer can leave any special instructions -->
+                <div class="checkout-card">
                     <label>Special Instructions (Optional)</label>
                     <textarea name="special_instructions" rows="4"
-                              placeholder="Any dietary requirements, delivery instructions, etc."></textarea>
+                              placeholder="Any dietary requirements, delivery instructions, etc.">
+                    </textarea>
                 </div>
 
-                <!-- This is for the hidden field to store payment intent id -->
+                <!-- This is the hidden field to store the payment intent id -->
                 <input type="hidden" name="payment_intent_id" id="payment_intent_id">
                 <input type="hidden" name="payment_status" id="payment_status" value="pending">
 
-                <!-- Submit Button -->
-                <button type="submit" id="submit-btn" style="width: 100%; background: #8B0000; color: #FFD700;
-                 padding: 20px; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
-                  text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease;"
-                    onmouseover="this.style.background='#660000'"
-                    onmouseout="this.style.background='#8B0000'">
+                <!-- These are the hidden fields to store coupon data for form submission -->
+                <input type="hidden" name="coupon_code" id="coupon_code_hidden">
+                <input type="hidden" name="discount_amount" id="discount_amount_hidden" value="0">
+
+                <!-- This is the place order button which opens the confirmation modal -->
+                <button type="button" id="submit-btn" class="btn-place-order"
+                        onclick="openConfirm()">
                     Place Order
                 </button>
+
             </form>
+        </div>
+
+    </div>
+</div>
+<!-- This is the order confirmation modal shown before placing the order -->
+<div id="confirm-modal" class="confirm-modal">
+    <div class="confirm-modal-box">
+        <h3>Confirm Your Order</h3>
+
+        <!-- This is where the order items and details are listed in the modal -->
+        <div id="confirm-items-list"></div>
+
+        <!-- This shows the discount row in the modal if a coupon was applied -->
+        <div id="confirm-discount-row" class="confirm-discount-row">
+            <span class="confirm-item-label">Discount</span>
+            <span id="confirm-discount-val" class="confirm-item-value"></span>
+        </div>
+
+        <!-- This is the total row in the modal -->
+        <div class="confirm-total-row">
+            <span>Total</span>
+            <span id="confirm-total-val" class="confirm-total-amount"></span>
+        </div>
+
+        <!-- These are the modal action buttons -->
+        <div class="confirm-modal-actions">
+            <button type="button" onclick="closeConfirm()" class="btn-modal-cancel">
+                Go Back
+            </button>
+            <button type="button" id="confirm-place-btn" class="btn-modal-confirm">
+                Yes, Place Order
+            </button>
         </div>
     </div>
 </div>
-<!-- Stripe Javascript -->
+<!-- This is the Stripe Javascript -->
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     const stripe = Stripe('{{ stripe_public_key }}');
@@ -187,15 +216,209 @@
     let paymentElement = null;
     let clientSecret = null;
 
+    // This tracks the applied coupon discount
+    let appliedDiscount = 0;
+    const originalTotal = {{ total }};
+
+    // This applies the coupon code entered by the customer
+    async function applyCoupon() {
+        const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+        const successEl = document.getElementById('coupon-success');
+        const errorEl = document.getElementById('coupon-error');
+        const applyBtn = document.querySelector('.btn-apply');
+
+        successEl.style.display = 'none';
+        errorEl.style.display = 'none';
+
+        if (!code) {
+            errorEl.textContent = 'Please enter a coupon code.';
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // This shows a loading state on the button while the coupon is being validated
+        applyBtn.textContent = 'Checking...';
+        applyBtn.disabled = true;
+
+        try {
+            const response = await fetch('/checkout/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code, total: originalTotal })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                appliedDiscount = data.discount_amount;
+
+                const newTotal = Math.max(0, originalTotal - appliedDiscount).toFixed(2);
+                const discountDisplay = data.discount_type === 'percent'
+                    ? `${data.discount_value}% off`
+                    : `£${parseFloat(data.discount_value).toFixed(2)} off`;
+
+                // This updates the order summary with the discounted price
+                document.getElementById('discount-row').style.display = 'flex';
+                document.getElementById('discount-label').textContent =
+                    `${code} (${discountDisplay})`;
+                document.getElementById('discount-amount').textContent =
+                    `-£${appliedDiscount.toFixed(2)}`;
+                document.getElementById('original-price').style.display = 'block';
+                document.getElementById('final-price').textContent = `£${newTotal}`;
+
+                // This stores the coupon data in the hidden fields for form submission
+                document.getElementById('coupon_code_hidden').value = code;
+                document.getElementById('discount_amount_hidden').value =
+                    appliedDiscount.toFixed(2);
+
+                // This locks the input and shows the success message
+                successEl.textContent =
+                    `✓ Code applied — you save £${appliedDiscount.toFixed(2)}!`;
+                successEl.style.display = 'block';
+                document.getElementById('coupon-input').disabled = true;
+                applyBtn.textContent = '✓ Applied';
+
+            } else {
+                // This shows the specific error message returned from the server
+                errorEl.textContent = data.message || 'Invalid or expired coupon code.';
+                errorEl.style.display = 'block';
+                applyBtn.textContent = 'Apply';
+                applyBtn.disabled = false;
+            }
+
+        } catch (err) {
+            errorEl.textContent = 'Something went wrong. Please try again.';
+            errorEl.style.display = 'block';
+            applyBtn.textContent = 'Apply';
+            applyBtn.disabled = false;
+        }
+    }
+
+    // This allows the customer to press Enter to apply the coupon
+    document.getElementById('coupon-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); }
+    });
+
+    // This opens the order confirmation modal
+    function openConfirm() {
+        const finalTotal = Math.max(0, originalTotal - appliedDiscount).toFixed(2);
+        const orderType = document.querySelector(
+            'input[name="order_type"]:checked').value;
+        const payMethod = document.querySelector(
+            'input[name="payment_method"]:checked').value;
+        const name = document.getElementById('full_name').value;
+
+        // This builds the items list for the confirmation modal
+        const cart = {{ cart | tojson }};
+        let itemsHtml = '';
+        for (const [id, item] of Object.entries(cart)) {
+            itemsHtml += `
+                <div class="confirm-item-row">
+                    <span class="confirm-item-label">${item.name} x${item.quantity}</span>
+                    <span class="confirm-item-value">
+                        £${(item.price * item.quantity).toFixed(2)}
+                    </span>
+                </div>`;
+        }
+
+        // This adds the order details to the confirmation modal
+        itemsHtml += `
+            <div class="confirm-item-row">
+                <span class="confirm-item-label">Name</span>
+                <span class="confirm-item-value">${name || '—'}</span>
+            </div>
+            <div class="confirm-item-row">
+                <span class="confirm-item-label">Order Type</span>
+                <span class="confirm-item-value"
+                      style="text-transform: capitalize;">${orderType}</span>
+            </div>
+            <div class="confirm-item-row">
+                <span class="confirm-item-label">Payment</span>
+                <span class="confirm-item-value">
+                    ${payMethod === 'cash' ? 'Cash' : 'Card / Online'}
+                </span>
+            </div>`;
+
+        document.getElementById('confirm-items-list').innerHTML = itemsHtml;
+        document.getElementById('confirm-total-val').textContent = `£${finalTotal}`;
+
+        // This shows the discount row in the modal if a coupon was applied
+        const discountRow = document.getElementById('confirm-discount-row');
+        if (appliedDiscount > 0) {
+            discountRow.style.display = 'flex';
+            document.getElementById('confirm-discount-val').textContent =
+                `-£${appliedDiscount.toFixed(2)}`;
+        } else {
+            discountRow.style.display = 'none';
+        }
+
+        document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    // This closes the confirmation modal
+    function closeConfirm() {
+        document.getElementById('confirm-modal').style.display = 'none';
+    }
+
+    // This closes the modal when clicking outside it
+    document.getElementById('confirm-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+    });
+
+    // This closes the modal when pressing Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeConfirm();
+    });
+
+    // This handles the final order placement from the confirmation modal
+    document.getElementById('confirm-place-btn').addEventListener('click', async function() {
+        // This disables the button immediately to prevent double submission
+        this.textContent = 'Placing...';
+        this.disabled = true;
+        closeConfirm();
+
+        const isOnline = document.getElementById('pay_online').checked;
+
+        if (isOnline) {
+            // This shows the loading screen for online payments
+            document.getElementById('payment-loading').style.display = 'flex';
+
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: { return_url: window.location.origin },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                // This hides the loader and shows the error if payment failed
+                document.getElementById('payment-loading').style.display = 'none';
+                document.getElementById('payment-errors').textContent = error.message;
+                this.textContent = 'Yes, Place Order';
+                this.disabled = false;
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                document.getElementById('payment_status').value = 'paid';
+                document.getElementById('payment_intent_id').value = paymentIntent.id;
+                // This submits the form after successful payment
+                document.getElementById('checkout-form').submit();
+            }
+        } else {
+            // This shows the loading screen for cash orders and submits the form
+            document.getElementById('payment-loading').style.display = 'flex';
+            document.getElementById('checkout-form').submit();
+        }
+    });
+
+    // This shows or hides the delivery address section based on the selected order type
     function toggleAddress() {
         const deliverySection = document.getElementById('delivery-address');
-        const isDelivery = document.querySelector('input[name="order_type"]:checked').value === 'delivery';
+        const isDelivery = document.querySelector(
+            'input[name="order_type"]:checked').value === 'delivery';
         deliverySection.style.display = isDelivery ? 'block' : 'none';
         document.getElementById('address1').required = isDelivery;
         document.getElementById('city').required = isDelivery;
         document.getElementById('postcode').required = isDelivery;
     }
 
+    // This shows or hides the Stripe payment element based on the selected payment method
     async function togglePaymentSection() {
         const isOnline = document.getElementById('pay_online').checked;
         const stripeSection = document.getElementById('stripe-section');
@@ -217,38 +440,7 @@
         }
     }
 
-    // This handles form submission
-    document.getElementById('checkout-form').addEventListener('submit', async function(e) {
-        const isOnline = document.getElementById('pay_online').checked;
-
-        if (isOnline) {
-            e.preventDefault();
-
-            // This shows the loading screen
-            const loader = document.getElementById('payment-loading');
-            loader.style.display = 'flex';
-
-            const { error, paymentIntent } = await stripe.confirmPayment({
-                elements,
-                confirmParams: { return_url: window.location.origin },
-                redirect: 'if_required'
-            });
-
-            if (error) {
-                loader.style.display = 'none';
-                document.getElementById('payment-errors').textContent = error.message;
-            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                document.getElementById('payment_status').value = 'paid';
-                document.getElementById('payment_intent_id').value = paymentIntent.id;
-                // This submits the form after successful payment
-                this.submit();
-            }
-        } else {
-            document.getElementById('payment-loading').style.display = 'flex';
-        }
-    });
-
-    // This highlights selected payment options
+    // This highlights the selected order type option
     document.querySelectorAll('.order-type-option').forEach(option => {
         option.closest('label').addEventListener('click', function() {
             document.querySelectorAll('.order-type-option').forEach(opt => {
@@ -260,6 +452,7 @@
         });
     });
 
+    // This highlights the selected payment option
     document.querySelectorAll('.payment-option').forEach(option => {
         option.addEventListener('click', function() {
             document.querySelectorAll('.payment-option').forEach(opt => {

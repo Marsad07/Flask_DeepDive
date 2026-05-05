@@ -1,0 +1,467 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<div class="dash-page">
+
+    <!-- Header -->
+    <div class="dash-header">
+        <div>
+            <h1>Coupons</h1>
+            <p class="dash-welcome">Create and manage discount codes</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="dash-stats dash-stats-3" style="margin-bottom: 32px;">
+        <div class="stat-card stat-card-dark">
+            <div class="stat-number">{{ coupons|length }}</div>
+            <div class="stat-label">Total Codes</div>
+        </div>
+        <div class="stat-card stat-card-red">
+            <div class="stat-number">
+                {{ coupons|selectattr('is_active')|list|length }}
+            </div>
+            <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card stat-card-gold">
+            <div class="stat-number">
+                {{ coupons|rejectattr('is_active')|list|length }}
+            </div>
+            <div class="stat-label">Inactive</div>
+        </div>
+    </div>
+
+    <!-- Create Coupon -->
+    <p class="dash-section-title">Create New Coupon</p>
+    <div class="dash-card">
+        <div class="dash-card-body">
+            <form method="POST" action="{{ url_for('admin.create_coupon') }}"
+                  id="create-coupon-form">
+
+                <div class="form-row">
+
+                    <!-- Code -->
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Code (leave blank to auto-generate)</label>
+                        <input type="text" name="code" class="form-input"
+                               placeholder="e.g. SUMMER20"
+                               style="text-transform: uppercase;">
+                    </div>
+
+                    <!-- Discount type -->
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Discount Type</label>
+                        <select name="discount_type" class="form-select"
+                                id="discount-type-select" required>
+                            <option value="percent">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (£)</option>
+                        </select>
+                    </div>
+
+                    <!-- Value -->
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" id="discount-value-label">
+                            Discount Value (%)
+                        </label>
+                        <input type="number" name="discount_value" class="form-input"
+                               id="discount-value-input"
+                               placeholder="e.g. 10" min="0" step="0.01" required>
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <!-- Send to -->
+                    <div class="form-group" style="flex: 2;">
+                        <label class="form-label">Send Coupon To</label>
+                        <select name="send_to" class="form-select"
+                                id="send-to-select" onchange="toggleEmailSelect()">
+                            <option value="none">— Don't send email —</option>
+                            <option value="all_subscribers">All Newsletter Subscribers</option>
+                            <option value="all_customers">All Registered Customers</option>
+                            <option value="all_everyone">Everyone (Subscribers + Customers)</option>
+                            <option value="one">Specific Person</option>
+                        </select>
+                    </div>
+
+                    <!-- Specific email (shown only when "Specific Person" selected) -->
+                    <div class="form-group" style="flex: 2;" id="specific-email-group">
+                        <label class="form-label">Select Recipient</label>
+                        <select name="assigned_email" class="form-select">
+                            <option value="">— Select —</option>
+                            <optgroup label="Newsletter Subscribers">
+                                {% for sub in subscribers %}
+                                <option value="{{ sub.customer_email }}">
+                                    {{ sub.customer_email }} (subscriber)
+                                </option>
+                                {% endfor %}
+                            </optgroup>
+                            <optgroup label="Registered Customers">
+                                {% for customer in customers %}
+                                <option value="{{ customer.customer_email }}">
+                                    {{ customer.customer_fullname }} — {{ customer.customer_email }}
+                                </option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Max uses -->
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Max Uses</label>
+                        <input type="number" name="uses_limit" class="form-input"
+                               value="1" min="1" id="uses-limit-input">
+                    </div>
+
+                    <!-- Expiry -->
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Expires At (optional)</label>
+                        <input type="date" name="expires_at" class="form-input">
+                    </div>
+
+                </div>
+
+                <!-- Info banner shown when sending to all -->
+                <div id="bulk-send-info" class="info-banner" style="display: none;">
+                    ℹ️ A unique coupon code will be generated and emailed to each recipient
+                    individually. Max uses will automatically be set to 1 per code.
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+                    <button type="button" class="btn-primary"
+                            onclick="showCreateConfirm()">
+                        Create Coupon
+                    </button>
+                    <span id="recipient-preview" style="font-size: 13px; color: #9E8C78;
+                          font-family: 'Lato', sans-serif;"></span>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Coupons list -->
+    <div style="display: flex; align-items: center; justify-content: space-between;
+                margin-bottom: 18px;">
+        <p class="dash-section-title" style="margin: 0; border: none;">
+            All Coupons
+            <span style="font-size: 14px; font-weight: 400; color: #9E8C78;
+                         font-family: 'Lato', sans-serif;">
+                ({{ coupons|length }} total)
+            </span>
+        </p>
+
+        <!-- Quick filter tabs -->
+        <div style="display: flex; gap: 8px;">
+            <button class="coupon-filter-btn active" onclick="filterCoupons('all', this)">
+                All
+            </button>
+            <button class="coupon-filter-btn" onclick="filterCoupons('active', this)">
+                Active
+            </button>
+            <button class="coupon-filter-btn" onclick="filterCoupons('inactive', this)">
+                Inactive
+            </button>
+        </div>
+    </div>
+
+    <div class="dash-card" style="padding: 0;">
+        {% if coupons %}
+        <table class="dash-table" id="coupons-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Assigned To</th>
+                    <th class="center">Uses</th>
+                    <th>Expires</th>
+                    <th class="center">Status</th>
+                    <th class="center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr class="coupon-row" data-status="{{ 'active' if coupon.is_active else 'inactive' }}">
+
+                    <!-- Code with copy button -->
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="letter-spacing: 2px; color: #8B0000;">
+                                {{ coupon.code }}
+                            </strong>
+                            <button type="button" class="copy-btn"
+                                    onclick="copyCode('{{ coupon.code }}')"
+                                    title="Copy code">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                    <!-- Discount -->
+                    <td>
+                        {% if coupon.discount_type == 'percent' %}
+                            <span class="coupon-discount-badge percent">
+                                {{ coupon.discount_value }}% off
+                            </span>
+                        {% else %}
+                            <span class="coupon-discount-badge fixed">
+                                £{{ "%.2f"|format(coupon.discount_value) }} off
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Assigned to -->
+                    <td style="font-size: 13px; color: #9E8C78;">
+                        {{ coupon.assigned_email or '—' }}
+                    </td>
+
+                    <!-- Uses with progress bar -->
+                    <td class="center">
+                        <div style="display: flex; flex-direction: column;
+                                    align-items: center; gap: 4px;">
+                            <span style="font-size: 13px;">
+                                {{ coupon.uses_count }} / {{ coupon.uses_limit }}
+                            </span>
+                            <div class="coupon-usage-bar">
+                                <div class="coupon-usage-fill"
+                                     style="width: {{ [((coupon.uses_count / coupon.uses_limit) * 100)|int, 100]|min }}%;">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Expires -->
+                    <td style="font-size: 13px;">
+                        {% if coupon.expires_at %}
+                            {% if coupon.expires_at < today %}
+                                <span style="color: #dc3545;">
+                                    {{ coupon.expires_at.strftime('%d %b %Y') }} (expired)
+                                </span>
+                            {% else %}
+                                <span style="color: #5C4033;">
+                                    {{ coupon.expires_at.strftime('%d %b %Y') }}
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #9E8C78;">No expiry</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Status -->
+                    <td class="center">
+                        {% if coupon.is_active %}
+                        <span class="dash-resv-badge" data-status="Active">Active</span>
+                        {% else %}
+                        <span class="dash-resv-badge" data-status="Inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="center">
+                        <div class="row-actions" style="justify-content: center;">
+
+                            <!-- Toggle active -->
+                            <form method="POST"
+                                  action="{{ url_for('admin.toggle_coupon', coupon_id=coupon.id) }}"
+                                  class="inline-form">
+                                <button type="submit" class="btn-edit btn">
+                                    {{ 'Deactivate' if coupon.is_active else 'Activate' }}
+                                </button>
+                            </form>
+
+                            <!-- Delete -->
+                            <form method="POST"
+                                  action="{{ url_for('admin.delete_coupon', coupon_id=coupon.id) }}"
+                                  class="inline-form"
+                                  id="delete-form-{{ coupon.id }}">
+                                <button type="button" class="btn-delete btn"
+                                        onclick="showDeleteConfirm({{ coupon.id }}, '{{ coupon.code }}')">
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="dash-empty">No coupons created yet — create one above.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Create coupon confirmation modal -->
+<div id="create-confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Confirm Coupon Creation</p>
+        <p id="create-confirm-message" class="modal-message"></p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('create-confirm-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('create-coupon-form').submit()">
+                Yes, Create
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete coupon confirmation modal -->
+<div id="delete-confirm-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Delete Coupon</p>
+        <p id="delete-confirm-message" class="modal-message"></p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('delete-confirm-modal')">Cancel</button>
+            <button class="modal-btn-confirm" id="delete-confirm-btn">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Copy success toast -->
+<div id="copy-toast" class="copy-toast">
+    ✓ Code copied to clipboard
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Close modal helper
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+        m.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+                m.classList.remove('open');
+            });
+        }
+    });
+
+    // Update discount value label when type changes
+    document.getElementById('discount-type-select').addEventListener('change', function() {
+        const label = document.getElementById('discount-value-label');
+        const input = document.getElementById('discount-value-input');
+        if (this.value === 'percent') {
+            label.textContent = 'Discount Value (%)';
+            input.max = 100;
+            input.placeholder = 'e.g. 10';
+        } else {
+            label.textContent = 'Discount Value (£)';
+            input.removeAttribute('max');
+            input.placeholder = 'e.g. 5.00';
+        }
+    });
+
+    // Toggle specific email select visibility
+    function toggleEmailSelect() {
+        const sendTo = document.getElementById('send-to-select').value;
+        const specificGroup = document.getElementById('specific-email-group');
+        const bulkInfo = document.getElementById('bulk-send-info');
+        const usesInput = document.getElementById('uses-limit-input');
+        const preview = document.getElementById('recipient-preview');
+
+        const isBulk = ['all_subscribers', 'all_customers', 'all_everyone'].includes(sendTo);
+        const isSpecific = sendTo === 'one';
+
+        specificGroup.style.display = isSpecific ? 'block' : 'none';
+        bulkInfo.style.display = isBulk ? 'block' : 'none';
+
+        if (isBulk) {
+            usesInput.value = 1;
+            usesInput.disabled = true;
+
+            const labels = {
+                all_subscribers: 'Will send to all newsletter subscribers',
+                all_customers: 'Will send to all registered customers',
+                all_everyone: 'Will send to all subscribers and customers'
+            };
+            preview.textContent = labels[sendTo] || '';
+        } else {
+            usesInput.disabled = false;
+            preview.textContent = '';
+        }
+    }
+
+    // Show create confirmation modal
+    function showCreateConfirm() {
+        const sendTo = document.getElementById('send-to-select').value;
+        const discountType = document.getElementById('discount-type-select').value;
+        const discountValue = document.getElementById('discount-value-input').value;
+        const codeInput = document.querySelector('input[name="code"]').value;
+
+        const discountText = discountType === 'percent'
+            ? `${discountValue}% off`
+            : `£${parseFloat(discountValue).toFixed(2)} off`;
+
+        const sendLabels = {
+            none: 'no email will be sent',
+            all_subscribers: 'sent to all newsletter subscribers',
+            all_customers: 'sent to all registered customers',
+            all_everyone: 'sent to everyone (subscribers + customers)',
+            one: 'sent to the selected recipient'
+        };
+
+        const codeText = codeInput
+            ? `code <strong>${codeInput.toUpperCase()}</strong>`
+            : 'an auto-generated code';
+
+        document.getElementById('create-confirm-message').innerHTML =
+            `Create ${codeText} for <strong>${discountText}</strong>? ` +
+            `This coupon will be ${sendLabels[sendTo] || 'created'}.`;
+
+        document.getElementById('create-confirm-modal').classList.add('open');
+    }
+
+    // Show delete confirmation modal
+    function showDeleteConfirm(id, code) {
+        document.getElementById('delete-confirm-message').textContent =
+            `Are you sure you want to delete coupon ${code}? This cannot be undone.`;
+        document.getElementById('delete-confirm-btn').onclick = function() {
+            document.getElementById('delete-form-' + id).submit();
+        };
+        document.getElementById('delete-confirm-modal').classList.add('open');
+    }
+
+    // Filter coupons by status
+    function filterCoupons(status, btn) {
+        document.querySelectorAll('.coupon-filter-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
+
+        document.querySelectorAll('.coupon-row').forEach(function(row) {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Copy coupon code to clipboard
+    function copyCode(code) {
+        navigator.clipboard.writeText(code).then(function() {
+            const toast = document.getElementById('copy-toast');
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 2000);
+        });
+    }
+</script>
+{% endblock %}

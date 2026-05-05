@@ -1,139 +1,399 @@
 {% extends "admin_base.html" %}
 
 {% block admin_content %}
-{% if session.get('toast_message') %}
-<div class="toast" style="
-    position:fixed;
-    top:20px;
-    right:20px;
-    background:#8B0000;
-    color:#FFD700;
-    padding:12px 20px;
-    border-radius:6px;
-    z-index:9999;
-    animation: fadeOut 4s forwards;
-">
-    {{ session.get('toast_message') }}
-</div>
-{% set _ = session.pop('toast_message') %}
-{% endif %}
-<style>
-@keyframes fadeOut {
-    0% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
-}
-</style>
-<div class="menu-container">
-    <h1>Edit Staff Account</h1>
-    <form method="POST" style="max-width:500px;">
+<div class="dash-page">
+    <!-- Page header -->
+    <div class="dash-header">
+        <div>
+            <h1>Edit Staff Account</h1>
+            <p class="dash-welcome">
+                Managing account for <span>{{ staff.full_name }}</span>
+            </p>
+        </div>
+        <a href="{{ url_for('admin.manage_staff') }}" class="btn-back">
+            ← Back to Staff
+        </a>
+    </div>
 
-        <label>Full Name</label>
-        <input type="text" name="full_name"
-               value="{{ staff.full_name }}" required style="width:100%; margin-bottom:15px;">
+    <!-- Toast notification -->
+    {% if session.get('toast_message') %}
+    <div id="staff-toast" class="staff-toast show">
+        {{ session.get('toast_message') }}
+        <button onclick="this.parentElement.classList.remove('show')" class="staff-toast-close">✕</button>
+    </div>
+    {% set _ = session.pop('toast_message') %}
+    {% endif %}
 
-        <label>Email</label>
-        <input type="email" name="email" value="{{ staff.email }}" required style="width:100%; margin-bottom:15px;">
+    <div class="edit-staff-grid">
+        <!-- Left column — account details -->
+        <div>
+            <!-- Account info card -->
+            <p class="dash-section-title">Account Information</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+                    <form method="POST" id="edit-staff-form">
 
-        <label>Role</label>
-        <select name="role" style="width:100%; margin-bottom:15px;">
-            <option value="admin" {% if staff.role == 'admin' %}selected{% endif %}>Admin</option>
-            <option value="kitchen" {% if staff.role == 'kitchen' %}selected{% endif %}>Kitchen</option>
-            <option value="driver" {% if staff.role == 'driver' %}selected{% endif %}>Driver</option>
-        </select>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-input"
+                                   value="{{ staff.full_name }}" required>
+                        </div>
 
-        <label>Reset Password (manual)</label>
-        <input type="password" name="password" placeholder="Leave blank to keep current"
-               style="width:100%; margin-bottom:15px;">
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-input"
+                                   value="{{ staff.email }}" required>
+                        </div>
 
-        <label>
-            <input type="checkbox" name="is_active" {% if staff.is_active %}checked{% endif %}>
-            Active Account
-        </label>
-        <br><br>
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select">
+                                <option value="admin"
+                                        {% if staff.role == 'admin' %}selected{% endif %}>
+                                    Admin
+                                </option>
+                                <option value="kitchen"
+                                        {% if staff.role == 'kitchen' %}selected{% endif %}>
+                                    Kitchen
+                                </option>
+                                <option value="driver"
+                                        {% if staff.role == 'driver' %}selected{% endif %}>
+                                    Driver
+                                </option>
+                            </select>
+                        </div>
 
-        <label>
-            <input type="checkbox" name="is_available" {% if staff.is_available %}checked{% endif %}>
-            Available (Drivers Only)
-        </label>
-        <br><br>
+                        <!-- Account flags -->
+                        <div class="edit-staff-flags">
+                            <label class="edit-staff-toggle">
+                                <input type="checkbox" name="is_active"
+                                       {% if staff.is_active %}checked{% endif %}>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-label">Active Account</span>
+                            </label>
+                            <label class="edit-staff-toggle">
+                                <input type="checkbox" name="is_available"
+                                       {% if staff.is_available %}checked{% endif %}>
+                                <span class="toggle-track"></span>
+                                <span class="toggle-label">Available (Drivers Only)</span>
+                            </label>
+                        </div>
 
-        <button type="button"
-                onclick="showModal('Save Changes', 'Update this staff account?'
-                , () => document.querySelector('form').submit())"
-                style="padding:12px 25px; background:#8B0000; color:#FFD700; border:none; border-radius:6px;">
-            Save Changes
-        </button>
+                        <button type="button" class="btn-primary"
+                                style="width: 100%; margin-top: 8px;"
+                                onclick="showSaveConfirm()">
+                            Save Changes
+                        </button>
 
-        <button type="button"
-                onclick="showResetOptions()"
-                style="padding:12px 25px; background:#004080; color:white; border:none;
-                 border-radius:6px; margin-left:10px;">
-            Reset Password
-        </button>
-    </form>
-</div>
-<div id="confirm-modal" style="
-    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div style="
-        background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
-        width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
-        <h3 id="modal-title"></h3>
-        <p id="modal-message"></p>
-        <div id="modal-buttons" style="display:flex; gap:15px; justify-content:center;"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Password card -->
+            <p class="dash-section-title" style="margin-top: 28px;">Change Password</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+
+                    <!-- Current password display -->
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <div class="edit-staff-password-display">
+                            <span id="password-dots">••••••••</span>
+                            <button type="button" class="edit-staff-reveal-btn"
+                                    onclick="togglePasswordReveal()">
+                                👁 Show
+                            </button>
+                        </div>
+                        <p id="password-revealed" class="edit-staff-password-revealed"
+                           style="display: none;">
+                            {{ staff.password_hash[:20] }}...
+                            <small style="color: #9E8C78; font-style: italic;">
+                                (hashed — cannot be reversed)
+                            </small>
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="password" class="form-input"
+                               id="new-password-input"
+                               placeholder="Leave blank to keep current">
+                        <p style="font-size: 12px; color: #9E8C78; margin-top: 6px;
+                                  font-family: 'Lato', sans-serif;">
+                            Minimum 8 characters recommended
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-primary"
+                            style="width: 100%;"
+                            onclick="showManualResetConfirm()">
+                        Update Password
+                    </button>
+
+                    <div class="edit-staff-divider">or</div>
+
+                    <!-- Reset options -->
+                    <div class="edit-staff-reset-options">
+                        <button type="button" class="edit-staff-reset-btn"
+                                onclick="showResetDefaultConfirm()">
+                            <span>🔑</span>
+                            <div>
+                                <p>Reset to Default</p>
+                                <small>Sets password back to the system default</small>
+                            </div>
+                        </button>
+                        <button type="button" class="edit-staff-reset-btn"
+                                onclick="showResetEmailConfirm()">
+                            <span>📧</span>
+                            <div>
+                                <p>Send Reset Email</p>
+                                <small>Emails a reset link to {{ staff.email }}</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column — account summary -->
+        <div>
+            <p class="dash-section-title">Account Summary</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Staff ID</span>
+                        <span class="edit-staff-summary-val">#{{ staff.staff_id }}</span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Username</span>
+                        <span class="edit-staff-summary-val">{{ staff.staff_username }}</span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Role</span>
+                        <span class="edit-staff-summary-val" style="text-transform: capitalize;">
+                            {{ staff.role }}
+                        </span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Status</span>
+                        <span class="dash-resv-badge"
+                              data-status="{{ 'Active' if staff.is_active else 'Inactive' }}">
+                            {{ 'Active' if staff.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Last Login</span>
+                        <span class="edit-staff-summary-val">
+                            {{ staff.last_login.strftime('%d %b %Y at %H:%M')
+                               if staff.last_login else 'Never' }}
+                        </span>
+                    </div>
+
+                    <div class="edit-staff-summary-row" style="border: none;">
+                        <span class="edit-staff-summary-label">Member Since</span>
+                        <span class="edit-staff-summary-val">
+                            {{ staff.created_at.strftime('%d %b %Y')
+                               if staff.created_at else '—' }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Danger zone -->
+            <p class="dash-section-title" style="margin-top: 28px; color: #8B0000;">
+                Danger Zone
+            </p>
+            <div class="dash-card" style="border-left: 3px solid #8B0000;">
+                <div class="dash-card-body">
+                    <p style="font-size: 13px; color: #9E8C78; margin: 0 0 16px;
+                              font-family: 'Lato', sans-serif; line-height: 1.6;">
+                        Disabling this account will prevent the staff member from
+                        logging in. This can be reversed at any time.
+                    </p>
+                    {% if staff.is_active %}
+                    <button type="button" class="btn-danger"
+                            style="width: 100%;"
+                            onclick="showDisableConfirm()">
+                        Disable Account
+                    </button>
+                    {% else %}
+                    <div class="info-banner warning" style="margin: 0;">
+                        ⚠ This account is currently disabled.
+                        Toggle "Active Account" above and save to re-enable.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<script>
-function showModal(title, message, onConfirm) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
 
-    const btns = document.getElementById('modal-buttons');
-    btns.innerHTML = `
-        <button onclick="closeModal()" style="padding:10px 20px; background:#ccc; border-radius:6px;">Cancel</button>
-        <button onclick="(${onConfirm.toString()})()" style="padding:10px 20px; background:#8B0000; color:white;
-         border-radius:6px;">Confirm</button>
-    `;
+<!-- Save changes modal -->
+<div id="save-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Save Changes</p>
+        <p class="modal-message">
+            Are you sure you want to update this staff account?
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('save-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('edit-staff-form').submit()">
+                Yes, Save
+            </button>
+        </div>
+    </div>
+</div>
 
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
+<!-- Manual password reset modal -->
+<div id="manual-reset-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Update Password</p>
+        <p class="modal-message">
+            Are you sure you want to set a new password for {{ staff.full_name }}?
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('manual-reset-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('edit-staff-form').submit()">
+                Yes, Update
+            </button>
+        </div>
+    </div>
+</div>
 
-function showResetOptions() {
-    document.getElementById('modal-title').textContent = "Reset Password";
-    document.getElementById('modal-message').textContent = "Choose a reset method";
+<!-- Reset to default modal -->
+<div id="reset-default-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Reset to Default Password</p>
+        <p class="modal-message">
+            This will reset {{ staff.full_name }}'s password to the system default.
+            Make sure to inform them of the new password.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('reset-default-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="window.location='/admin/staff/{{ staff.staff_id }}/reset-default'">
+                Yes, Reset
+            </button>
+        </div>
+    </div>
+</div>
 
-    const id = {{ staff.staff_id }};
-    const btns = document.getElementById('modal-buttons');
-
-    btns.innerHTML = `
-        <button onclick="closeModal()" style="padding:10px 20px; background:#ccc; border-radius:6px;">Cancel</button>
-
-        <button onclick="window.location='/admin/staff/{{ staff.staff_id }}/reset-default'"
-            style="padding:10px 20px; background:#8B0000; color:#FFD700; border-radius:6px;">
-            Reset to Default
-        </button>
-
-
-        <button onclick="window.location='/admin/staff/${id}/reset-email'"
-                style="padding:10px 20px; background:#004080; color:white; border-radius:6px;">
-            Send Reset Email
-        </button>
-    `;
-
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('confirm-modal').style.display = 'none';
-}
-
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
-</script>
+<!-- Send reset email modal -->
+<div id="reset-email-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Send Reset Email</p>
+        <p class="modal-message">
+            A password reset link will be sent to
+            <strong>{{ staff.email }}</strong>.
+            The link will expire in 1 hour.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('reset-email-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="window.location='/admin/staff/{{ staff.staff_id }}/reset-email'">
+                Yes, Send Email
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Disable account modal -->
+<div id="disable-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Disable Account</p>
+        <p class="modal-message">
+            Are you sure you want to disable {{ staff.full_name }}'s account?
+            They will no longer be able to log in.
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('disable-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="window.location='/admin/staff/disable/{{ staff.staff_id }}'">
+                Yes, Disable
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
 
+    function showSaveConfirm() {
+        document.getElementById('save-modal').classList.add('open');
+    }
 
+    function showManualResetConfirm() {
+        const newPass = document.getElementById('new-password-input').value;
+        if (!newPass) {
+            alert('Please enter a new password first.');
+            return;
+        }
+        document.getElementById('manual-reset-modal').classList.add('open');
+    }
 
+    function showResetDefaultConfirm() {
+        document.getElementById('reset-default-modal').classList.add('open');
+    }
+
+    function showResetEmailConfirm() {
+        document.getElementById('reset-email-modal').classList.add('open');
+    }
+
+    function showDisableConfirm() {
+        document.getElementById('disable-modal').classList.add('open');
+    }
+
+    function togglePasswordReveal() {
+        const dots = document.getElementById('password-dots');
+        const revealed = document.getElementById('password-revealed');
+        const btn = document.querySelector('.edit-staff-reveal-btn');
+        if (revealed.style.display === 'none') {
+            dots.style.display = 'none';
+            revealed.style.display = 'block';
+            btn.textContent = '🙈 Hide';
+        } else {
+            dots.style.display = 'block';
+            revealed.style.display = 'none';
+            btn.textContent = '👁 Show';
+        }
+    }
+
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+        m.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+                m.classList.remove('open');
+            });
+        }
+    });
+
+    // Auto hide toast
+    const toast = document.getElementById('staff-toast');
+    if (toast) {
+        setTimeout(function() { toast.classList.remove('show'); }, 4000);
+    }
+</script>
+{% endblock %}

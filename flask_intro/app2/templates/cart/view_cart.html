@@ -1,89 +1,86 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu2.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="cart-page">
-  <!-- This is for the page header -->
-  <div class="cart-header">
-    <h1>YOUR CART</h1>
-    <div class="order-header-divider"></div>
-  </div>
+    <!-- This is for the page header -->
+    <div class="order-header">
+        <h1>YOUR CART</h1>
+        <div class="order-header-divider"></div>
+    </div>
 
-  {% if cart %}
+    {% if cart %}
 
-    <!-- This shows all items in cart -->
-    <div class="cart-items">
-      {% for item_id, item in cart.items() %}
-      <div class="cart-item-card">
+        <!-- This shows all items in cart -->
+        <div class="cart-items">
+            {% for item_id, item in cart.items() %}
+            <div class="cart-item-card">
 
-        <!-- This is the item details -->
-        <div class="cart-item-info">
-          <h3 class="cart-item-name">{{ item.name }}</h3>
-          <p class="cart-item-unit">
-            £{{ "%.2f"|format(item.price) }} × {{ item.quantity }}
-          </p>
+                <!-- This is the item details -->
+                <div class="cart-item-info">
+                    <h3 class="cart-item-name">{{ item.name }}</h3>
+                    <p class="cart-item-unit">
+                        £{{ "%.2f"|format(item.price) }} × {{ item.quantity }}
+                    </p>
+                </div>
+
+                <!-- This is the subtotal and remove button -->
+                <div class="cart-item-right">
+                    <p class="cart-item-subtotal">
+                        £{{ "%.2f"|format(item.price * item.quantity) }}
+                    </p>
+                    <form method="POST"
+                          action="{{ url_for('cart.remove_from_cart', item_id=item_id) }}">
+                        <button type="submit" class="btn-remove">Remove</button>
+                    </form>
+                </div>
+
+            </div>
+            {% endfor %}
         </div>
 
-        <!-- This is the subtotal and remove button -->
-        <div class="cart-item-right">
-          <p class="cart-item-subtotal">
-            £{{ "%.2f"|format(item.price * item.quantity) }}
-          </p>
-          <form method="POST"
-                action="{{ url_for('cart.remove_from_cart', item_id=item_id) }}">
-            <button type="submit" class="btn-remove">Remove</button>
-          </form>
+        <!-- This is the total section -->
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount">£{{ "%.2f"|format(total) }}</span>
         </div>
 
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- This is the total section -->
-    <div class="cart-total">
-      <span class="cart-total-label">Total</span>
-      <span class="cart-total-amount">£{{ "%.2f"|format(total) }}</span>
-    </div>
-
-    <!-- This is the action buttons -->
-    <div class="cart-actions">
-      <a href="{{ url_for('cart.order_now_menu') }}" class="btn-continue">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Continue Shopping
-      </a>
-      <a href="{{ url_for('checkout.checkout_page') }}" class="btn-checkout">
-        Proceed to Checkout
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
-  {% else %}
-    <!-- This shows when cart is empty -->
-    <div class="cart-empty">
-      <div class="cart-empty-icon">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
-                stroke="#D4AF37" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h3 class="cart-empty-title">Your cart is empty</h3>
-      <p class="cart-empty-sub">Looks like you haven't added anything yet.</p>
-      <a href="{{ url_for('cart.order_now_menu') }}" class="btn-checkout">
-        Browse Menu
-      </a>
-    </div>
-
-  {% endif %}
+        <!-- This is the action buttons -->
+        <div class="cart-actions">
+            <a href="{{ url_for('cart.order_now_menu') }}" class="btn-continue">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Continue Shopping
+            </a>
+            <a href="{{ url_for('checkout.checkout_page') }}" class="btn-checkout">
+                Proceed to Checkout
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    {% else %}
+        <!-- This shows when cart is empty -->
+        <div class="cart-empty">
+            <div class="cart-empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
+                          stroke="#D4AF37" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h3 class="cart-empty-title">Your cart is empty</h3>
+            <p class="cart-empty-sub">Looks like you haven't added anything yet.</p>
+            <a href="{{ url_for('cart.order_now_menu') }}" class="btn-checkout">
+                Browse Menu
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

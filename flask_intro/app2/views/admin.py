@@ -13,8 +13,19 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                manage_staff, create_staff, edit_staff, disable_staff, manage_drivers,
                                                driver_details, update_footer_about)
 
-from controllers.staff_controller import reset_staff_email, reset_staff_default
-from controllers.admin_reservations_controller import (edit_reservation, cancel_reservation)
+from app2.controllers.newsletter_coupon_controller import (
+    manage_newsletter,
+    delete_newsletter_subscriber,
+    send_newsletter,
+    export_subscribers,
+    manage_coupons,
+    create_coupon,
+    delete_coupon,
+    toggle_coupon
+)
+
+from app2.controllers.staff_controller import reset_staff_email, reset_staff_default
+from app2.controllers.admin_reservations_controller import (edit_reservation, cancel_reservation)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
@@ -75,3 +86,15 @@ admin_bp.route('/staff/<int:staff_id>/edit', methods=['GET', 'POST'])(edit_staff
 admin_bp.route('/staff/<int:staff_id>/disable')(disable_staff)
 admin_bp.route('/staff/<int:staff_id>/reset-default')(reset_staff_default)
 admin_bp.route('/staff/<int:staff_id>/reset-email')(reset_staff_email)
+
+
+admin_bp.route("/newsletter")(manage_newsletter)
+admin_bp.route("/newsletter/delete/<email>", methods=["POST"])(delete_newsletter_subscriber)
+admin_bp.route("/newsletter/send", methods=["POST"])(send_newsletter)
+admin_bp.route("/newsletter/export")(export_subscribers)
+
+
+admin_bp.route("/coupons")(manage_coupons)
+admin_bp.route("/coupons/create", methods=["POST"])(create_coupon)
+admin_bp.route("/coupons/delete/<int:coupon_id>", methods=["POST"])(delete_coupon)
+admin_bp.route("/coupons/toggle/<int:coupon_id>", methods=["POST"])(toggle_coupon)
