@@ -1,0 +1,349 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<div class="dash-page">
+    <!-- Page header -->
+    <div class="dash-header">
+        <div>
+            <h1>Account Settings</h1>
+            <p class="dash-welcome">
+                Manage your admin account for
+                <span>{{ branding.restaurant_name }}</span>
+            </p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Toast -->
+    {% if session.get('toast_message') %}
+    <div id="settings-toast" class="staff-toast show">
+        {{ session.get('toast_message') }}
+        <button onclick="this.parentElement.classList.remove('show')"
+                class="staff-toast-close">✕</button>
+    </div>
+    {% set _ = session.pop('toast_message') %}
+    {% endif %}
+
+    <div class="edit-staff-grid">
+
+        <!-- Left column -->
+        <div>
+
+            <!-- Account details card -->
+            <p class="dash-section-title">Account Details</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+                    <form method="POST" action="{{ url_for('admin.update_admin_settings') }}"
+                          id="details-form">
+                        <input type="hidden" name="action" value="details">
+
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="admin_fullname" class="form-input"
+                                   value="{{ admin.admin_fullname or '' }}"
+                                   placeholder="Your full name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="admin_username" class="form-input"
+                                   value="{{ admin.admin_username }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="admin_email" class="form-input"
+                                   value="{{ admin.admin_email or '' }}"
+                                   placeholder="your@email.com">
+                        </div>
+
+                        <button type="button" class="btn-primary"
+                                style="width: 100%;"
+                                onclick="showConfirm('details')">
+                            Save Details
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change password card -->
+            <p class="dash-section-title" style="margin-top: 28px;">Change Password</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+                    <form method="POST" action="{{ url_for('admin.update_admin_settings') }}"
+                          id="password-form">
+                        <input type="hidden" name="action" value="password">
+
+                        <!-- Current password -->
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <div class="settings-password-wrap">
+                                <input type="password" name="current_password"
+                                       class="form-input settings-password-input"
+                                       id="current-pass"
+                                       placeholder="Enter your current password"
+                                       required>
+                                <button type="button" class="settings-eye-btn"
+                                        onclick="toggleEye('current-pass', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- New password -->
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <div class="settings-password-wrap">
+                                <input type="password" name="new_password"
+                                       class="form-input settings-password-input"
+                                       id="new-pass"
+                                       placeholder="Minimum 8 characters"
+                                       required>
+                                <button type="button" class="settings-eye-btn"
+                                        onclick="toggleEye('new-pass', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm password -->
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <div class="settings-password-wrap">
+                                <input type="password" name="confirm_password"
+                                       class="form-input settings-password-input"
+                                       id="confirm-pass"
+                                       placeholder="Re-enter new password"
+                                       required>
+                                <button type="button" class="settings-eye-btn"
+                                        onclick="toggleEye('confirm-pass', this)">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Password strength indicator -->
+                        <div class="settings-strength-wrap">
+                            <div class="settings-strength-bar" id="strength-bar"></div>
+                        </div>
+                        <p id="strength-label" class="settings-strength-label"></p>
+
+                        <button type="button" class="btn-primary"
+                                style="width: 100%; margin-top: 8px;"
+                                onclick="showConfirm('password')">
+                            Update Password
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right column — account summary -->
+        <div>
+
+            <p class="dash-section-title">Account Summary</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Admin ID</span>
+                        <span class="edit-staff-summary-val">#{{ admin.admin_id }}</span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Username</span>
+                        <span class="edit-staff-summary-val">{{ admin.admin_username }}</span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Role</span>
+                        <span class="edit-staff-summary-val" style="text-transform: capitalize;">
+                            {{ admin.role | replace('_', ' ') }}
+                        </span>
+                    </div>
+
+                    <div class="edit-staff-summary-row">
+                        <span class="edit-staff-summary-label">Last Login</span>
+                        <span class="edit-staff-summary-val">
+                            {{ admin.last_login.strftime('%d %b %Y at %H:%M')
+                               if admin.last_login else 'Never' }}
+                        </span>
+                    </div>
+
+                    <div class="edit-staff-summary-row" style="border: none;">
+                        <span class="edit-staff-summary-label">Member Since</span>
+                        <span class="edit-staff-summary-val">
+                            {{ admin.created_at.strftime('%d %b %Y')
+                               if admin.created_at else '—' }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Security info card -->
+            <p class="dash-section-title" style="margin-top: 28px;">Security</p>
+            <div class="dash-card">
+                <div class="dash-card-body">
+
+                    <div class="settings-security-item">
+                        <div class="settings-security-icon">🔐</div>
+                        <div>
+                            <p class="settings-security-title">Password</p>
+                            <p class="settings-security-sub">
+                                Protected with bcrypt hashing
+                            </p>
+                        </div>
+                        <span class="dash-resv-badge" data-status="confirmed">
+                            Protected
+                        </span>
+                    </div>
+
+                    <div class="settings-security-item" style="border: none;">
+                        <div class="settings-security-icon">📧</div>
+                        <div>
+                            <p class="settings-security-title">Email</p>
+                            <p class="settings-security-sub">
+                                {{ admin.admin_email or 'Not set' }}
+                            </p>
+                        </div>
+                        <span class="dash-resv-badge"
+                              data-status="{{ 'confirmed' if admin.admin_email else 'pending' }}">
+                            {{ 'Verified' if admin.admin_email else 'Not Set' }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save details confirmation modal -->
+<div id="details-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Save Account Details</p>
+        <p class="modal-message">
+            Are you sure you want to update your account details?
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('details-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('details-form').submit()">
+                Yes, Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Change password confirmation modal -->
+<div id="password-modal" class="modal-overlay">
+    <div class="modal-box">
+        <p class="modal-title">Update Password</p>
+        <p class="modal-message">
+            Are you sure you want to change your password?
+        </p>
+        <div class="modal-actions">
+            <button class="modal-btn-cancel"
+                    onclick="closeModal('password-modal')">Cancel</button>
+            <button class="modal-btn-confirm"
+                    onclick="document.getElementById('password-form').submit()">
+                Yes, Update
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    function showConfirm(type) {
+        if (type === 'password') {
+            const currentPass = document.getElementById('current-pass').value;
+            const newPass = document.getElementById('new-pass').value;
+            const confirmPass = document.getElementById('confirm-pass').value;
+            if (!currentPass) {
+                alert('Please enter your current password.');
+                return;
+            }
+            if (newPass.length < 8) {
+                alert('Password must be at least 8 characters.');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert('Passwords do not match.');
+                return;
+            }
+        }
+        document.getElementById(type + '-modal').classList.add('open');
+    }
+
+    // Toggle password eye
+    function toggleEye(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+        m.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+                m.classList.remove('open');
+            });
+        }
+    });
+
+    // Password strength indicator
+    document.getElementById('new-pass').addEventListener('input', function() {
+        const val = this.value;
+        const bar = document.getElementById('strength-bar');
+        const label = document.getElementById('strength-label');
+        let strength = 0;
+        if (val.length >= 8) strength++;
+        if (/[A-Z]/.test(val)) strength++;
+        if (/[0-9]/.test(val)) strength++;
+        if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+        const levels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        const colors = ['', '#dc3545', '#ffc107', '#17a2b8', '#28a745'];
+        const widths = ['0%', '25%', '50%', '75%', '100%'];
+
+        bar.style.width = widths[strength];
+        bar.style.background = colors[strength];
+        label.textContent = strength > 0 ? levels[strength] : '';
+        label.style.color = colors[strength];
+    });
+
+    // Auto hide toast
+    const toast = document.getElementById('settings-toast');
+    if (toast) {
+        setTimeout(function() { toast.classList.remove('show'); }, 4000);
+    }
+</script>
+{% endblock %}

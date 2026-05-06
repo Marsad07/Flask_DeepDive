@@ -11,7 +11,8 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                add_about_section, delete_about_section, manage_tables,
                                                save_table_positions, add_table, delete_table, update_table,
                                                manage_staff, create_staff, edit_staff, disable_staff, manage_drivers,
-                                               driver_details, update_footer_about)
+                                               driver_details, update_footer_about, admin_settings,
+                                               update_admin_settings)
 
 from app2.controllers.newsletter_coupon_controller import (
     manage_newsletter,
@@ -98,3 +99,6 @@ admin_bp.route("/coupons")(manage_coupons)
 admin_bp.route("/coupons/create", methods=["POST"])(create_coupon)
 admin_bp.route("/coupons/delete/<int:coupon_id>", methods=["POST"])(delete_coupon)
 admin_bp.route("/coupons/toggle/<int:coupon_id>", methods=["POST"])(toggle_coupon)
+
+admin_bp.route('/settings', methods=['GET', 'POST'])(admin_settings)
+admin_bp.route('/settings/update', methods=['POST'])(update_admin_settings)

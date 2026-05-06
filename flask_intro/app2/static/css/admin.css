@@ -1437,3 +1437,133 @@ body {
     .edit-staff-grid { grid-template-columns: 1fr; }
 }
 
+/* Settings page */
+.settings-strength-wrap {
+    height: 4px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 2px;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+.settings-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.settings-strength-label {
+    font-size: 12px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    margin: 0 0 16px;
+    min-height: 16px;
+}
+
+.settings-security-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.settings-security-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.settings-security-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 2px;
+    font-family: 'Lato', sans-serif;
+}
+
+.settings-security-sub {
+    font-size: 12px;
+    color: #9E8C78;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Password field with eye toggle */
+.settings-password-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.settings-password-input {
+    padding-right: 44px;
+    margin-bottom: 0;
+}
+
+.settings-eye-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #9E8C78;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.settings-eye-btn:hover { color: #2C2416; }
+
+/* Password strength */
+.settings-strength-wrap {
+    height: 4px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 2px;
+    margin: 12px 0 6px;
+    overflow: hidden;
+}
+
+.settings-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+.settings-strength-label {
+    font-size: 12px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    margin: 0 0 16px;
+    min-height: 16px;
+}
+
+/* Security items */
+.settings-security-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.settings-security-icon { font-size: 22px; flex-shrink: 0; }
+
+.settings-security-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1C1008;
+    margin: 0 0 2px;
+    font-family: 'Lato', sans-serif;
+}
+
+.settings-security-sub {
+    font-size: 12px;
+    color: #9E8C78;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+}
+
+

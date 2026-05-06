@@ -1,40 +1,73 @@
 {% extends "base.html" %}
 
-{% block header %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tracking.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="menu-container">
-    <h1>REGISTER</h1>
+<div class="forgot-wrap">
+    <div class="forgot-card">
 
-    {% if error %}
-    <p style="color: #8B0000; text-align: center; background: #FFE6E6; padding: 15px;
-      border-radius: 8px; margin: 20px auto; max-width: 500px;">
-        {{ error }}
-    </p>
-    {% endif %}
+        <h1 class="forgot-title">Create Account</h1>
+        <p class="forgot-subtitle">
+            Join us to track orders, manage reservations and more.
+        </p>
 
-    <form method="POST" style="max-width: 500px; margin: 40px auto;">
-        <label for="customer_fullname">Full Name</label>
-        <input type="text" id="customer_fullname" name="customer_fullname" required autofocus>
+        {% if error %}
+        <div class="forgot-error">⚠ {{ error }}</div>
+        {% endif %}
 
-        <label for="customer_email">Email</label>
-        <input type="email" id="customer_email" name="customer_email" required>
+        <form method="POST">
+            <label class="forgot-label" for="customer_fullname">Full Name</label>
+            <input type="text" id="customer_fullname" name="customer_fullname"
+                   class="forgot-input" placeholder="e.g. John Smith"
+                   required autofocus>
 
-        <label for="customer_phonenum">Phone Number</label>
-        <input type="tel" id="customer_phonenum" name="customer_phonenum" pattern="[0-9]{10,}" required>
+            <label class="forgot-label" for="customer_email">Email Address</label>
+            <input type="email" id="customer_email" name="customer_email"
+                   class="forgot-input" placeholder="e.g. john@example.com"
+                   required>
 
-        <label for="customer_password">Password</label>
-        <input type="password" id="customer_password" name="customer_password" required minlength="6">
+            <label class="forgot-label" for="customer_phonenum">Phone Number</label>
+            <input type="tel" id="customer_phonenum" name="customer_phonenum"
+                   class="forgot-input" placeholder="e.g. 07700900000"
+                   pattern="[0-9]{10,}" required>
 
-        <input type="submit" value="CREATE ACCOUNT">
-    </form>
+            <label class="forgot-label" for="customer_password">Password</label>
+            <div class="forgot-password-wrap">
+                <input type="password" id="customer_password" name="customer_password"
+                       class="forgot-input" placeholder="Minimum 6 characters"
+                       required minlength="6">
+                <button type="button" class="forgot-eye-btn"
+                        onclick="toggleEye('customer_password', this)">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
 
-    <p style="text-align: center; margin-top: 20px; color: #5C4033;">
-        Already have an account?
-        <a href="{{ url_for('customer_auth.login') }}"
-           style="color: #8B0000; text-decoration: none; font-weight: bold;">Login here</a>
-    </p>
+            <input type="submit" value="CREATE ACCOUNT" class="forgot-btn">
+        </form>
 
+        <p class="forgot-divider">Already have an account?</p>
+        <a href="{{ url_for('customer_auth.login') }}" class="forgot-back">
+            Login here →
+        </a>
+    </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function toggleEye(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}

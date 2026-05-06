@@ -1098,5 +1098,69 @@ def update_footer_about():
         return redirect(url_for('admin.dashboard'))
     return redirect(url_for('admin.dashboard'))
 
+def admin_settings():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM admin_restaurant WHERE admin_id = %s",
+                   (session['admin_id'],))
+    admin = cursor.fetchone()
+    cursor.close()
+    db.close()
+
+    return render_template('admin/settings.html', admin=admin)
+
+def update_admin_settings():
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
+    action = request.form.get('action')
+    admin_id = session['admin_id']
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if action == 'details':
+        fullname = request.form.get('admin_fullname')
+        email = request.form.get('admin_email')
+        username = request.form.get('admin_username')
+
+        cursor.execute("""
+            UPDATE admin_restaurant
+            SET admin_fullname = %s, admin_email = %s, admin_username = %s
+            WHERE admin_id = %s
+        """, (fullname, email, username, admin_id))
+        db.commit()
+        session['admin_username'] = username
+        session['toast_message'] = 'Account details updated successfully.'
+
+    elif action == 'password':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        cursor.execute("SELECT password_hash FROM admin_restaurant WHERE admin_id = %s",
+                       (admin_id,))
+        admin = cursor.fetchone()
+
+        if not check_password_hash(admin['password_hash'], current_password):
+            session['toast_message'] = 'Current password is incorrect.'
+        elif new_password != confirm_password:
+            session['toast_message'] = 'New passwords do not match.'
+        elif len(new_password) < 8:
+            session['toast_message'] = 'Password must be at least 8 characters.'
+        else:
+            hashed = generate_password_hash(new_password)
+            cursor.execute("""
+                UPDATE admin_restaurant SET password_hash = %s
+                WHERE admin_id = %s
+            """, (hashed, admin_id))
+            db.commit()
+            session['toast_message'] = 'Password updated successfully.'
+
+    cursor.close()
+    db.close()
+    return redirect(url_for('admin.admin_settings'))
 
 
