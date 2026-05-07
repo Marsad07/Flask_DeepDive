@@ -10,6 +10,16 @@ from werkzeug.utils import secure_filename
 from app2.models.homepage_model import (get_branding, update_branding, get_all_reviews,
                                          update_review, add_review, delete_review,
                                          get_dishes, update_dish)
+from app2.models.themeSettings_model import get_theme, save_theme
+GOOGLE_FONTS = [
+    'Lato', 'Roboto', 'Open Sans', 'Montserrat', 'Raleway',
+    'Nunito', 'Poppins', 'Inter', 'Source Sans Pro', 'Ubuntu'
+]
+
+HEADING_FONTS = [
+    'Playfair Display', 'Merriweather', 'Lora', 'Cormorant Garamond',
+    'EB Garamond', 'Libre Baskerville', 'Crimson Text', 'Bitter'
+]
 
 def admin_login():
     if request.method == "POST":
@@ -22,6 +32,7 @@ def admin_login():
         admin = cursor.fetchone()
 
         if admin and check_password_hash(admin['password_hash'], password):
+            session.permanent = True
             session['admin_id'] = admin['admin_id']
             session['admin_username'] = admin['admin_username']
             session['role'] = admin['role']
@@ -45,22 +56,66 @@ def dashboard():
         return redirect(url_for('admin.admin_login'))
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
-    cursor.execute("SELECT COUNT(*) as count FROM reservations_restaurant WHERE reservation_date = CURDATE()")
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM reservations_restaurant "
+        "WHERE reservation_date = CURDATE()"
+    )
     today_bookings = cursor.fetchone()['count']
 
     cursor.execute("SELECT COUNT(*) as count FROM reservations_restaurant")
     total_bookings = cursor.fetchone()['count']
 
-    cursor.execute("SELECT COUNT(*) as count FROM newsletter_subs WHERE status = 'ACTIVE'")
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM newsletter_subs WHERE status = 'ACTIVE'"
+    )
     newsletter_subs = cursor.fetchone()['count']
 
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM customer_orders "
+        "WHERE DATE(order_date) = CURDATE()"
+    )
+    today_orders = cursor.fetchone()['count']
+
+    cursor.execute(
+        "SELECT COALESCE(SUM(total_price), 0) as revenue FROM customer_orders "
+        "WHERE DATE(order_date) = CURDATE() AND order_status != 'cancelled'"
+    )
+    today_revenue = cursor.fetchone()['revenue']
+
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM customer_orders "
+        "WHERE order_status IN ('pending', 'confirmed')"
+    )
+    pending_orders = cursor.fetchone()['count']
+
     cursor.execute("""
-        SELECT * FROM reservations_restaurant 
-        ORDER BY reservation_createdate DESC 
-        LIMIT 5
+        SELECT * FROM reservations_restaurant
+        ORDER BY reservation_createdate DESC
+        LIMIT 4
     """)
     recent_reservations = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT order_id, order_type, order_status, total_price, order_date
+        FROM customer_orders
+        ORDER BY order_date DESC, order_time DESC
+        LIMIT 4
+    """)
+    recent_orders = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT s.staff_id, s.full_name, s.is_available, s.is_active,
+               o.order_id as current_order
+        FROM staff_accounts s
+        LEFT JOIN customer_orders o
+            ON o.assigned_driver_id = s.staff_id
+            AND o.order_status NOT IN ('completed', 'cancelled')
+        WHERE s.role = 'driver'
+        ORDER BY s.is_active DESC, s.is_available DESC
+        LIMIT 4
+    """)
+    drivers = cursor.fetchall()
+
     cursor.close()
     db.close()
     return render_template('admin/dashboard.html',
@@ -68,7 +123,12 @@ def dashboard():
                            today_bookings=today_bookings,
                            total_bookings=total_bookings,
                            newsletter_subs=newsletter_subs,
-                           recent_reservations=recent_reservations)
+                           today_orders=today_orders,
+                           today_revenue=today_revenue,
+                           pending_orders=pending_orders,
+                           recent_reservations=recent_reservations,
+                           recent_orders=recent_orders,
+                           drivers=drivers)
 
 def logout():
     session.clear()
@@ -1162,5 +1222,30 @@ def update_admin_settings():
     cursor.close()
     db.close()
     return redirect(url_for('admin.admin_settings'))
+
+def manage_theme():
+    if request.method == 'POST':
+        save_theme({
+            'color_primary':     request.form.get('color_primary',     '#8B0000'),
+            'color_accent':      request.form.get('color_accent',      '#D4AF37'),
+            'color_background':  request.form.get('color_background',  '#F7F4EE'),
+            'color_surface':     request.form.get('color_surface',     '#FFFFFF'),
+            'color_text':        request.form.get('color_text',        '#2C2416'),
+            'color_text_muted':  request.form.get('color_text_muted',  '#9E8C78'),
+            'color_sidebar_bg':  request.form.get('color_sidebar_bg',  '#2C2416'),
+            'color_sidebar_text':request.form.get('color_sidebar_text','#FFFEF2'),
+            'font_body':         request.form.get('font_body',         'Lato'),
+            'font_heading':      request.form.get('font_heading',      'Playfair Display'),
+            'border_radius':     request.form.get('border_radius',     '2px'),
+            'dark_mode':         1 if 'dark_mode' in request.form else 0,
+        })
+        flash('Theme saved!', 'success')
+        return redirect(url_for('admin.manage_theme'))
+
+    theme = get_theme()
+    return render_template('admin/theme.html',
+                           theme=theme,
+                           body_fonts=GOOGLE_FONTS,
+                           heading_fonts=HEADING_FONTS)
 
 

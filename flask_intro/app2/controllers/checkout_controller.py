@@ -177,7 +177,7 @@ def process_order():
     <style>
         @media (prefers-color-scheme: dark) {{
             .email-body {{ background-color: #1A1410 !important; color: #FFFEF2 !important; }}
-            .order-ref-box {{ background-color: #2C2416 !important; }}
+            .order-ref-box {{ background-color: var(--color-text) !important; }}
             p {{ color: #FFFEF2 !important; }}
         }}
     </style>

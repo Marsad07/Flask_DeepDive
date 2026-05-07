@@ -12,7 +12,7 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                save_table_positions, add_table, delete_table, update_table,
                                                manage_staff, create_staff, edit_staff, disable_staff, manage_drivers,
                                                driver_details, update_footer_about, admin_settings,
-                                               update_admin_settings)
+                                               update_admin_settings, manage_theme)
 
 from app2.controllers.newsletter_coupon_controller import (
     manage_newsletter,
@@ -56,6 +56,7 @@ admin_bp.add_url_rule('/admin/update-review', view_func=update_review_item, meth
 admin_bp.add_url_rule('/admin/add-review', view_func=add_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/delete-review/<int:review_id>', view_func=delete_review_item, methods=['POST'])
 admin_bp.add_url_rule('/admin/update-dish', view_func=update_dish_item, methods=['POST'])
+admin_bp.route('/theme', methods=['GET', 'POST'])(manage_theme)
 
 admin_bp.route('/drivers')(manage_drivers)
 admin_bp.route('/drivers/<int:staff_id>/toggle-active', methods=['POST'])(toggle_driver_active)

@@ -2,6 +2,7 @@
 
 {% block admin_content %}
 <div class="dash-page">
+
     <!-- This is for the top header row -->
     <div class="dash-header">
         <h1>Image Manager</h1>
@@ -13,19 +14,24 @@
                 gap: 25px; max-width: 1200px; margin: 30px auto;">
 
         <!-- This is the hero image section -->
-        <div class="dash-card" style="border-left: 4px solid #8B0000;">
+        <div class="dash-card" style="border-left: 4px solid var(--color-primary);">
             <div class="dash-card-body">
 
                 <p class="dash-card-title">Homepage Hero Image</p>
 
                 <!-- This shows the current hero image if one exists -->
                 {% if hero %}
-                    <img src="{{ hero }}" style="width: 100%; height: 180px;
-                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                    <img src="{{ hero }}"
+                         style="width: 100%; height: 180px; object-fit: cover;
+                                border-radius: var(--radius); margin-bottom: 15px;">
                 {% else %}
-                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                    <div style="width: 100%; height: 180px;
+                                background: var(--color-bg);
+                                border-radius: var(--radius);
                                 display: flex; align-items: center; justify-content: center;
-                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                                margin-bottom: 15px;
+                                color: var(--color-text-muted);
+                                font-family: var(--font-body);">
                         No image uploaded
                     </div>
                 {% endif %}
@@ -39,22 +45,26 @@
                         Upload
                     </button>
                 </form>
-
             </div>
         </div>
         <!-- This is the dish 1 image section -->
-        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+        <div class="dash-card" style="border-left: 4px solid var(--color-accent);">
             <div class="dash-card-body">
 
                 <p class="dash-card-title">Dish 1 Image</p>
 
                 {% if dish1 %}
-                    <img src="{{ dish1 }}" style="width: 100%; height: 180px;
-                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                    <img src="{{ dish1 }}"
+                         style="width: 100%; height: 180px; object-fit: cover;
+                                border-radius: var(--radius); margin-bottom: 15px;">
                 {% else %}
-                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                    <div style="width: 100%; height: 180px;
+                                background: var(--color-bg);
+                                border-radius: var(--radius);
                                 display: flex; align-items: center; justify-content: center;
-                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                                margin-bottom: 15px;
+                                color: var(--color-text-muted);
+                                font-family: var(--font-body);">
                         No image uploaded
                     </div>
                 {% endif %}
@@ -72,18 +82,23 @@
             </div>
         </div>
         <!-- This is the dish 2 image section -->
-        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+        <div class="dash-card" style="border-left: 4px solid var(--color-accent);">
             <div class="dash-card-body">
 
                 <p class="dash-card-title">Dish 2 Image</p>
 
                 {% if dish2 %}
-                    <img src="{{ dish2 }}" style="width: 100%; height: 180px;
-                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                    <img src="{{ dish2 }}"
+                         style="width: 100%; height: 180px; object-fit: cover;
+                                border-radius: var(--radius); margin-bottom: 15px;">
                 {% else %}
-                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                    <div style="width: 100%; height: 180px;
+                                background: var(--color-bg);
+                                border-radius: var(--radius);
                                 display: flex; align-items: center; justify-content: center;
-                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                                margin-bottom: 15px;
+                                color: var(--color-text-muted);
+                                font-family: var(--font-body);">
                         No image uploaded
                     </div>
                 {% endif %}
@@ -101,22 +116,26 @@
             </div>
         </div>
         <!-- This is the dish 3 image section -->
-        <div class="dash-card" style="border-left: 4px solid #D4AF37;">
+        <div class="dash-card" style="border-left: 4px solid var(--color-accent);">
             <div class="dash-card-body">
 
                 <p class="dash-card-title">Dish 3 Image</p>
 
                 {% if dish3 %}
-                    <img src="{{ dish3 }}" style="width: 100%; height: 180px;
-                         object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+                    <img src="{{ dish3 }}"
+                         style="width: 100%; height: 180px; object-fit: cover;
+                                border-radius: var(--radius); margin-bottom: 15px;">
                 {% else %}
-                    <div style="width: 100%; height: 180px; background: #F8F4EC; border-radius: 8px;
+                    <div style="width: 100%; height: 180px;
+                                background: var(--color-bg);
+                                border-radius: var(--radius);
                                 display: flex; align-items: center; justify-content: center;
-                                margin-bottom: 15px; color: #9e9e9e; font-family: Georgia, serif;">
+                                margin-bottom: 15px;
+                                color: var(--color-text-muted);
+                                font-family: var(--font-body);">
                         No image uploaded
                     </div>
                 {% endif %}
-
                 <form method="POST" enctype="multipart/form-data" id="form-dish3">
                     <input type="hidden" name="image_key" value="dish3">
                     <input type="file" name="image_file" accept="image/*" required
@@ -129,20 +148,19 @@
 
             </div>
         </div>
-
     </div>
 </div>
 
 <!-- This is for the confirmation modal -->
 <div id="confirm-modal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 id="modal-title" class="modal-title"></h3>
-    <p id="modal-message" class="modal-message"></p>
-    <div class="modal-actions">
-      <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
-      <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
+    <div class="modal-box">
+        <h3 id="modal-title" class="modal-title"></h3>
+        <p id="modal-message" class="modal-message"></p>
+        <div class="modal-actions">
+            <button onclick="closeModal()" class="modal-btn-cancel">Cancel</button>
+            <button id="modal-confirm-btn" class="modal-btn-confirm">Confirm</button>
+        </div>
     </div>
-  </div>
 </div>
 <script>
     // This opens the confirmation modal for image uploads
@@ -156,12 +174,12 @@
             document.getElementById(`form-${key}`).submit();
         };
 
-        document.getElementById("confirm-modal").style.display = "flex";
+        document.getElementById("confirm-modal").classList.add("open");
     }
 
     // This closes the modal
     function closeModal() {
-        document.getElementById("confirm-modal").style.display = "none";
+        document.getElementById("confirm-modal").classList.remove("open");
     }
 
     // Close modal when clicking outside the box
@@ -170,7 +188,3 @@
     });
 </script>
 {% endblock %}
-
-
-
-

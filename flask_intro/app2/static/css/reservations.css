@@ -6,10 +6,10 @@
 }
 
 .resv-page h1 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     letter-spacing: 3px;
     text-align: center;
     margin: 0 0 10px;
@@ -18,7 +18,7 @@
 .resv-page h3 {
     text-align: center;
     font-size: 16px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     font-weight: 400;
     margin: 0 0 40px;
@@ -26,8 +26,8 @@
 
 /* Form card */
 .resv-form-card {
-    background: #fff;
-    border-radius: 4px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
     border: 1px solid rgba(212,175,55,0.2);
     box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     padding: 40px 40px 48px;
@@ -43,12 +43,12 @@
 
 /* Section label above table canvas */
 .section-label {
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #5C4033;
+    color: var(--color-text-muted);
     margin: 0 0 14px;
 }
 
@@ -58,8 +58,8 @@
     width: 100%;
     height: 460px;
     border: 1.5px solid rgba(212,175,55,0.4);
-    border-radius: 4px;
-    background: #FAF7F0;
+    border-radius: var(--radius);
+    background: var(--color-bg);
     overflow: hidden;
     margin-bottom: 12px;
 }
@@ -72,21 +72,25 @@
     text-align: center;
     z-index: 10;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: var(--radius);
     transition: background 0.2s ease;
 }
 
-.table-item:hover { background: rgba(139,0,0,0.08); }
+.table-item:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
 .table-item.unavailable { opacity: 0.3; cursor: not-allowed; }
-.table-item.selected { background: rgba(139,0,0,0.08); }
+.table-item.selected {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
 
 .table-item:hover .table-circle,
 .table-item:hover .table-square,
 .table-item:hover .table-rect,
 .table-item:hover .table-booth,
 .table-item:hover .table-large {
-    background: #8B0000;
-    box-shadow: 0 4px 15px rgba(139,0,0,0.4);
+    background: var(--color-primary);
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
 .table-item.selected .table-circle,
@@ -94,13 +98,13 @@
 .table-item.selected .table-rect,
 .table-item.selected .table-booth,
 .table-item.selected .table-large {
-    background: #8B0000;
-    box-shadow: 0 0 0 4px #D4AF37;
+    background: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--color-accent);
 }
 
 .table-info {
     font-size: 11px;
-    color: #5C4033;
+    color: var(--color-text-muted);
     font-weight: bold;
     line-height: 1.4;
     letter-spacing: 0.3px;
@@ -118,26 +122,23 @@
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    color: #9E8C78;
-    font-family: 'Lato', sans-serif;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
 }
 
-.table-legend-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-}
+.table-legend-dot { width: 14px; height: 14px; border-radius: 50%; }
 
-.legend-available  { background: #b57f50; }
-.legend-selected   { background: #8B0000; box-shadow: 0 0 0 3px #D4AF37; }
+.legend-available   { background: var(--color-text-muted); }
+.legend-selected    { background: var(--color-primary); box-shadow: 0 0 0 3px var(--color-accent); }
+/* Keeping unavailable grey intentionally — semantic disabled state */
 .legend-unavailable { background: #ccc; }
 
 /* Table error message */
 #table-error {
     display: none;
-    color: #8B0000;
+    color: var(--color-primary);
     font-size: 13px;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     margin: 8px 0 20px;
 }
 
@@ -148,9 +149,9 @@
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid rgba(212,175,55,0.5);
-    border-radius: 2px;
-    background: #FFFEF2;
-    color: #2C2416;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
     font-family: Georgia, serif;
     font-size: 15px;
     outline: none;
@@ -159,18 +160,18 @@
     transition: border-color 0.2s;
 }
 
-.field-group-spaced textarea:focus { border-color: #D4AF37; }
+.field-group-spaced textarea:focus { border-color: var(--color-accent); }
 
 /* Confirm button */
 .btn-confirm {
     width: 100%;
     padding: 16px;
     margin-top: 32px;
-    background: #8B0000;
-    color: #D4AF37;
+    background: var(--color-primary);
+    color: var(--color-accent);
     border: none;
-    border-radius: 2px;
-    font-family: 'Lato', sans-serif;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -179,7 +180,9 @@
     transition: background 0.2s;
 }
 
-.btn-confirm:hover { background: #6B0000; }
+.btn-confirm:hover {
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
 
 /* Reservation success page */
 .resv-success-wrap {
@@ -190,22 +193,22 @@
 }
 
 .resv-success-wrap h1 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 36px;
-    color: #8B0000;
+    color: var(--color-primary);
     letter-spacing: 2px;
     margin: 0 0 16px;
 }
 
 .resv-success-wrap p {
     font-size: 18px;
-    color: #5C4033;
+    color: var(--color-text-muted);
     margin: 0 0 32px;
 }
 
 .resv-success-card {
-    background: #fff;
-    border-radius: 4px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
     border: 1px solid rgba(212,175,55,0.2);
     box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     padding: 32px 36px;
@@ -214,25 +217,23 @@
 }
 
 .resv-success-card h2 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 20px;
-    color: #8B0000;
+    color: var(--color-primary);
     margin: 0 0 20px;
 }
 
 .resv-success-card p {
     font-size: 15px;
-    color: #2C2416;
+    color: var(--color-text);
     margin: 0 0 10px;
 }
 
-.resv-success-card p strong {
-    color: #1C1008;
-}
+.resv-success-card p strong { color: var(--color-text); }
 
 .resv-success-note {
     font-size: 13px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin-top: 20px !important;
 }

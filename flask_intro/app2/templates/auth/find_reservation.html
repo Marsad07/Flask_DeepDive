@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block styles %}
+
 .resv-lookup-wrap {
     max-width: 480px;
     margin: 48px auto 80px;
@@ -9,39 +10,39 @@
 
 .resv-lookup-back {
     display: inline-block;
-    color: #8B0000;
+    color: var(--color-primary);
     text-decoration: none;
     font-size: 13px;
     font-weight: 700;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     margin-bottom: 20px;
 }
 
 .resv-lookup-back:hover { opacity: 0.75; }
 
 .resv-lookup-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 30px;
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     margin: 0 0 8px;
     letter-spacing: 1px;
 }
 
 .resv-lookup-subtitle {
     font-size: 14px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     margin: 0 0 28px;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
 }
 
 .resv-lookup-card {
-    background: #fff;
-    border-radius: 4px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
     border: 1px solid rgba(139,0,0,0.1);
     box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     padding: 32px 32px 36px;
-    border-top: 3px solid #8B0000;
+    border-top: 3px solid var(--color-primary);
 }
 
 .resv-lookup-label {
@@ -50,19 +51,19 @@
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #5C4033;
+    color: var(--color-text-muted);
     margin-bottom: 7px;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
 }
 
 .resv-lookup-input {
     width: 100%;
     padding: 11px 14px;
     border: 1.5px solid rgba(212,175,55,0.4);
-    border-radius: 2px;
-    background: #FFFEF2;
-    color: #2C2416;
-    font-family: 'Lato', sans-serif;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
@@ -70,16 +71,16 @@
     margin-bottom: 18px;
 }
 
-.resv-lookup-input:focus { border-color: #D4AF37; }
+.resv-lookup-input:focus { border-color: var(--color-accent); }
 
 .resv-lookup-btn {
     width: 100%;
     padding: 13px;
-    background: #8B0000;
-    color: #D4AF37;
+    background: var(--color-primary);
+    color: var(--color-accent);
     border: none;
-    border-radius: 2px;
-    font-family: 'Lato', sans-serif;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -89,7 +90,10 @@
     margin-top: 4px;
 }
 
-.resv-lookup-btn:hover { background: #6B0000; }
+.resv-lookup-btn:hover {
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
 {% endblock %}
 
 {% block content %}
@@ -98,7 +102,6 @@
     <a href="{{ url_for('general.home_page') }}" class="resv-lookup-back">
         ← Back to Home
     </a>
-
     <h1 class="resv-lookup-title">Find Your Reservation</h1>
     <p class="resv-lookup-subtitle">Enter your details to view or manage your booking.</p>
 

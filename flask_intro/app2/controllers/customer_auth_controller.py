@@ -293,11 +293,11 @@ def forgot_password():
                 <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
                     <tr>
                         <td bgcolor="#2C2416" align="center" style="padding: 30px; border-radius: 12px 12px 0 0;">
-                            <h1 style="color: #FFD700; margin: 0; font-size: 28px;
+                            <h1 style="color: var(--color-accent); margin: 0; font-size: 28px;
                             letter-spacing: 3px; font-family: Georgia, serif;">
                                 RESTAURANT NAME
                             </h1>
-                            <p style="color: #D4AF37; margin: 8px 0 0 0; font-size: 14px; letter-spacing: 2px;
+                            <p style="color: var(--color-accent); margin: 8px 0 0 0; font-size: 14px; letter-spacing: 2px;
                              font-family: Georgia, serif;">
                                 PASSWORD RESET
                             </p>
@@ -305,7 +305,7 @@ def forgot_password():
                     </tr>
                     <tr>
                         <td bgcolor="#FFFFFF" style="padding: 30px;">
-                            <p style="color: #2C2416; font-size: 16px; font-family: Georgia, serif; margin: 0 0 10px 0;">
+                            <p style="color: var(--color-text); font-size: 16px; font-family: Georgia, serif; margin: 0 0 10px 0;">
                                 Hi {customer['customer_fullname']},
                             </p>
                             <p style="color: #5C4033; font-size: 15px; line-height: 1.6; font-family: Georgia, serif;
@@ -316,7 +316,7 @@ def forgot_password():
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
                                 <tr>
                                     <td align="center">
-                                        <a href="{reset_url}" style="background-color: #8B0000; color: #FFD700;
+                                        <a href="{reset_url}" style="background-color: var(--color-primary); color: var(--color-accent);
                                          padding: 14px 35px; text-decoration: none; border-radius: 8px;
                                           font-size: 15px; font-weight: bold; letter-spacing: 2px;
                                            text-transform: uppercase; font-family: Georgia, serif;
@@ -334,7 +334,7 @@ def forgot_password():
                     </tr>
                     <tr>
                         <td bgcolor="#2C2416" align="center" style="padding: 20px; border-radius: 0 0 12px 12px;">
-                            <p style="color: #D4AF37; margin: 0;
+                            <p style="color: var(--color-accent); margin: 0;
                              font-size: 13px; letter-spacing: 1px; font-family: Georgia, serif;">
                                 © 2026 Restaurant Name. All rights reserved.
                             </p>

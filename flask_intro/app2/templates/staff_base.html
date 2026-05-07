@@ -9,29 +9,54 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts — kept on one line to avoid broken URL -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Playfair+
-          Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap">
-
-    {% block head %}{% endblock %}
-
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family
+          =Lato:wght@300;400;700&display=swap">
+    <!-- Theme variables injected from DB -->
     <style>
+      :root {
+        --color-primary:      {{ theme.color_primary }};
+        --color-accent:       {{ theme.color_accent }};
+        --color-bg:           {{ theme.color_background }};
+        --color-surface:      {{ theme.color_surface }};
+        --color-text:         {{ theme.color_text }};
+        --color-text-muted:   {{ theme.color_text_muted }};
+        --color-sidebar-bg:   {{ theme.color_sidebar_bg }};
+        --color-sidebar-text: {{ theme.color_sidebar_text }};
+        --font-body:          '{{ theme.font_body }}', sans-serif;
+        --font-heading:       '{{ theme.font_heading }}', serif;
+        --radius:             {{ theme.border_radius }};
+      }
+      {% if theme.dark_mode %}
+      :root {
+        --color-bg:         #1a1a1a;
+        --color-surface:    #2a2a2a;
+        --color-text:       #f0f0f0;
+        --color-text-muted: #aaaaaa;
+      }
+      {% endif %}
+    </style>
+    {% block head %}{% endblock %}
+    <style>
+        /* Staff base layout */
         body {
             margin: 0;
             padding: 0;
-            background: #F7F4EE;
-            font-family: 'Lato', sans-serif;
+            background: var(--color-bg);
+            font-family: var(--font-body);
+            color: var(--color-text);
         }
 
         /* Staff topbar */
         .staff-topbar {
-            background: #2C2416;
-            color: #FFFEF2;
+            background: var(--color-sidebar-bg);
+            color: var(--color-sidebar-text);
             padding: 14px 28px;
             display: flex;
             align-items: center;
@@ -40,10 +65,10 @@
         }
 
         .staff-topbar-title {
-            font-family: 'Playfair Display', serif;
+            font-family: var(--font-heading);
             font-size: 18px;
             font-weight: 700;
-            color: #D4AF37;
+            color: var(--color-accent);
             letter-spacing: 2px;
         }
 
@@ -63,11 +88,11 @@
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
-            color: #D4AF37;
+            color: var(--color-accent);
             text-decoration: none;
             border: 1px solid rgba(212,175,55,0.3);
             padding: 6px 14px;
-            border-radius: 2px;
+            border-radius: var(--radius);
             transition: background 0.2s;
         }
 
@@ -81,17 +106,106 @@
             margin: 0 auto;
             padding: 40px 24px 80px;
         }
+
+        /* Modal styles needed by kitchen and driver pages */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: var(--color-surface);
+            border-radius: var(--radius);
+            padding: 36px 40px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 4px solid var(--color-primary);
+        }
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            color: var(--color-text);
+            margin: 0 0 12px;
+            font-weight: 700;
+        }
+
+        .modal-message {
+            color: var(--color-text-muted);
+            font-size: 14px;
+            margin: 0 0 24px;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .modal-btn-cancel {
+            padding: 10px 24px;
+            background: transparent;
+            border: 1.5px solid var(--color-text);
+            color: var(--color-text);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: background 0.2s;
+        }
+
+        .modal-btn-cancel:hover { background: var(--color-bg); }
+
+        .modal-btn-confirm {
+            padding: 10px 24px;
+            background: var(--color-primary);
+            border: none;
+            color: #fff;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: background 0.2s;
+        }
+
+        .modal-btn-confirm:hover {
+            background: color-mix(in srgb, var(--color-primary) 80%, black);
+        }
+
+        /* dash-section-title used on kitchen page */
+        .dash-section-title {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-text);
+            margin: 0 0 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(139,0,0,0.15);
+        }
     </style>
 </head>
-
 <body>
-
     <!-- Staff topbar -->
     <div class="staff-topbar">
         <span class="staff-topbar-title">{{ branding.restaurant_name }}</span>
         <div class="staff-topbar-right">
             <span class="staff-topbar-name">{{ staff_name }}</span>
-            <a href="{{ url_for('staff.staff_logout') }}" class="staff-topbar-logout">Logout</a>
+            <a href="{{ url_for('staff.staff_logout') }}" class="staff-topbar-logout">
+                Logout
+            </a>
         </div>
     </div>
 
@@ -99,8 +213,6 @@
     <div class="staff-main">
         {% block staff_content %}{% endblock %}
     </div>
-
     {% block scripts %}{% endblock %}
-
 </body>
 </html>

@@ -73,11 +73,11 @@ def newsletter_signup():
                                     <tr>
                                         <td bgcolor="#2C2416" align="center" style="padding: 30px;
                                          border-radius: 12px 12px 0 0;">
-                                            <h1 style="color: #FFD700; margin: 0; font-size: 28px;
+                                            <h1 style="color: var(--color-accent); margin: 0; font-size: 28px;
                                              letter-spacing: 3px; font-family: Georgia, serif;">
                                                 RESTAURANT NAME
                                             </h1>
-                                            <p style="color: #D4AF37; margin: 8px 0 0 0; font-size: 14px;
+                                            <p style="color: var(--color-accent); margin: 8px 0 0 0; font-size: 14px;
                                              letter-spacing: 2px; font-family: Georgia, serif;">
                                                 NEWSLETTER SUBSCRIPTION
                                             </p>
@@ -85,7 +85,7 @@ def newsletter_signup():
                                     </tr>
                                     <tr>
                                         <td bgcolor="#FFFFFF" style="padding: 30px;">
-                                            <p style="color: #2C2416; font-size: 16px;
+                                            <p style="color: var(--color-text); font-size: 16px;
                                              font-family: Georgia, serif; margin: 0 0 10px 0;">
                                                 Welcome!
                                             </p>
@@ -104,7 +104,7 @@ def newsletter_signup():
                                                          font-family: Georgia, serif;">
                                                             Subscribed with
                                                         </p>
-                                                        <p style="margin: 5px 0 0 0; color: #8B0000; font-size: 16px;
+                                                        <p style="margin: 5px 0 0 0; color: var(--color-primary); font-size: 16px;
                                                          font-weight: bold; font-family: Georgia, serif;">
                                                             {email}
                                                         </p>
@@ -120,7 +120,7 @@ def newsletter_signup():
                                     <tr>
                                         <td bgcolor="#2C2416" align="center" style="padding: 20px;
                                          border-radius: 0 0 12px 12px;">
-                                            <p style="color: #D4AF37; margin: 0; font-size: 13px;
+                                            <p style="color: var(--color-accent); margin: 0; font-size: 13px;
                                              letter-spacing: 1px; font-family: Georgia, serif;">
                                                 © 2026 Restaurant Name. All rights reserved.
                                             </p>

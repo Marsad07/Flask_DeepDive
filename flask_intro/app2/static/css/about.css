@@ -1,7 +1,7 @@
 /* About page */
 .about-page {
     min-height: 80vh;
-    background: #FFFEF2;
+    background: var(--color-bg);
 }
 
 .about-header {
@@ -18,17 +18,17 @@
 }
 
 .about-header h1 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(32px, 5vw, 52px);
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     letter-spacing: 4px;
     margin: 0 0 12px;
 }
 
 .about-tagline {
     font-size: 18px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin: 0 0 24px;
 }
@@ -36,7 +36,7 @@
 .about-header-divider {
     width: 60px;
     height: 3px;
-    background: linear-gradient(90deg, #8B0000, #D4AF37);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
     border-radius: 2px;
     margin: 0 auto;
 }
@@ -50,12 +50,12 @@
 
 /* Eyebrow label */
 .about-section-eyebrow {
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #D4AF37;
+    color: var(--color-accent);
     margin: 0 0 32px;
     opacity: 0;
     transform: translateY(12px);
@@ -89,17 +89,17 @@
 }
 
 .about-section-heading {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 28px;
     font-weight: 700;
-    color: #8B0000;
+    color: var(--color-primary);
     margin: 0 0 16px;
     letter-spacing: 1px;
 }
 
 .about-section-content {
     font-size: 17px;
-    color: #5C4033;
+    color: var(--color-text-muted);
     line-height: 1.85;
     margin: 0;
 }

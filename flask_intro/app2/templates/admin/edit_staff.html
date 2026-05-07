@@ -107,7 +107,7 @@
                         <p id="password-revealed" class="edit-staff-password-revealed"
                            style="display: none;">
                             {{ staff.password_hash[:20] }}...
-                            <small style="color: #9E8C78; font-style: italic;">
+                            <small style="color: var(--color-text-muted)); font-style: italic;">
                                 (hashed — cannot be reversed)
                             </small>
                         </p>
@@ -118,8 +118,8 @@
                         <input type="password" name="password" class="form-input"
                                id="new-password-input"
                                placeholder="Leave blank to keep current">
-                        <p style="font-size: 12px; color: #9E8C78; margin-top: 6px;
-                                  font-family: 'Lato', sans-serif;">
+                        <p style="font-size: 12px; color: var(--color-text-muted)); margin-top: 6px;
+                                  font-family: background: var(--font-body);">
                             Minimum 8 characters recommended
                         </p>
                     </div>
@@ -206,13 +206,13 @@
             </div>
 
             <!-- Danger zone -->
-            <p class="dash-section-title" style="margin-top: 28px; color: #8B0000;">
+            <p class="dash-section-title" style="margin-top: 28px; color: var(--color-primary);">
                 Danger Zone
             </p>
             <div class="dash-card" style="border-left: 3px solid #8B0000;">
                 <div class="dash-card-body">
-                    <p style="font-size: 13px; color: #9E8C78; margin: 0 0 16px;
-                              font-family: 'Lato', sans-serif; line-height: 1.6;">
+                    <p style="font-size: 13px; color: var(--color-text-muted)); margin: 0 0 16px;
+                              font-family: background: var(--font-body); line-height: 1.6;">
                         Disabling this account will prevent the staff member from
                         logging in. This can be reversed at any time.
                     </p>

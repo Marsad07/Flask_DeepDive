@@ -1,251 +1,195 @@
 {% extends "admin_base.html" %}
 
 {% block admin_content %}
-<div class="menu-container">
-    <h1 style="margin-bottom: 10px;">
-        {{ customer.customer_fullname }}'s Order
-    </h1>
-    <div style="background: white; padding: 25px; border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+<div class="dash-page">
+    <!-- This is the page header -->
+    <div class="dash-header">
+        <div>
+            <h1>{{ customer.customer_fullname }}'s Order</h1>
+            <p class="dash-welcome">Order #{{ order.order_id }}</p>
+        </div>
+        <a href="{{ url_for('admin.view_all_orders') }}" class="btn-back">
+            ← Back to Orders
+        </a>
+    </div>
 
-        <div style="margin-bottom: 20px;">
-            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
-            <p><strong>Order Type:</strong> {{ order.order_type|capitalize }}</p>
-            <p><strong>Status:</strong> {{ order.order_status|capitalize }}</p>
-            <p><strong>Date:</strong> {{ order.order_date }} {{ order.order_time }}</p>
+    <!-- This is the order info + status update card -->
+    <div class="dash-card dash-card-body" style="margin-bottom: 20px;">
+
+        <!-- This is the order details grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    gap: 16px; margin-bottom: 24px;">
+            <div>
+                <p class="form-label">Order Type</p>
+                <p style="margin: 0; color: var(--color-text);">
+                    {{ order.order_type | capitalize }}
+                </p>
+            </div>
+            <div>
+                <p class="form-label">Status</p>
+                <p style="margin: 0; color: var(--color-text);">
+                    {{ order.order_status | capitalize }}
+                </p>
+            </div>
+            <div>
+                <p class="form-label">Date & Time</p>
+                <p style="margin: 0; color: var(--color-text);">
+                    {{ order.order_date }} {{ order.order_time }}
+                </p>
+            </div>
+            <div>
+                <p class="form-label">Total</p>
+                <p style="margin: 0; font-weight: 700; color: var(--color-primary); font-size: 18px;">
+                    £{{ "%.2f"|format(order.total_price) }}
+                </p>
+            </div>
         </div>
 
         <!-- This is for updating order status -->
-        <div style="margin-bottom: 25px; padding: 20px; background: #F8F4EC;
-                    border-radius: 8px; border-left: 4px solid #8B0000;">
-            <h3 style="margin: 0 0 15px 0; color: #2C2416; font-family: Georgia, serif;">
-                Update Order Status
-            </h3>
-
-            <form action="{{ url_for('admin.update_order_status', order_id=order.order_id) }}" method="POST"
-                  class="inline-form"
-                  style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-
-                <select name="status" style="
-                    padding: 10px 15px;
-                    border: 2px solid #D4AF37;
-                    border-radius: 6px;
-                    font-family: Georgia, serif;
-                    font-size: 15px;
-                    color: #2C2416;
-                    background: white;
-                    cursor: pointer;">
-                    {% set statuses = ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery',
-                    'completed', 'cancelled'] %}
-                    {% for s in statuses %}
-                        <option value="{{ s }}" {{ 'selected' if order.order_status == s }}>
-                            {{ s | capitalize }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <input type="number" name="estimated_mins" min="1" max="120"
-                       placeholder="Est. minutes"
-                       value="{{ order.estimated_minutes if order.estimated_minutes else '' }}"
-                       style="
-                        padding: 10px 15px;
-                        border: 2px solid #D4AF37;
-                        border-radius: 6px;
-                        font-family: Georgia, serif;
-                        font-size: 15px;
-                        color: #2C2416;
-                        width: 130px;">
-
-                <button type="submit" style="
-                    padding: 10px 25px;
-                    background-color: #8B0000;
-                    color: #FFD700;
-                    border: none;
-                    border-radius: 6px;
-                    font-family: Georgia, serif;
-                    font-size: 15px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    letter-spacing: 1px;">
-                    Update Status
-                </button>
+        <div class="info-banner warning" style="padding: 20px; border-radius: var(--radius);
+                    margin-bottom: 0;">
+            <p class="dash-card-title" style="margin-bottom: 16px;">Update Order Status</p>
+            <form action="{{ url_for('admin.update_order_status', order_id=order.order_id) }}"
+                  method="POST" class="inline-form">
+                <div class="form-row">
+                    <div style="flex: 1; min-width: 160px;">
+                        <select name="status" class="form-select">
+                            {% set statuses = ['pending', 'confirmed', 'preparing', 'ready',
+                                               'out for delivery', 'completed', 'cancelled'] %}
+                            {% for s in statuses %}
+                            <option value="{{ s }}"
+                                    {{ 'selected' if order.order_status == s }}>
+                                {{ s | capitalize }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="width: 150px;">
+                        <input type="number" name="estimated_mins" min="1" max="120"
+                               placeholder="Est. minutes" class="form-input"
+                               value="{{ order.estimated_minutes
+                                         if order.estimated_minutes else '' }}">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        Update Status
+                    </button>
+                </div>
             </form>
         </div>
-
-        <!-- This is for offering the driver -->
-        {% if order.order_type == "delivery" %}
-        <div style="margin-bottom: 25px; padding: 20px; background: #F0EFEA;
-            border-radius: 8px; border-left: 4px solid #2C2416;">
-            <h3 style="margin: 0 0 15px 0; color: #2C2416; font-family: Georgia, serif;">
-                Offer Delivery Driver
-            </h3>
-
-            <form action="{{ url_for('admin.offer_driver', order_id=order.order_id) }}"
-                  method="POST"
-                  class="inline-form"
-                  style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-
-                <select name="driver_id" required
-                        style="padding: 10px 15px; border: 2px solid #8B0000; border-radius: 6px;
-                               font-family: Georgia, serif; font-size: 15px; color: #2C2416;">
-                    <option value="">Offer to Driver</option>
-
-                    {% for d in drivers %}
+    </div>
+    <!-- This is for offering the driver — only shown for delivery orders -->
+    {% if order.order_type == "delivery" %}
+    <div class="dash-card dash-card-body" style="margin-bottom: 20px;">
+        <p class="dash-card-title">Offer Delivery Driver</p>
+        <form action="{{ url_for('admin.offer_driver', order_id=order.order_id) }}"
+              method="POST" class="inline-form">
+            <div class="form-row">
+                <div style="flex: 1;">
+                    <select name="driver_id" required class="form-select">
+                        <option value="">Select a driver to offer</option>
+                        {% for d in drivers %}
                         <option value="{{ d.staff_id }}"
-                            {% if order.driver_offer_id == d.staff_id %}selected{% endif %}>
+                                {{ 'selected' if order.driver_offer_id == d.staff_id }}>
                             {{ d.staff_name }} ({{ d.staff_username }})
                         </option>
-                    {% endfor %}
-                </select>
-
-                <button type="submit"
-                        style="padding: 10px 25px; background-color: #2C2416; color: #FFD700;
-                               border: none; border-radius: 6px; font-family: Georgia, serif;Restaurant Name
-                               font-size: 15px; font-weight: bold; cursor: pointer;">
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-edit">
                     Offer Driver
                 </button>
-            </form>
-        </div>
-        {% endif %}
-
-        <hr style="margin: 20px 0;">
-
-        <h3 style="margin-bottom: 15px;">Items Ordered</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    <!-- This is the items ordered table -->
+    <p class="dash-section-title">Items Ordered</p>
+    <div class="dash-card">
+        <table class="dash-table">
             <thead>
-                <tr style="background: #2C2416; color: #FFD700;">
-                    <th style="padding: 12px; text-align: left;">Item</th>
-                    <th style="padding: 12px; text-align: left;">Qty</th>
-                    <th style="padding: 12px; text-align: left;">Price</th>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in items %}
-                <tr style="border-bottom: 1px solid #E8DFD0;">
-                    <td style="padding: 12px;">{{ item.item_name }}</td>
-                    <td style="padding: 12px;">{{ item.quantity }}</td>
-                    <td style="padding: 12px;">£{{ "%.2f"|format(item.item_price) }}</td>
+                <tr>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>£{{ "%.2f"|format(item.item_price) }}</td>
                 </tr>
                 {% endfor %}
+                <tr style="background: var(--color-bg);">
+                    <td colspan="2"
+                        style="text-align: right; font-weight: 700; font-size: 16px;
+                               padding: 16px; color: var(--color-text);">
+                        Total
+                    </td>
+                    <td style="font-weight: 700; font-size: 20px;
+                               color: var(--color-primary); padding: 16px;">
+                        £{{ "%.2f"|format(order.total_price) }}
+                    </td>
+                </tr>
             </tbody>
         </table>
-
-        <div style="margin-top: 25px; padding: 15px; background: #F8F4EC; border-radius: 8px;
-                    font-size: 22px; font-weight: bold; text-align: right; color: #2C2416;">
-            TOTAL: £{{ "%.2f"|format(order.total_price) }}
-        </div>
-
-        <a href="{{ url_for('admin.view_all_orders') }}"
-           style="display: inline-block; margin-top: 20px; color: #8B0000;
-                  font-weight: bold; text-decoration: none;">
-            ← Back to Orders
-        </a>
     </div>
-    <!-- This is for the admin -->
-    <div id="admin-toast" style="
-        display:none;
-        position:fixed;
-        top:20px;
-        right:20px;
-        width:300px;
-        background:white;
-        border-left:6px solid #2C2416;
-        padding:18px 20px;
-        border-radius:10px;
-        box-shadow:0 6px 25px rgba(0,0,0,0.15);
-        z-index:9999;
-        animation: slideIn 0.35s ease-out;
-        font-family: Georgia, serif;
-        font-size:15px;
-    ">
-        <p id="admin-toast-text" style="margin:0;"></p>
-    </div>
+</div>
 
-    <!-- This is for the driver -->
-    <div id="driver-warning-modal" style="
-        display:none;
-        position: fixed;
-        top:0; left:0;
-        width:100%; height:100%;
-        background: rgba(0,0,0,0.5);
-        justify-content:center;
-        align-items:center;
-        z-index:99999;">
-        <div style="
-            background:white;
-            padding:25px;
-            border-radius:10px;
-            width:350px;
-            text-align:center;
-            box-shadow:0 4px 20px rgba(0,0,0,0.2);
-            font-family:Georgia, serif;">
-            <h3 style="margin-bottom:15px; color:#8B0000;">Driver Offer Blocked</h3>
-            <p id="driver-warning-text" style="margin-bottom:20px; color:#2C2416;"></p>
+<!-- This is the admin toast notification for driver responses -->
+<div id="admin-toast" class="staff-toast">
+    <p id="admin-toast-text" style="margin: 0;"></p>
+    <button onclick="document.getElementById('admin-toast').classList.remove('show')"
+            class="staff-toast-close">✕</button>
+</div>
 
-            <button onclick="closeDriverWarning()" style="
-                padding:10px 20px;
-                background:#8B0000;
-                color:white;
-                border:none;
-                border-radius:6px;
-                cursor:pointer;
-                font-weight:bold;
-            ">OK</button>
+<!-- This is the driver warning modal -->
+<div id="driver-warning-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Driver Offer Blocked</h3>
+        <p id="driver-warning-text" class="modal-message"></p>
+        <div class="modal-actions">
+            <button onclick="closeDriverWarning()" class="modal-btn-confirm">OK</button>
         </div>
     </div>
-    <style>
-    @keyframes slideIn {
-        from { opacity:0; transform: translateX(40px); }
-        to { opacity:1; transform: translateX(0); }
-    }
-    </style>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
 <script>
-const socket = io();
+    const socket = io();
 
-socket.on("connect", () => {
-    socket.emit("join_admin");
-});
+    socket.on("connect", () => {
+        socket.emit("join_admin");
+    });
 
-// This is for the admin notification
-socket.on("driver_response_update", function(data) {
-    const toast = document.getElementById("admin-toast");
-    const text = document.getElementById("admin-toast-text");
+    // This is for the admin notification when driver responds
+    socket.on("driver_response_update", function(data) {
+        const toast = document.getElementById("admin-toast");
+        const text  = document.getElementById("admin-toast-text");
 
-    if (data.accepted === true || data.accepted === "true") {
-        toast.style.borderLeftColor = "#2C7A2C";
-        text.textContent = "✓ Driver accepted order #" + data.order_id;
-        text.style.color = "#155724";
-    } else {
-        toast.style.borderLeftColor = "#8B0000";
-        text.textContent = "✗ Driver declined order #" + data.order_id;
-        text.style.color = "#721c24";
+        if (data.accepted === true || data.accepted === "true") {
+            text.textContent = "✓ Driver accepted order #" + data.order_id;
+        } else {
+            text.textContent = "✗ Driver declined order #" + data.order_id;
+        }
+
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 5000);
+    });
+
+    // This shows the driver warning modal
+    function showDriverWarning(message) {
+        document.getElementById("driver-warning-text").textContent = message;
+        document.getElementById("driver-warning-modal").classList.add("open");
     }
 
-    toast.style.display = "block";
+    // This closes the driver warning modal
+    function closeDriverWarning() {
+        document.getElementById("driver-warning-modal").classList.remove("open");
+    }
 
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 5000);
-});
-
-// This is the for the driver
-function showDriverWarning(message) {
-    document.getElementById("driver-warning-text").textContent = message;
-    document.getElementById("driver-warning-modal").style.display = "flex";
-}
-
-function closeDriverWarning() {
-    document.getElementById("driver-warning-modal").style.display = "none";
-}
-
-document.getElementById("driver-warning-modal").addEventListener("click", function(e) {
-    if (e.target === this) closeDriverWarning();
-});
+    document.getElementById("driver-warning-modal").addEventListener("click", function(e) {
+        if (e.target === this) closeDriverWarning();
+    });
 </script>
-
 {% endblock %}
-
-
-

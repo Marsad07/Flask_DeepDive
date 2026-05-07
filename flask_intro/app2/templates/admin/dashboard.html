@@ -1,170 +1,176 @@
 {% extends "admin_base.html" %}
 
 {% block admin_content %}
-
 <div class="dash-page">
-  <div class="dash-header">
-    <div>
-      <h1>Admin Dashboard</h1>
-      <p class="dash-welcome">
-        Welcome back, <span>{{ admin_name }}</span> —
-        {{ branding.restaurant_name }}
-      </p>
-    </div>
-  </div>
-
-  <!-- this is for the stat cards -->
-  <div class="dash-stats dash-stats-3">
-    <div class="stat-card stat-card-red">
-      <div class="stat-number">{{ today_bookings }}</div>
-      <div class="stat-label">Today's Bookings</div>
-    </div>
-
-    <div class="stat-card stat-card-gold">
-      <div class="stat-number">{{ total_bookings }}</div>
-      <div class="stat-label">Total Bookings</div>
-    </div>
-
-    <div class="stat-card stat-card-dark">
-      <div class="stat-number">{{ newsletter_subs }}</div>
-      <div class="stat-label">Newsletter Subscribers</div>
-    </div>
-  </div>
-
-  <!-- This is for the quick actions -->
-  <p class="dash-section-title">Quick Actions</p>
-  <div class="dash-actions">
-
-    <a href="{{ url_for('admin.manage_categories') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </div>
-      <span class="dash-action-label">Manage Categories</span>
-    </a>
-
-    <a href="{{ url_for('admin.update_hours') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      </div>
-      <span class="dash-action-label">Update Hours</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_tables') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><rect x="3" y="8" width="18" height="3" rx="1"/>
-             <path d="M6 11v6M18 11v6M4 17h16"/></svg>
-      </div>
-      <span class="dash-action-label">Manage Tables</span>
-    </a>
-
-    <a href="{{ url_for('admin.view_analytics') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      </div>
-      <span class="dash-action-label">View Analytics</span>
-    </a>
-
-    <a href="{{ url_for('admin.image_manager') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/>
-             <circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      </div>
-      <span class="dash-action-label">View / Change Images</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_homepage') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-             <path d="M9 22V12h6v10"/></svg>
-      </div>
-      <span class="dash-action-label">Manage Homepage</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_contact') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-             <circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <span class="dash-action-label">Edit Contact Details</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_social_links') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><circle cx="18" cy="5" r="3"/>
-             <circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-             <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
-      </div>
-      <span class="dash-action-label">Edit Social Media Links</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_about') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-      </div>
-      <span class="dash-action-label">Manage About Us</span>
-    </a>
-
-    <a href="{{ url_for('admin.manage_staff') }}" class="dash-action-card">
-      <div class="dash-action-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-             stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-             <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/>
-             <circle cx="16" cy="7" r="4"/></svg>
-      </div>
-      <span class="dash-action-label">Manage Staff</span>
-    </a>
-
-  </div>
-  <!-- Recent reservations -->
-  <p class="dash-section-title">Recent Reservations</p>
-  <div class="dash-card">
-
-    {% if recent_reservations %}
-      {% for reservation in recent_reservations %}
-      <div class="dash-reservation-row">
+    <!-- This is the dashboard header -->
+    <div class="dash-header">
         <div>
-          <p class="dash-resv-name">{{ reservation.customer_fullname }}</p>
-          <p class="dash-resv-details">
-            {{ reservation.reservation_date }} at {{ reservation.reservation_time }}
-            &nbsp;·&nbsp; Table {{ reservation.table_number }}
-            &nbsp;·&nbsp; {{ reservation.num_of_guests }} guests
-          </p>
+            <h1>Dashboard</h1>
+            <p class="dash-welcome">
+                Welcome back, <span>{{ admin_name }}</span> —
+                {{ branding.restaurant_name }}
+            </p>
         </div>
-        <span class="dash-resv-badge">{{ reservation.reservation_status }}</span>
-      </div>
-      {% endfor %}
-    {% else %}
-      <p class="dash-empty">No reservations yet.</p>
+    </div>
+
+    <!-- This is the stat cards row -->
+    <div class="dash-stats dash-stats-4">
+        <div class="stat-card stat-card-red">
+            <div class="stat-number">{{ today_bookings }}</div>
+            <div class="stat-label">Bookings Today</div>
+        </div>
+        <div class="stat-card stat-card-gold">
+            <div class="stat-number">{{ today_orders }}</div>
+            <div class="stat-label">Orders Today</div>
+        </div>
+        <div class="stat-card stat-card-dark">
+            <div class="stat-number">£{{ "%.2f"|format(today_revenue) }}</div>
+            <div class="stat-label">Revenue Today</div>
+        </div>
+        <div class="stat-card stat-card-brown">
+            <div class="stat-number">{{ pending_orders }}</div>
+            <div class="stat-label">Pending Orders</div>
+        </div>
+    </div>
+
+    <!-- This is the alert banner for pending orders needing attention -->
+    {% if pending_orders > 0 %}
+    <div class="info-banner warning" style="display: flex; align-items: center; gap: 10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71
+                     3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        {{ pending_orders }} order{{ 's' if pending_orders != 1 }} currently pending —
+        <a href="{{ url_for('admin.view_all_orders') }}"
+           style="color: var(--color-primary); font-weight: 700; text-decoration: none;">
+            View orders →
+        </a>
+    </div>
     {% endif %}
+    <!-- This is the split layout — reservations left, live orders right -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- This is the recent reservations card -->
+        <div class="dash-card">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                        padding: 16px 24px 0;">
+                <p class="dash-card-title" style="margin: 0; border: none; padding: 0;">
+                    Recent Reservations
+                </p>
+                <a href="{{ url_for('admin.view_reservations') }}"
+                   style="font-size: 12px; color: var(--color-primary); font-weight: 700;
+                          text-decoration: none;">
+                    View all →
+                </a>
+            </div>
 
-    <a href="{{ url_for('admin.view_reservations') }}" class="dash-view-all">
-      View All Reservations →
-    </a>
+            {% if recent_reservations %}
+                {% for r in recent_reservations %}
+                <div class="dash-reservation-row">
+                    <div>
+                        <p class="dash-resv-name">{{ r.customer_fullname }}</p>
+                        <p class="dash-resv-details">
+                            {{ r.reservation_date }} at {{ r.reservation_time }}
+                            &nbsp;·&nbsp; Table {{ r.table_number }}
+                            &nbsp;·&nbsp; {{ r.num_of_guests }} guests
+                        </p>
+                    </div>
+                    <span class="dash-resv-badge"
+                          data-status="{{ r.reservation_status }}">
+                        {{ r.reservation_status }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="dash-empty">No reservations yet.</p>
+            {% endif %}
+        </div>
 
-  </div>
+        <!-- This is the live orders card -->
+        <div class="dash-card">
+            <div style="display: flex; align-items: center; justify-content: space-between;
+                        padding: 16px 24px 0;">
+                <p class="dash-card-title" style="margin: 0; border: none; padding: 0;">
+                    Live Orders
+                </p>
+                <a href="{{ url_for('admin.view_all_orders') }}"
+                   style="font-size: 12px; color: var(--color-primary); font-weight: 700;
+                          text-decoration: none;">
+                    View all →
+                </a>
+            </div>
+            {% if recent_orders %}
+                {% for order in recent_orders %}
+                <div class="dash-reservation-row">
+                    <div>
+                        <p class="dash-resv-name">Order #{{ order.order_id }}</p>
+                        <p class="dash-resv-details">
+                            {{ '🏪 Collection' if order.order_type == 'collection'
+                               else '🚗 Delivery' }}
+                            &nbsp;·&nbsp; £{{ "%.2f"|format(order.total_price) }}
+                        </p>
+                    </div>
+                    <span class="dash-resv-badge" data-status="{{ order.order_status }}">
+                        {{ order.order_status | capitalize }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="dash-empty">No orders yet today.</p>
+            {% endif %}
+        </div>
+
+    </div>
+    <!-- This is the drivers on duty section -->
+    <p class="dash-section-title">Drivers on Duty</p>
+    <div class="dash-card" style="padding: 8px 0;">
+        {% if drivers %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+            {% for driver in drivers %}
+            <div class="dash-reservation-row" style="padding: 14px 24px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+
+                    <!-- This is the driver avatar circle with initials -->
+                    <div style="width: 36px; height: 36px; border-radius: 50%;
+                                background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+                                display: flex; align-items: center; justify-content: center;
+                                font-size: 13px; font-weight: 700; color: var(--color-primary);
+                                flex-shrink: 0;">
+                        {{ driver.full_name.split()[0][0] }}{{ driver.full_name.split()[-1][0]
+                           if driver.full_name.split()|length > 1 else '' }}
+                    </div>
+                    <div>
+                        <p class="dash-resv-name" style="font-size: 14px;">
+                            {{ driver.full_name }}
+                        </p>
+                        <p class="dash-resv-details">
+                            {% if not driver.is_active %}
+                                Offline
+                            {% elif driver.current_order %}
+                                Out for delivery · Order #{{ driver.current_order }}
+                            {% else %}
+                                Available
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <!-- This is the online/offline status dot -->
+                <div style="width: 10px; height: 10px; border-radius: 50; flex-shrink: 0;
+                            background: {{ '#22c55e' if driver.is_active else 'var(--color-text-muted)' }};">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="dash-empty">No drivers registered.</p>
+        {% endif %}
+
+        <a href="{{ url_for('admin.manage_drivers') }}" class="dash-view-all">
+            Manage Drivers →
+        </a>
+    </div>
 </div>
 {% endblock %}
-
-
-
-

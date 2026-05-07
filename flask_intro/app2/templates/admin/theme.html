@@ -1,0 +1,330 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+
+<div class="dash-page">
+  <div class="dash-header">
+    <div>
+      <h1>Theme & Style</h1>
+      <p class="dash-welcome">Customise the look of your entire website</p>
+    </div>
+  </div>
+
+  <!-- Live preview bar -->
+  <div id="preview-bar" style="
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:16px 20px; border-radius:4px; margin-bottom:28px;
+    background:var(--color-surface); border:1px solid rgba(0,0,0,0.08);
+    box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+    <span style="font-family:var(--font-heading);font-size:18px;font-weight:700;color:var(--color-text)">Preview</span>
+    <button id="prev-btn-primary"
+            style="padding:8px 18px;border:none;cursor:pointer;font-weight:700;font-size:13px;">Primary Button</button>
+    <button id="prev-btn-accent"
+            style="padding:8px 18px;border:none;cursor:pointer;font-weight:700;font-size:13px;">Accent Button</button>
+    <span id="prev-heading" style="font-size:20px;font-weight:700;">Heading Font</span>
+    <span id="prev-body"    style="font-size:14px;">Body font sample text</span>
+    <span id="prev-badge"
+          style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;
+          text-transform:uppercase;">Badge</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('admin.manage_theme') }}" id="theme-form">
+
+    <!-- Colours -->
+    <p class="dash-section-title">Colours</p>
+    <div class="dash-card dash-card-body" style="margin-bottom:28px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;">
+
+        {% set fields = [
+          ('color_primary',     'Primary Colour',     theme.color_primary,     'Main buttons, accents, key highlights'),
+          ('color_accent',      'Accent / Gold',      theme.color_accent,      'Icons, badges, hover states'),
+          ('color_background',  'Page Background',    theme.color_background,  'Main page background colour'),
+          ('color_surface',     'Card / Surface',     theme.color_surface,     'Cards, modals, panels'),
+          ('color_text',        'Body Text',          theme.color_text,        'Main readable text'),
+          ('color_text_muted',  'Muted Text',         theme.color_text_muted,  'Subtitles, hints, meta info'),
+          ('color_sidebar_bg',  'Sidebar Background', theme.color_sidebar_bg,  'Admin sidebar colour'),
+          ('color_sidebar_text','Sidebar Text',       theme.color_sidebar_text,'Nav link text colour'),
+        ] %}
+
+        {% for name, label, value, hint in fields %}
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">{{ label }}</label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="color" value="{{ value }}"
+                   class="colour-picker" data-target="{{ name }}"
+                   style="width:44px;height:44px;border:none;cursor:pointer;
+                          border-radius:4px;background:none;padding:0;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--color-text)"
+                   class="colour-hex" data-for="{{ name }}">{{ value }}</div>
+              <div style="font-size:11px;color:var(--color-text-muted)">{{ hint }}</div>
+            </div>
+          </div>
+          <!-- hidden input so the hex is submitted correctly -->
+          <input type="hidden" name="{{ name }}" value="{{ value }}" class="colour-hidden" id="hidden-{{ name }}">
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <p class="dash-section-title">Typography</p>
+    <div class="dash-card dash-card-body" style="margin-bottom:28px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Body Font</label>
+          <select name="font_body" class="form-select" id="font-body-select">
+            {% for f in body_fonts %}
+            <option value="{{ f }}" {{ 'selected' if theme.font_body == f }}>{{ f }}</option>
+            {% endfor %}
+          </select>
+          <p style="font-size:12px;color:var
+          (--color-text-muted);margin:6px 0 0">Used for all paragraph text, labels, buttons</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Heading Font</label>
+          <select name="font_heading" class="form-select" id="font-heading-select">
+            {% for f in heading_fonts %}
+            <option value="{{ f }}" {{ 'selected' if theme.font_heading == f }}>{{ f }}</option>
+            {% endfor %}
+          </select>
+          <p style="font-size:12px;color:var(--color-text-muted);
+          margin:6px 0 0">Used for page titles, card headings, section titles</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STYLE -->
+    <p class="dash-section-title">Style Options</p>
+    <div class="dash-card dash-card-body" style="margin-bottom:28px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Button & Card Radius</label>
+          <select name="border_radius" class="form-select" id="radius-select">
+            <option value="0px"  {{ 'selected' if theme.border_radius == '0px'  }}>Sharp (0px)</option>
+            <option value="2px"  {{ 'selected' if theme.border_radius == '2px'  }}>
+              Slightly Rounded (2px) — Default</option>
+            <option value="6px"  {{ 'selected' if theme.border_radius == '6px'  }}>Rounded (6px)</option>
+            <option value="12px" {{ 'selected' if theme.border_radius == '12px' }}>Very Rounded (12px)</option>
+            <option value="999px"{{ 'selected' if theme.border_radius == '999px'}}>Pill (999px)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Dark Mode</label>
+          <label class="edit-staff-toggle" style="margin-top:8px;">
+            <input type="checkbox" name="dark_mode" {{ 'checked' if theme.dark_mode }}>
+            <div class="toggle-track"></div>
+            <span class="toggle-label">Enable dark mode across all pages</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Preset Themes -->
+    <p class="dash-section-title">Quick Presets</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;">
+      {% set presets = [
+        ('Classic Dark Gold',  '#8B0000','#D4AF37','#F7F4EE','#FFFFFF','#2C2416','#9E8C78','#2C2416','#FFFEF2'),
+        ('Midnight Blue',      '#1a3a5c','#F0B429','#F0F4F8','#FFFFFF','#1a2030','#6B7C93','#1a2030','#E8EDF2'),
+        ('Forest Green',       '#1A5C3A','#F5C842','#F2F7F2','#FFFFFF','#1C2B1C','#7A9E7A','#1A3A1A','#E8F0E8'),
+        ('Charcoal Modern',    '#333333','#FF6B35','#F5F5F5','#FFFFFF','#1a1a1a','#888888','#1a1a1a','#F0F0F0'),
+        ('Rose Gold',          '#C2185B','#F8BBD0','#FFF8F9','#FFFFFF','#2C1A1F','#A0777E','#2C1A1F','#FFE8EF'),
+        ('Ocean Teal',         '#006D77','#83C5BE','#EDF6F9','#FFFFFF','#1C2B2D','#7A9EA0','#006D77','#E8F4F6'),
+      ] %}
+      {% for label, pri, acc, bg, surf, txt, muted, sid, sidtxt in presets %}
+      <button type="button" class="preset-btn"
+              data-primary="{{ pri }}" data-accent="{{ acc }}"
+              data-background="{{ bg }}" data-surface="{{ surf }}"
+              data-text="{{ txt }}" data-text_muted="{{ muted }}"
+              data-sidebar_bg="{{ sid }}" data-sidebar_text="{{ sidtxt }}"
+              style="padding:10px 18px;border:1.5px solid rgba(0,0,0,0.12);
+                     border-radius:4px;cursor:pointer;font-family:var(--font-body);
+                     font-size:13px;font-weight:700;background:var(--color-surface);
+                     color:var(--color-text);transition:all 0.2s;display:flex;
+                     align-items:center;gap:8px;">
+        <span style="display:flex;gap:4px;">
+          <span style="width:14px;height:14px;border-radius:50%;background:{{ pri }};display:inline-block;"></span>
+          <span style="width:14px;height:14px;border-radius:50%;background:{{ acc }};display:inline-block;"></span>
+        </span>
+        {{ label }}
+      </button>
+      {% endfor %}
+    </div>
+
+    <!-- Reset + Save -->
+    <div style="display:flex;justify-content:space-between;
+    align-items:center;flex-wrap:wrap;gap:12px;padding-bottom:40px;">
+      <button type="button" id="reset-btn"
+              style="padding:10px 22px;background:transparent;border:1.5px solid rgba(0,0,0,0.2);
+                     border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;
+                     font-family:var(--font-body);color:var(--color-text-muted);">
+        ↩ Reset to Default
+      </button>
+      <button type="submit" class="btn-submit" style="width:auto;padding:12px 40px;">
+        Save Theme
+      </button>
+    </div>
+  </form>
+</div>
+<!-- Load Google Fonts dynamically -->
+<div id="font-link-container"></div>
+<script>
+//  Colour pickers
+// Remove duplicate hidden inputs (Jinja loop creates two inputs per field)
+// We only want the hidden one submitted
+document.querySelectorAll('input[type="color"]').forEach(picker => {
+  picker.addEventListener('input', function() {
+    const target = this.dataset.target;
+    const hex    = this.value;
+
+    // Update hidden input
+    document.getElementById('hidden-' + target).value = hex;
+
+    // Update hex label
+    const hexLabel = document.querySelector(`.colour-hex[data-for="${target}"]`);
+    if (hexLabel) hexLabel.textContent = hex;
+
+    // Apply live to :root
+    const map = {
+      color_primary:     '--color-primary',
+      color_accent:      '--color-accent',
+      color_background:  '--color-bg',
+      color_surface:     '--color-surface',
+      color_text:        '--color-text',
+      color_text_muted:  '--color-text-muted',
+      color_sidebar_bg:  '--color-sidebar-bg',
+      color_sidebar_text:'--color-sidebar-text',
+    };
+    if (map[target]) {
+      document.documentElement.style.setProperty(map[target], hex);
+    }
+    updatePreviewBar();
+  });
+});
+
+//  Preview bar
+function updatePreviewBar() {
+  const getVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const primary = getVar('--color-primary');
+  const accent  = getVar('--color-accent');
+  const text    = getVar('--color-text');
+  const surface = getVar('--color-surface');
+  const radius  = getVar('--radius') || '2px';
+
+  const pb = document.getElementById('prev-btn-primary');
+  pb.style.background   = primary;
+  pb.style.color        = accent;
+  pb.style.borderRadius = radius;
+
+  const ab = document.getElementById('prev-btn-accent');
+  ab.style.background   = accent;
+  ab.style.color        = text;
+  ab.style.borderRadius = radius;
+
+  const badge = document.getElementById('prev-badge');
+  badge.style.background = primary + '22';
+  badge.style.color      = primary;
+}
+updatePreviewBar();
+
+// Font selects
+function loadGoogleFont(family) {
+  const id  = 'gfont-' + family.replace(/\s/g,'-');
+  if (!document.getElementById(id)) {
+    const link = document.createElement('link');
+    link.id   = id;
+    link.rel  = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@400;700&display=swap`;
+    document.head.appendChild(link);
+  }
+}
+
+document.getElementById('font-body-select').addEventListener('change', function() {
+  loadGoogleFont(this.value);
+  document.documentElement.style.setProperty('--font-body', `'${this.value}', sans-serif`);
+  document.getElementById('prev-body').style.fontFamily = this.value;
+});
+
+document.getElementById('font-heading-select').addEventListener('change', function() {
+  loadGoogleFont(this.value);
+  document.documentElement.style.setProperty('--font-heading', `'${this.value}', serif`);
+  document.getElementById('prev-heading').style.fontFamily = this.value;
+});
+
+// Border radius
+document.getElementById('radius-select').addEventListener('change', function() {
+  document.documentElement.style.setProperty('--radius', this.value);
+  updatePreviewBar();
+});
+
+// Preset buttons
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const map = {
+      color_primary:     '--color-primary',
+      color_accent:      '--color-accent',
+      color_background:  '--color-bg',
+      color_surface:     '--color-surface',
+      color_text:        '--color-text',
+      color_text_muted:  '--color-text-muted',
+      color_sidebar_bg:  '--color-sidebar-bg',
+      color_sidebar_text:'--color-sidebar-text',
+    };
+    Object.entries(map).forEach(([dataKey, cssVar]) => {
+      const val = this.dataset[dataKey.replace('color_','')];
+      if (val) {
+        document.documentElement.style.setProperty(cssVar, val);
+        // Update picker + hidden input
+        const picker = document.querySelector(`input[type="color"][data-target="${dataKey}"]`);
+        const hidden = document.getElementById('hidden-' + dataKey);
+        const label  = document.querySelector(`.colour-hex[data-for="${dataKey}"]`);
+        if (picker) picker.value = val;
+        if (hidden) hidden.value = val;
+        if (label)  label.textContent = val;
+      }
+    });
+    updatePreviewBar();
+  });
+});
+
+// Reset to defaults
+document.getElementById('reset-btn').addEventListener('click', function() {
+  if (!confirm('Reset theme to original defaults?')) return;
+  const defaults = {
+    color_primary:     '#8B0000',
+    color_accent:      '#D4AF37',
+    color_background:  '#F7F4EE',
+    color_surface:     '#FFFFFF',
+    color_text:        '#2C2416',
+    color_text_muted:  '#9E8C78',
+    color_sidebar_bg:  '#2C2416',
+    color_sidebar_text:'#FFFEF2',
+  };
+  const cssMap = {
+    color_primary:     '--color-primary',
+    color_accent:      '--color-accent',
+    color_background:  '--color-bg',
+    color_surface:     '--color-surface',
+    color_text:        '--color-text',
+    color_text_muted:  '--color-text-muted',
+    color_sidebar_bg:  '--color-sidebar-bg',
+    color_sidebar_text:'--color-sidebar-text',
+  };
+  Object.entries(defaults).forEach(([key, val]) => {
+    document.getElementById('hidden-' + key).value = val;
+    const picker = document.querySelector(`[data-target="${key}"]`);
+    const label  = document.querySelector(`.colour-hex[data-for="${key}"]`);
+    if (picker) picker.value = val;
+    if (label)  label.textContent = val;
+    document.documentElement.style.setProperty(cssMap[key], val);
+  });
+  updatePreviewBar();
+});
+</script>
+{% endblock %}

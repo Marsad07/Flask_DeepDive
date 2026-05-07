@@ -1,7 +1,7 @@
 /* Menu page */
 .menu-page {
     min-height: 80vh;
-    background: #FFFEF2;
+    background: var(--color-bg);
 }
 
 .menu-header {
@@ -10,17 +10,17 @@
 }
 
 .menu-header h1 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(32px, 5vw, 52px);
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     letter-spacing: 4px;
     margin: 0 0 12px;
 }
 
 .menu-tagline {
     font-size: 18px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin: 0 0 24px;
 }
@@ -28,7 +28,7 @@
 .menu-header-divider {
     width: 60px;
     height: 3px;
-    background: linear-gradient(90deg, #8B0000, #D4AF37);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
     border-radius: 2px;
     margin: 0 auto;
 }
@@ -60,10 +60,10 @@
 }
 
 .menu-category-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 26px;
     font-weight: 700;
-    color: #8B0000;
+    color: var(--color-primary);
     letter-spacing: 3px;
     text-transform: uppercase;
     white-space: nowrap;
@@ -99,10 +99,10 @@
 }
 
 .menu-item-name {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 18px;
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     white-space: nowrap;
 }
 
@@ -113,16 +113,16 @@
 }
 
 .menu-item-price {
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     font-size: 16px;
     font-weight: 700;
-    color: #8B0000;
+    color: var(--color-primary);
     white-space: nowrap;
 }
 
 .menu-item-desc {
     font-size: 13px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin: 6px 0 0 0;
     line-height: 1.5;

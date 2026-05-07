@@ -348,13 +348,13 @@ def cancel_reservation(resv_id):
        <!DOCTYPE html>
        <html>
        <body style="font-family: Georgia, serif; background: #FFFEF2; padding: 20px;">
-         <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px;
+         <div style="max-width: 600px; margin: auto; background: var(--color-surface); padding: 30px; border-radius: 8px;
                      border: 1px solid #D4AF37;">
-           <h2 style="color: #8B0000; text-align: center;">Reservation Cancelled</h2>
-           <p style="font-size: 16px; color: #2C2416;">
+           <h2 style="color: var(--color-primary); text-align: center;">Reservation Cancelled</h2>
+           <p style="font-size: 16px; color: var(--color-text);">
              Hello <strong>{r['customer_fullname']}</strong>,
            </p>
-           <p style="font-size: 16px; color: #2C2416;">
+           <p style="font-size: 16px; color: var(--color-text);">
              Your reservation has been successfully cancelled.
            </p>
            <div style="margin-top: 20px; padding: 15px; background: #FFF8E6; border-left: 4px solid #8B0000;">
@@ -368,7 +368,7 @@ def cancel_reservation(resv_id):
            <p style="margin-top: 30px; font-size: 15px; color: #5C4033;">
              If this was a mistake, you can make a new reservation anytime.
            </p>
-           <p style="margin-top: 20px; font-size: 14px; color: #8B0000; text-align: center;">
+           <p style="margin-top: 20px; font-size: 14px; color: var(--color-primary); text-align: center;">
              Thank you for choosing our restaurant.
            </p>
          </div>

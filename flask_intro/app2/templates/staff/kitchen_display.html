@@ -1,5 +1,6 @@
 {% extends "staff_base.html" %}
 
+
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/kitchen.css') }}">
 {% endblock %}
@@ -123,11 +124,11 @@
         document.getElementById("modal-confirm-btn").onclick = function() {
             document.getElementById(`kitchen-form-${orderId}`).submit();
         };
-        document.getElementById("confirm-modal").style.display = "flex";
+        document.getElementById("confirm-modal").classList.add("open");
     }
 
     function closeModal() {
-        document.getElementById("confirm-modal").style.display = "none";
+        document.getElementById("confirm-modal").classList.remove("open");
     }
 
     document.getElementById("confirm-modal").addEventListener("click", function(e) {

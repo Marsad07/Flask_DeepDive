@@ -5,8 +5,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: Georgia, serif;
-    background: #FFFEF2;
-    color: #2C2416;
+    background: var(--color-bg);
+    color: var(--color-text);
     overflow-x: hidden;
 }
 
@@ -23,15 +23,25 @@ body {
     font-size: 16px;
     color: white;
     margin: 0 auto 6px;
-    background: #b57f50;
+    background: var(--color-text-muted);
     transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .table-circle { width: 56px; height: 56px; border-radius: 50%; }
 .table-square { width: 64px; height: 64px; border-radius: 6px; }
 .table-rect   { width: 88px; height: 56px; border-radius: 6px; }
-.table-booth  { width: 64px; height: 64px; border-radius: 6px; background: #660000; }
-.table-large  { width: 92px; height: 70px; border-radius: 6px; background: #8B0000; }
+.table-booth {
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-primary) 75%, black);
+}
+.table-large {
+    width: 92px;
+    height: 70px;
+    border-radius: 6px;
+    background: var(--color-primary);
+}
 
 /* Layout labels */
 .layout-label {
@@ -40,7 +50,7 @@ body {
     font-size: 12px;
     font-weight: bold;
     letter-spacing: 3px;
-    color: #8B4513;
+    color: var(--color-text-muted);
     opacity: 0.75;
     text-align: center;
     width: 100%;
@@ -56,21 +66,21 @@ body {
 .page-header {
     text-align: center;
     padding: 70px 20px 50px;
-    background: #FFFEF2;
+    background: var(--color-bg);
 }
 
 .page-header h1 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(32px, 5vw, 52px);
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     letter-spacing: 4px;
     margin: 0 0 12px;
 }
 
 .page-header-tagline {
     font-size: 18px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin: 0 0 24px;
 }
@@ -78,7 +88,7 @@ body {
 .page-header-divider {
     width: 60px;
     height: 3px;
-    background: linear-gradient(90deg, #8B0000, #D4AF37);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
     border-radius: 2px;
     margin: 0 auto;
 }
@@ -87,11 +97,11 @@ body {
 .btn-primary-pub {
     display: inline-block;
     padding: 14px 36px;
-    background: #8B0000;
-    color: #D4AF37;
+    background: var(--color-primary);
+    color: var(--color-accent);
     border: none;
-    border-radius: 2px;
-    font-family: 'Lato', sans-serif;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -101,12 +111,13 @@ body {
     transition: background 0.2s;
 }
 
-.btn-primary-pub:hover { background: #6B0000; color: #D4AF37; }
+.btn-primary-pub:hover {
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
+    color: var(--color-accent);
+}
 
 /* Shared form field styles */
-.field-group {
-    margin-bottom: 20px;
-}
+.field-group { margin-bottom: 20px; }
 
 .field-group label {
     display: block;
@@ -114,9 +125,9 @@ body {
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #5C4033;
+    color: var(--color-text-muted);
     margin-bottom: 8px;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
 }
 
 .field-group input,
@@ -125,9 +136,9 @@ body {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid rgba(212,175,55,0.5);
-    border-radius: 2px;
-    background: #FFFEF2;
-    color: #2C2416;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
     font-family: Georgia, serif;
     font-size: 15px;
     outline: none;
@@ -138,7 +149,7 @@ body {
 .field-group input:focus,
 .field-group select:focus,
 .field-group textarea:focus {
-    border-color: #D4AF37;
+    border-color: var(--color-accent);
 }
 
 /* Shared modal */
@@ -155,25 +166,25 @@ body {
 .modal-backdrop.open { display: flex; }
 
 .modal-box {
-    background: #fff;
-    border-radius: 4px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
     padding: 36px 40px;
     max-width: 440px;
     width: 90%;
     box-shadow: 0 8px 40px rgba(0,0,0,0.2);
     text-align: center;
-    border-top: 4px solid #8B0000;
+    border-top: 4px solid var(--color-primary);
 }
 
 .modal-box h3 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 22px;
-    color: #1C1008;
+    color: var(--color-text);
     margin: 0 0 12px;
 }
 
 .modal-box p {
-    color: #5C4033;
+    color: var(--color-text-muted);
     font-size: 14px;
     margin: 0 0 24px;
     line-height: 1.6;
@@ -188,32 +199,34 @@ body {
 .btn-modal-cancel {
     padding: 10px 24px;
     background: transparent;
-    border: 1.5px solid #2C2416;
-    color: #2C2416;
-    border-radius: 2px;
+    border: 1.5px solid var(--color-text);
+    color: var(--color-text);
+    border-radius: var(--radius);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     transition: background 0.2s;
 }
 
-.btn-modal-cancel:hover { background: #F5F0E8; }
+.btn-modal-cancel:hover { background: var(--color-bg); }
 
 .btn-modal-confirm {
     padding: 10px 24px;
-    background: #8B0000;
+    background: var(--color-primary);
     border: none;
     color: #fff;
-    border-radius: 2px;
+    border-radius: var(--radius);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-body);
     transition: background 0.2s;
 }
 
-.btn-modal-confirm:hover { background: #6B0000; }
+.btn-modal-confirm:hover {
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
 
 /* Fade-in animation */
 .fade-in {
@@ -228,9 +241,7 @@ body {
 }
 
 /* This is the dropdown container */
-ul.navbar li.dropdown {
-    position: relative;
-}
+ul.navbar li.dropdown { position: relative; }
 
 /* This is the dropdown menu */
 ul.navbar li.dropdown .dropdown-menu {
@@ -238,21 +249,21 @@ ul.navbar li.dropdown .dropdown-menu {
     position: absolute;
     top: 100%;
     right: 0;
-    background: #2C2416;
+    background: var(--color-sidebar-bg);
     list-style: none;
     margin: 0;
     padding: 8px 0;
     min-width: 160px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     z-index: 1000;
-    border-top: 2px solid #8B0000;
+    border-top: 2px solid var(--color-primary);
 }
 
 /* This is each link in the dropdown */
 ul.navbar li.dropdown .dropdown-menu li a {
     display: block;
     padding: 12px 20px;
-    color: #FFFEF2;
+    color: var(--color-sidebar-text);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -262,6 +273,6 @@ ul.navbar li.dropdown .dropdown-menu li a {
 }
 
 ul.navbar li.dropdown .dropdown-menu li a:hover {
-    background: #8B0000;
-    color: #FFD700;
+    background: var(--color-primary);
+    color: var(--color-accent);
 }

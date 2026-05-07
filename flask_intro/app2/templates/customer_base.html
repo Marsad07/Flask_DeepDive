@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts — kept on one line to avoid broken URL -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
@@ -21,13 +22,34 @@
     <!-- Customer stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/customer.css') }}">
 
+    <!-- Theme variables injected from DB -->
+    <style>
+        :root {
+            --color-primary:      {{ theme.color_primary }};
+            --color-accent:       {{ theme.color_accent }};
+            --color-bg:           {{ theme.color_background }};
+            --color-surface:      {{ theme.color_surface }};
+            --color-text:         {{ theme.color_text }};
+            --color-text-muted:   {{ theme.color_text_muted }};
+            --color-sidebar-bg:   {{ theme.color_sidebar_bg }};
+            --color-sidebar-text: {{ theme.color_sidebar_text }};
+            --font-body:          '{{ theme.font_body }}', sans-serif;
+            --font-heading:       '{{ theme.font_heading }}', serif;
+            --radius:             {{ theme.border_radius }};
+        }
+        {% if theme.dark_mode %}
+        :root {
+            --color-bg:         #1a1a1a;
+            --color-surface:    #2a2a2a;
+            --color-text:       #f0f0f0;
+            --color-text-muted: #aaaaaa;
+        }
+        {% endif %}
+    </style>
     {% block extra_css %}{% endblock %}
-
     {% block head %}{% endblock %}
 </head>
-
 <body>
-
     <!-- Customer topbar -->
     <div class="customer-topbar">
         <a href="{{ url_for('general.home_page') }}" class="customer-topbar-logo">
@@ -35,43 +57,46 @@
         </a>
         <div class="customer-topbar-right">
             <span class="customer-topbar-name">{{ session.get('customer_name', '') }}</span>
-            <a href="{{ url_for('customer_auth.logout') }}" class="customer-topbar-logout">Logout</a>
+            <a href="{{ url_for('customer_auth.logout') }}" class="customer-topbar-logout">
+                Logout
+            </a>
         </div>
     </div>
-
     <!-- Customer nav tabs -->
     <nav class="customer-nav">
-    <!-- Left side nav links -->
-    <div class="customer-nav-links">
-        <a href="{{ url_for('customer_auth.customer_dashboard') }}"
-           class="customer-nav-link {{ 'active' if request.endpoint == 'customer_auth.customer_dashboard' }}">
-            Dashboard
+        <!-- Left side nav links -->
+        <div class="customer-nav-links">
+            <a href="{{ url_for('customer_auth.customer_dashboard') }}"
+               class="customer-nav-link
+               {{ 'active' if request.endpoint == 'customer_auth.customer_dashboard' }}">
+                Dashboard
+            </a>
+            <a href="{{ url_for('customer_auth.order_history') }}"
+               class="customer-nav-link
+               {{ 'active' if request.endpoint == 'customer_auth.order_history' }}">
+                Orders
+            </a>
+            <a href="{{ url_for('reservations.my_reservations') }}"
+               class="customer-nav-link
+               {{ 'active' if request.endpoint == 'reservations.my_reservations' }}">
+                Reservations
+            </a>
+            <a href="{{ url_for('customer_auth.customer_profile') }}"
+               class="customer-nav-link
+               {{ 'active' if request.endpoint == 'customer_auth.customer_profile' }}">
+                Profile
+            </a>
+        </div>
+        <!-- Right side back to home -->
+        <a href="{{ url_for('general.home_page') }}" class="customer-nav-home">
+            ← Back to Home
         </a>
-        <a href="{{ url_for('customer_auth.order_history') }}"
-           class="customer-nav-link {{ 'active' if request.endpoint == 'customer_auth.order_history' }}">
-            Orders
-        <a href="{{ url_for('reservations.my_reservations') }}"
-           class="customer-nav-link {{ 'active' if request.endpoint == 'reservations.my_reservations' }}">
-            Reservations
-        </a>
-        <a href="{{ url_for('customer_auth.customer_profile') }}"
-           class="customer-nav-link {{ 'active' if request.endpoint == 'customer_auth.customer_profile' }}">
-            Profile
-        </a>
-    </div>
-
-    <!-- Right side back to home -->
-    <a href="{{ url_for('general.home_page') }}" class="customer-nav-home">
-        ← Back to Home
-    </a>
-</nav>
-
+    </nav>
     <!-- Page content -->
     <div class="customer-main">
         {% block customer_content %}{% endblock %}
     </div>
 
     {% block scripts %}{% endblock %}
-
 </body>
 </html>

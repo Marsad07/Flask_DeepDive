@@ -3,13 +3,37 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+    <!-- Theme variables injected here -->
     <style>
-        .site-title { display: none !important; }
-        ul.navbar { display: none !important; }
-        .hamburger { display: none !important; }
+        :root {
+            --color-primary:      {{ theme.color_primary }};
+            --color-accent:       {{ theme.color_accent }};
+            --color-bg:           {{ theme.color_background }};
+            --color-surface:      {{ theme.color_surface }};
+            --color-text:         {{ theme.color_text }};
+            --color-text-muted:   {{ theme.color_text_muted }};
+            --color-sidebar-bg:   {{ theme.color_sidebar_bg }};
+            --color-sidebar-text: {{ theme.color_sidebar_text }};
+            --font-body:          '{{ theme.font_body }}', sans-serif;
+            --font-heading:       '{{ theme.font_heading }}', serif;
+            --radius:             {{ theme.border_radius }};
+        }
+        {% if theme.dark_mode %}
+        :root {
+            --color-bg:         #1a1a1a;
+            --color-surface:    #2a2a2a;
+            --color-text:       #f0f0f0;
+            --color-text-muted: #aaaaaa;
+        }
+        {% endif %}
+
+        .site-title  { display: none !important; }
+        ul.navbar    { display: none !important; }
+        .hamburger   { display: none !important; }
         .site-footer { display: none !important; }
-        .content { padding: 0 !important; }
-        body { background: #F7F4EE; }
+        .content     { padding: 0 !important; }
+        body         { background: var(--color-bg); }
     </style>
 {% endblock %}
 
@@ -38,8 +62,8 @@
             <a href="{{ url_for('admin.manage_drivers') }}" class="admin-nav-link">
                 <span>Drivers</span>
             </a>
-            <a href="{{ url_for('admin.admin_settings') }}" class="admin-nav-link">
-                <span>Settings</span>
+            <a href="{{ url_for('admin.manage_theme') }}" class="admin-nav-link">
+                <span>Theme & Style</span>
             </a>
             <div class="admin-dropdown">
                 <button class="admin-dropdown-toggle">Admin Tools</button>
@@ -57,20 +81,19 @@
                     <a href="{{ url_for('admin.manage_newsletter') }}">Newsletter</a>
                     <a href="{{ url_for('admin.manage_coupons') }}">Coupons</a>
                 </div>
+            <a href="{{ url_for('admin.admin_settings') }}" class="admin-nav-link">
+                <span>Settings</span>
+            </a>
             </div>
-
             <a href="{{ url_for('admin.logout') }}" class="admin-nav-link logout-link">
                 <span>Logout</span>
             </a>
         </nav>
     </aside>
-
     <main class="admin-main">
         {% block admin_content %}{% endblock %}
     </main>
-
 </div>
-
 <script>
     document.querySelector('.admin-dropdown-toggle').addEventListener('click', function () {
         document.getElementById('adminDropdownMenu').classList.toggle('open');

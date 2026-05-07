@@ -1,71 +1,86 @@
 {% extends "admin_base.html" %}
 
-
-
 {% block admin_content %}
+
 <!-- This loads the Google Charts library which i will be using to show data -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="dash-page">
 
-  <!-- This is for the top header row -->
-  <div class="dash-header">
-    <h1>Analytics</h1>
-    <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
-  </div>
-
-  <!-- This creates the stats cards -->
-  <div class="dash-stats dash-stats-4">
-    <div class="stat-card stat-card-red">
-      <div class="stat-number">{{ total_reservations }}</div>
-      <div class="stat-label">Total Reservations</div>
-    </div>
-    <div class="stat-card stat-card-gold">
-      <div class="stat-number">{{ total_monthly_reservations }}</div>
-      <div class="stat-label">This Month</div>
-    </div>
-    <div class="stat-card stat-card-dark">
-      <div class="stat-number">{{ "%.1f"|format(total_guests) }}</div>
-      <div class="stat-label">Avg Guests</div>
-    </div>
-    <div class="stat-card stat-card-brown">
-      <div class="stat-number">{{ popular_table }}</div>
-      <div class="stat-label">Popular Table</div>
-    </div>
-  </div>
-
-  <p class="dash-section-title">Booking Insights</p>
-  <div class="dash-chart-grid-2">
-
-    <!-- Chart 1: Bookings by Day -->
-    <div class="dash-chart-card">
-      <div class="dash-chart-card-body">
-        <p class="dash-chart-title">Bookings by Day</p>
-        <div id="bookings_by_day_chart" style="width: 100%; height: 360px;"></div>
-      </div>
+    <!-- This is for the top header row -->
+    <div class="dash-header">
+        <h1>Analytics</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
     </div>
 
-    <!-- Chart 2: Bookings by Time -->
-    <div class="dash-chart-card">
-      <div class="dash-chart-card-body">
-        <p class="dash-chart-title">Popular Time Slots</p>
-        <div id="bookings_by_time_chart" style="width: 100%; height: 360px;"></div>
-      </div>
+    <!-- This creates the stats cards -->
+    <div class="dash-stats dash-stats-4">
+        <div class="stat-card stat-card-red">
+            <div class="stat-number">{{ total_reservations }}</div>
+            <div class="stat-label">Total Reservations</div>
+        </div>
+        <div class="stat-card stat-card-gold">
+            <div class="stat-number">{{ total_monthly_reservations }}</div>
+            <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-card stat-card-dark">
+            <div class="stat-number">{{ "%.1f"|format(total_guests) }}</div>
+            <div class="stat-label">Avg Guests</div>
+        </div>
+        <div class="stat-card stat-card-brown">
+            <div class="stat-number">{{ popular_table }}</div>
+            <div class="stat-label">Popular Table</div>
+        </div>
     </div>
-  </div>
-  <!-- Chart 3: Monthly Trend -->
-  <div class="dash-chart-grid-1">
-    <div class="dash-chart-card">
-      <div class="dash-chart-card-body">
-        <p class="dash-chart-title">Monthly Trend</p>
-        <div id="monthly_trend_chart" style="width: 100%; height: 360px;"></div>
-      </div>
+
+    <p class="dash-section-title">Booking Insights</p>
+    <div class="dash-chart-grid-2">
+
+        <!-- Chart 1: Bookings by Day -->
+        <div class="dash-chart-card">
+            <div class="dash-chart-card-body">
+                <p class="dash-chart-title">Bookings by Day</p>
+                <div id="bookings_by_day_chart" style="width: 100%; height: 360px;"></div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Bookings by Time -->
+        <div class="dash-chart-card">
+            <div class="dash-chart-card-body">
+                <p class="dash-chart-title">Popular Time Slots</p>
+                <div id="bookings_by_time_chart" style="width: 100%; height: 360px;"></div>
+            </div>
+        </div>
+
     </div>
-  </div>
+
+    <!-- Chart 3: Monthly Trend -->
+    <div class="dash-chart-grid-1">
+        <div class="dash-chart-card">
+            <div class="dash-chart-card-body">
+                <p class="dash-chart-title">Monthly Trend</p>
+                <div id="monthly_trend_chart" style="width: 100%; height: 360px;"></div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
+    // Reads CSS variables so chart colours follows the theme
+    const rootStyle    = getComputedStyle(document.documentElement);
+    const colorPrimary = rootStyle.getPropertyValue('--color-primary').trim()    || '#8B0000';
+    const colorAccent  = rootStyle.getPropertyValue('--color-accent').trim()     || '#D4AF37';
+    const colorSidebar = rootStyle.getPropertyValue('--color-sidebar-bg').trim() || '#2C2416';
+    const colorMuted   = rootStyle.getPropertyValue('--color-text-muted').trim() || '#9E8C78';
+    const colorText    = rootStyle.getPropertyValue('--color-text').trim()       || '#2C2416';
+
+    // Shared axis style used by all three charts
+    const axisStyle = {
+        titleTextStyle: { color: colorMuted },
+        textStyle:      { color: colorText  }
+    };
+
     // Load Google Charts
-    google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', { packages: ['corechart'] });
     google.charts.setOnLoadCallback(drawCharts);
 
     function drawCharts() {
@@ -84,16 +99,17 @@
         ]);
 
         var options = {
-            colors: ['#8B0000'],
+            colors: [colorPrimary],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Day of Week', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
-            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
-            textStyle: { color: '#5C4033' } },
+            hAxis: Object.assign({ title: 'Day of Week' },   axisStyle),
+            vAxis: Object.assign({ title: 'Number of Bookings', minValue: 0 }, axisStyle),
             chartArea: { width: '80%', height: '75%' }
         };
 
-        var chart = new google.visualization.ColumnChart(document.getElementById('bookings_by_day_chart'));
+        var chart = new google.visualization.ColumnChart(
+            document.getElementById('bookings_by_day_chart')
+        );
         chart.draw(data, options);
     }
 
@@ -107,16 +123,17 @@
         ]);
 
         var options = {
-            colors: ['#D4AF37'],
+            colors: [colorAccent],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Time Slot', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
-            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
-            textStyle: { color: '#5C4033' } },
+            hAxis: Object.assign({ title: 'Time Slot' },         axisStyle),
+            vAxis: Object.assign({ title: 'Number of Bookings', minValue: 0 }, axisStyle),
             chartArea: { width: '80%', height: '75%' }
         };
 
-        var chart = new google.visualization.ColumnChart(document.getElementById('bookings_by_time_chart'));
+        var chart = new google.visualization.ColumnChart(
+            document.getElementById('bookings_by_time_chart')
+        );
         chart.draw(data, options);
     }
 
@@ -130,21 +147,19 @@
         ]);
 
         var options = {
-            colors: ['#2C2416'],
+            colors: [colorSidebar],
             backgroundColor: 'transparent',
             legend: { position: 'none' },
-            hAxis: { title: 'Month', titleTextStyle: { color: '#9E8C78' }, textStyle: { color: '#5C4033' } },
-            vAxis: { title: 'Number of Bookings', minValue: 0, titleTextStyle: { color: '#9E8C78' },
-             textStyle: { color: '#5C4033' } },
+            hAxis: Object.assign({ title: 'Month' },              axisStyle),
+            vAxis: Object.assign({ title: 'Number of Bookings', minValue: 0 }, axisStyle),
             curveType: 'function',
             chartArea: { width: '88%', height: '75%' }
         };
 
-        var chart = new google.visualization.LineChart(document.getElementById('monthly_trend_chart'));
+        var chart = new google.visualization.LineChart(
+            document.getElementById('monthly_trend_chart')
+        );
         chart.draw(data, options);
     }
 </script>
 {% endblock %}
-
-
-

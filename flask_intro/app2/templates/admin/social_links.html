@@ -3,33 +3,33 @@
 <div class="menu-container">
     <h1>SOCIAL MEDIA LINKS</h1>
     <!-- This is for adding new links-->
-    <div style="background: white; padding: 25px; border-radius: 12px;
+    <div style="background: var(--color-surface); padding: 25px; border-radius: 12px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
-        <h3 style="color: #2C2416; font-family: Georgia, serif; margin-bottom: 20px;">
+        <h3 style="color: var(--color-text); font-family: Georgia, serif; margin-bottom: 20px;">
             Add New Link
         </h3>
         <form action="{{ url_for('admin.add_social_link') }}" method="POST" class="inline-form"
               style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
 
             <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Platform</label>
+                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">Platform</label>
                 <input type="text" name="platform" placeholder="e.g. Instagram"
                        style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
                               font-family: Georgia, serif; width: 150px;">
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">URL</label>
+                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">URL</label>
                 <input type="text" name="url" placeholder="https://instagram.com/..."
                        style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
                               font-family: Georgia, serif; width: 250px;">
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">
+                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">
                     Icon Class
                     <a href="https://fontawesome.com/icons?d=gallery&s=brands" target="_blank"
-                       style="color: #8B0000; font-size: 12px; margin-left: 5px;">
+                       style="color: var(--color-primary); font-size: 12px; margin-left: 5px;">
                         (Font Awesome brands)
                     </a>
                 </label>
@@ -39,14 +39,14 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: #2C2416;">Order</label>
+                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">Order</label>
                 <input type="number" name="display_order" value="0" min="0"
                        style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
                               font-family: Georgia, serif; width: 70px;">
             </div>
 
             <button type="submit"
-                    style="padding: 10px 25px; background: #8B0000; color: #FFD700;
+                    style="padding: 10px 25px; background: var(--color-primary); color: var(--color-accent);
                            border: none; border-radius: 6px; font-family: Georgia, serif;
                            font-size: 15px; font-weight: bold; cursor: pointer;">
                 Add Link
@@ -54,16 +54,16 @@
         </form>
     </div>
     <!-- This shows the existing links -->
-    <div style="background: white; padding: 25px; border-radius: 12px;
+    <div style="background: var(--color-surface); padding: 25px; border-radius: 12px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
-        <h3 style="color: #2C2416; font-family: Georgia, serif; margin-bottom: 20px;">
+        <h3 style="color: var(--color-text); font-family: Georgia, serif; margin-bottom: 20px;">
             Current Links
         </h3>
 
         {% if links %}
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr style="background: #2C2416; color: #FFD700;">
+                <tr style="background: var(--color-sidebar-bg); color: var(--color-accent);">
                     <th style="padding: 12px; text-align: left;">Platform</th>
                     <th style="padding: 12px; text-align: left;">URL</th>
                     <th style="padding: 12px; text-align: left;">Icon</th>
@@ -76,12 +76,12 @@
                 {% for link in links %}
                 <tr style="border-bottom: 1px solid #E8DFD0;">
                     <td style="padding: 12px;">
-                        <i class="{{ link.icon_class }}" style="margin-right: 8px; color: #8B0000;"></i>
+                        <i class="{{ link.icon_class }}" style="margin-right: 8px; color: var(--color-primary);"></i>
                         {{ link.platform }}
                     </td>
                     <td style="padding: 12px;">
                         <a href="{{ link.url }}" target="_blank"
-                           style="color: #8B0000; word-break: break-all;">
+                           style="color: var(--color-primary); word-break: break-all;">
                             {{ link.url }}
                         </a>
                     </td>
@@ -102,7 +102,7 @@
                             <button onclick="openEdit({{ link.id }}, '{{ link.platform }}',
                                             '{{ link.url }}', '{{ link.icon_class }}',
                                             {{ link.display_order }}, {{ 1 if link.is_active else 0 }})"
-                                    style="padding: 6px 14px; background: #D4AF37; color: #2C2416;
+                                    style="padding: 6px 14px; background: var(--color-accent); color: var(--color-text);
                                            border: none; border-radius: 4px; cursor: pointer;
                                            font-family: Georgia, serif; font-size: 13px; font-weight: bold;">
                                 Edit
@@ -114,7 +114,7 @@
                                   method="POST" class="inline-form">
                                 <button type="button"
                                         onclick="showDeleteConfirm({{ link.id }}, '{{ link.platform }}')"
-                                        style="padding: 6px 14px; background: #8B0000; color: white;
+                                        style="padding: 6px 14px; background: var(--color-primary); color: white;
                                                border: none; border-radius: 4px; cursor: pointer;
                                                font-family: Georgia, serif; font-size: 13px;">
                                     Remove

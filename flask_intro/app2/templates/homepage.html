@@ -21,7 +21,11 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(20,8,0,0.55) 100%);
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.1) 0%,
+        rgba(20,8,0,0.55) 100%
+    );
 }
 
 .hero-content {
@@ -41,7 +45,7 @@
 }
 
 .hero-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(36px, 7vw, 72px);
     font-weight: 700;
     margin: 0 0 16px;
@@ -50,7 +54,7 @@
 }
 
 .hero-motto {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: clamp(16px, 3vw, 22px);
     font-style: italic;
     font-weight: 300;
@@ -71,12 +75,12 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: #8B0000;
-    color: #D4AF37;
+    background: var(--color-primary);
+    color: var(--color-accent);
     padding: 16px 40px;
     text-decoration: none;
-    border-radius: 2px;
-    font-family: 'Lato', Arial, sans-serif;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
@@ -86,10 +90,10 @@
 }
 
 .hero-btn-primary:hover {
-    background: #6B0000;
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
     transform: translateY(-2px);
     box-shadow: 0 6px 28px rgba(139,0,0,0.6);
-    color: #D4AF37;
+    color: var(--color-accent);
     text-decoration: none;
 }
 
@@ -101,8 +105,8 @@
     color: white;
     padding: 15px 40px;
     text-decoration: none;
-    border-radius: 2px;
-    font-family: 'Lato', Arial, sans-serif;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
@@ -123,25 +127,29 @@
 /* This is for the story section */
 .home-story {
     padding: 90px 40px;
-    background: linear-gradient(135deg, #FFFEF2 0%, #F5F0E8 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-bg) 0%,
+        color-mix(in srgb, var(--color-bg) 80%, var(--color-text)) 100%
+    );
     text-align: center;
 }
 
 .home-section-label {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #D4AF37;
+    color: var(--color-accent);
     margin: 0 0 14px;
 }
 
 .home-section-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     margin: 0 0 12px;
     letter-spacing: 2px;
 }
@@ -149,7 +157,7 @@
 .home-section-divider {
     width: 50px;
     height: 3px;
-    background: linear-gradient(90deg, #8B0000, #D4AF37);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
     border-radius: 2px;
     margin: 0 auto 32px;
 }
@@ -157,16 +165,16 @@
 .home-story-text {
     max-width: 760px;
     margin: 0 auto;
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 17px;
     line-height: 1.9;
-    color: #5C4033;
+    color: var(--color-text-muted);
 }
 
 /* This is for the signature dishes section */
 .home-dishes {
     padding: 90px 40px;
-    background: #FFFEF2;
+    background: var(--color-bg);
 }
 
 .home-dishes-grid {
@@ -178,8 +186,8 @@
 }
 
 .dish-card {
-    background: #fff;
-    border-radius: 2px;
+    background: var(--color-surface);
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: 0 2px 20px rgba(139,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05);
     transition: transform 0.25s, box-shadow 0.25s;
@@ -192,7 +200,7 @@
 
 .dish-card-img {
     height: 240px;
-    background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -206,7 +214,7 @@
 }
 
 .dish-card-placeholder {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -216,21 +224,21 @@
 
 .dish-card-body {
     padding: 24px 26px 28px;
-    border-top: 3px solid #8B0000;
+    border-top: 3px solid var(--color-primary);
 }
 
 .dish-card-name {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-heading);
     font-size: 21px;
     font-weight: 700;
-    color: #1C1008;
+    color: var(--color-text);
     margin: 0 0 8px;
 }
 
 .dish-card-desc {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 14px;
-    color: #9E8C78;
+    color: var(--color-text-muted);
     font-style: italic;
     margin: 0;
     line-height: 1.6;
@@ -239,7 +247,7 @@
 /* This is for the reviews section */
 .home-reviews {
     padding: 90px 40px;
-    background: #2C2416;
+    background: var(--color-sidebar-bg);
     text-align: center;
 }
 
@@ -248,11 +256,11 @@
 }
 
 .home-reviews .home-section-title {
-    color: #D4AF37;
+    color: var(--color-accent);
 }
 
 .home-reviews .home-section-divider {
-    background: linear-gradient(90deg, #D4AF37, #8B0000);
+    background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
 }
 
 .reviews-grid {
@@ -266,7 +274,7 @@
 .review-card {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(212,175,55,0.15);
-    border-radius: 2px;
+    border-radius: var(--radius);
     padding: 32px 28px;
     text-align: left;
     transition: background 0.2s, border-color 0.2s;
@@ -278,14 +286,14 @@
 }
 
 .review-stars {
-    color: #D4AF37;
+    color: var(--color-accent);
     font-size: 18px;
     letter-spacing: 2px;
     margin-bottom: 16px;
 }
 
 .review-text {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 15px;
     font-style: italic;
     color: rgba(255,254,242,0.8);
@@ -294,12 +302,12 @@
 }
 
 .review-author {
-    font-family: 'Lato', Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #D4AF37;
+    color: var(--color-accent);
     margin: 0;
 }
 
@@ -326,6 +334,7 @@
     }
 }
 {% endblock %}
+
 {% block content %}
 <!-- This is the hero section with overlay -->
 <div class="hero">
@@ -345,22 +354,31 @@
         <p class="hero-motto">{{ branding.restaurant_motto }}</p>
         <div class="hero-btns">
             <a href="{{ url_for('cart.order_now_menu') }}" class="hero-btn-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"
-                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18
+                             M16 10a4 4 0 01-8 0"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 Order Takeaway
             </a>
-            <a href="{{ url_for('reservations.reservations_page') }}" class="hero-btn-secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <a href="{{ url_for('reservations.reservations_page') }}"
+               class="hero-btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="4" width="18" height="18" rx="2"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M16 2v4M8 2v4M3 10h18"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
                 </svg>
                 Book a Table
             </a>
         </div>
     </div>
 </div>
+
 <!-- This is the about/story section -->
 <div class="home-story">
     <p class="home-section-label">Est. since day one</p>
@@ -368,6 +386,7 @@
     <div class="home-section-divider"></div>
     <p class="home-story-text">(Restaurant Story)</p>
 </div>
+
 <!-- This is the featured dishes section -->
 <div class="home-dishes">
     <p class="home-section-label" style="text-align:center;">From our kitchen</p>

@@ -134,8 +134,8 @@
                             onclick="showCreateConfirm()">
                         Create Coupon
                     </button>
-                    <span id="recipient-preview" style="font-size: 13px; color: #9E8C78;
-                          font-family: 'Lato', sans-serif;"></span>
+                    <span id="recipient-preview" style="font-size: 13px; color: var(--color-text-muted));
+                          font-family: background: var(--font-body);"></span>
                 </div>
 
             </form>
@@ -147,8 +147,8 @@
                 margin-bottom: 18px;">
         <p class="dash-section-title" style="margin: 0; border: none;">
             All Coupons
-            <span style="font-size: 14px; font-weight: 400; color: #9E8C78;
-                         font-family: 'Lato', sans-serif;">
+            <span style="font-size: 14px; font-weight: 400; color: var(--color-text-muted));
+                         font-family: background: var(--font-body);">
                 ({{ coupons|length }} total)
             </span>
         </p>
@@ -188,7 +188,7 @@
                     <!-- Code with copy button -->
                     <td>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <strong style="letter-spacing: 2px; color: #8B0000;">
+                            <strong style="letter-spacing: 2px; color: var(--color-primary);">
                                 {{ coupon.code }}
                             </strong>
                             <button type="button" class="copy-btn"
@@ -213,7 +213,7 @@
                     </td>
 
                     <!-- Assigned to -->
-                    <td style="font-size: 13px; color: #9E8C78;">
+                    <td style="font-size: 13px; color: var(--color-text-muted));">
                         {{ coupon.assigned_email or '—' }}
                     </td>
 
@@ -245,7 +245,7 @@
                                 </span>
                             {% endif %}
                         {% else %}
-                            <span style="color: #9E8C78;">No expiry</span>
+                            <span style="color: var(--color-text-muted));">No expiry</span>
                         {% endif %}
                     </td>
 
