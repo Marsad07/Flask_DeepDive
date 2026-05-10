@@ -4,17 +4,56 @@ from datetime import date, datetime
 from app2 import socketio
 from flask_mailman import EmailMessage
 
+def _get_tables_and_booked_slots(cursor):
+    """Helper to fetch active tables and booked slots — used in multiple places."""
+    cursor.execute(
+        "SELECT * FROM restaurant_customer_tables "
+        "WHERE is_active = TRUE ORDER BY table_number ASC"
+    )
+    tables = cursor.fetchall()
+    cursor.execute("""
+        SELECT DISTINCT table_number, reservation_date, reservation_time
+        FROM reservations_restaurant
+        WHERE reservation_date >= %s
+          AND reservation_status != 'Cancelled'
+    """, (date.today().isoformat(),))
+    booked_slots = [
+        {
+            'table_num': r['table_number'],
+            'date': r['reservation_date'].isoformat(),
+            'time': str(r['reservation_time']).zfill(8)
+        }
+        for r in cursor.fetchall()
+    ]
+    return tables, booked_slots
+
 @staff_redirect
 def reservations_page():
     if request.method == "POST":
-        name = request.form.get("fullname")
-        email = request.form.get("email")
-        phone = request.form.get("phoneNum")
-        resv_date = request.form.get("resv_date")
-        resv_time = request.form.get("resv_time")
-        guests = request.form.get("guests_num")
-        table = request.form.get("table_num")
+        name             = request.form.get("fullname")
+        email            = request.form.get("email")
+        phone            = request.form.get("phoneNum")
+        resv_date        = request.form.get("resv_date")
+        resv_time        = request.form.get("resv_time")
+        guests           = request.form.get("guests_num")
+        table            = request.form.get("table_num")
         special_requests = request.form.get("special_requests")
+
+        # Guard — if any required field is missing or empty, bounce back to the form
+        if not all([name, email, phone, resv_date, resv_time, guests, table]):
+            db = get_db()
+            cursor = db.cursor(dictionary=True)
+            tables, booked_slots = _get_tables_and_booked_slots(cursor)
+            cursor.close()
+            db.close()
+            return render_template(
+                "reservations.html",
+                today=date.today().isoformat(),
+                tables=tables,
+                booked_slots=booked_slots,
+                error="Please fill in all fields before confirming."
+            )
+
         db = get_db()
         cursor = db.cursor(dictionary=True)
         cursor.execute("""
@@ -30,25 +69,7 @@ def reservations_page():
             db.close()
             db2 = get_db()
             cursor2 = db2.cursor(dictionary=True)
-            cursor2.execute(
-                "SELECT * FROM restaurant_customer_tables "
-                "WHERE is_active = TRUE ORDER BY table_number ASC"
-            )
-            tables = cursor2.fetchall()
-            cursor2.execute("""
-                SELECT DISTINCT table_number, reservation_date, reservation_time
-                FROM reservations_restaurant
-                WHERE reservation_date >= %s
-                  AND reservation_status != 'Cancelled'
-            """, (date.today().isoformat(),))
-            booked_slots = [
-                {
-                    'table_num': r['table_number'],
-                    'date': r['reservation_date'].isoformat(),
-                    'time': str(r['reservation_time']).zfill(8)
-                }
-                for r in cursor2.fetchall()
-            ]
+            tables, booked_slots = _get_tables_and_booked_slots(cursor2)
             cursor2.close()
             db2.close()
             today = date.today().isoformat()
@@ -277,25 +298,7 @@ def reservations_page():
         )
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT * FROM restaurant_customer_tables "
-        "WHERE is_active = TRUE ORDER BY table_number ASC"
-    )
-    tables = cursor.fetchall()
-    cursor.execute("""
-        SELECT DISTINCT table_number, reservation_date, reservation_time
-        FROM reservations_restaurant
-        WHERE reservation_date >= %s
-          AND reservation_status != 'Cancelled'
-    """, (date.today().isoformat(),))
-    booked_slots = [
-        {
-            'table_num': r['table_number'],
-            'date': r['reservation_date'].isoformat(),
-            'time': str(r['reservation_time']).zfill(8)
-        }
-        for r in cursor.fetchall()
-    ]
+    tables, booked_slots = _get_tables_and_booked_slots(cursor)
     cursor.close()
     db.close()
     today = date.today().isoformat()

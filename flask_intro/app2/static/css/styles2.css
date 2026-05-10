@@ -135,7 +135,7 @@ body {
 .field-group textarea {
     width: 100%;
     padding: 12px 14px;
-    border: 1.5px solid rgba(212,175,55,0.5);
+    border: 1.5px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
     border-radius: var(--radius);
     background: var(--color-bg);
     color: var(--color-text);

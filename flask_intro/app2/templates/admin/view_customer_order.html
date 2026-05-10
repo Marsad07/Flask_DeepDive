@@ -4,6 +4,14 @@
 <div class="dash-page">
     <!-- This is the page header -->
     <div class="dash-header">
+        <!-- Driver warning flash — shown when an offer is blocked -->
+        {% with messages = get_flashed_messages(category_filter=["driver_warning"]) %}
+            {% if messages %}
+            <div class="info-banner warning" style="margin-bottom: 20px;">
+                ⚠ {{ messages[0] }}
+            </div>
+            {% endif %}
+        {% endwith %}
         <div>
             <h1>{{ customer.customer_fullname }}'s Order</h1>
             <p class="dash-welcome">Order #{{ order.order_id }}</p>

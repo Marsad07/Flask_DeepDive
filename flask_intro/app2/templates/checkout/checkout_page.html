@@ -71,7 +71,8 @@
                     <label>Email</label>
                     <input type="email" name="email" id="email" required>
                     <label>Phone Number</label>
-                    <input type="tel" name="phone" pattern="[0-9]{10,}" required>
+                    <input type="tel" name="phone" id="phone"
+                           placeholder="e.g. 07712345678" required>
                 </div>
 
                 <!-- This is where the customer chooses their order type -->
@@ -98,8 +99,8 @@
                 <!-- This is where the customer enters their delivery address -->
                 <div id="delivery-address" class="checkout-card" style="display: none;">
                     <h2>Delivery Address</h2>
-                    <p style="font-size: 12px; color: var(--color-text-muted)); margin: 4px 0 16px;
-                              font-family: background: var(--font-body);">
+                    <p style="font-size: 12px; color: var(--color-text-muted);
+                              margin: 4px 0 16px; font-family: var(--font-body);">
                         Please include your house number for accurate delivery tracking.
                     </p>
                     <label>Address Line 1</label>
@@ -160,21 +161,21 @@
 
                 <!-- This is the hidden field to store the payment intent id -->
                 <input type="hidden" name="payment_intent_id" id="payment_intent_id">
-                <input type="hidden" name="payment_status" id="payment_status" value="pending">
+                <input type="hidden" name="payment_status" id="payment_status"
+                       value="pending">
 
                 <!-- These are the hidden fields to store coupon data for form submission -->
                 <input type="hidden" name="coupon_code" id="coupon_code_hidden">
-                <input type="hidden" name="discount_amount" id="discount_amount_hidden" value="0">
+                <input type="hidden" name="discount_amount" id="discount_amount_hidden"
+                       value="0">
 
-                <!-- This is the place order button which opens the confirmation modal -->
+                <!-- This is the place order button which validates then opens the confirmation modal -->
                 <button type="button" id="submit-btn" class="btn-place-order"
-                        onclick="openConfirm()">
+                        onclick="validateAndConfirm()">
                     Place Order
                 </button>
-
             </form>
         </div>
-
     </div>
 </div>
 <!-- This is the order confirmation modal shown before placing the order -->
@@ -212,39 +213,122 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
     const stripe = Stripe('{{ stripe_public_key }}');
-    let elements = null;
+    let elements  = null;
     let paymentElement = null;
-    let clientSecret = null;
+    let clientSecret   = null;
 
     // This tracks the applied coupon discount
     let appliedDiscount = 0;
     const originalTotal = {{ total }};
 
+    // This validates all contact and address fields before opening the confirmation modal
+    function validateAndConfirm() {
+        const name  = document.getElementById('full_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        // This clears any existing validation errors before re-checking
+        clearErrors();
+
+        let valid = true;
+
+        // This checks that the name field is not empty
+        if (!name) {
+            showError('full_name', 'Please enter your full name.');
+            valid = false;
+        }
+
+        // This validates the email address format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            showError('email', 'Please enter your email address.');
+            valid = false;
+        } else if (!emailRegex.test(email)) {
+            showError('email', 'Please enter a valid email address.');
+            valid = false;
+        }
+
+        // This validates that the phone number contains only digits and is 10-15 characters
+        const phoneRegex = /^[0-9]{10,15}$/;
+        if (!phone) {
+            showError('phone', 'Please enter your phone number.');
+            valid = false;
+        } else if (!phoneRegex.test(phone)) {
+            showError('phone', 'Phone must be 10–15 digits with no spaces or letters.');
+            valid = false;
+        }
+
+        // This checks the delivery address fields if the customer has selected delivery
+        const isDelivery = document.querySelector(
+            'input[name="order_type"]:checked').value === 'delivery';
+        if (isDelivery) {
+            const address1 = document.getElementById('address1').value.trim();
+            const city     = document.getElementById('city').value.trim();
+            const postcode = document.getElementById('postcode').value.trim();
+
+            if (!address1) {
+                showError('address1', 'Please enter your address.');
+                valid = false;
+            }
+            if (!city) {
+                showError('city', 'Please enter your city.');
+                valid = false;
+            }
+            if (!postcode) {
+                showError('postcode', 'Please enter your postcode.');
+                valid = false;
+            }
+        }
+
+        // This only opens the confirmation modal if all validation passes
+        if (valid) openConfirm();
+    }
+
+    // This shows a validation error message below the given input field
+    function showError(inputId, message) {
+        const input = document.getElementById(inputId);
+        input.style.borderColor = 'var(--color-primary)';
+
+        const err = document.createElement('p');
+        err.className   = 'field-error';
+        err.textContent = message;
+        err.style.cssText =
+            'color: var(--color-primary); font-size: 12px; ' +
+            'margin: 4px 0 0; font-family: var(--font-body);';
+        input.insertAdjacentElement('afterend', err);
+    }
+
+    // This clears all existing validation error messages and resets input border colours
+    function clearErrors() {
+        document.querySelectorAll('.field-error').forEach(e => e.remove());
+        document.querySelectorAll('input').forEach(i => i.style.borderColor = '');
+    }
+
     // This applies the coupon code entered by the customer
     async function applyCoupon() {
-        const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+        const code      = document.getElementById('coupon-input').value.trim().toUpperCase();
         const successEl = document.getElementById('coupon-success');
-        const errorEl = document.getElementById('coupon-error');
-        const applyBtn = document.querySelector('.btn-apply');
+        const errorEl   = document.getElementById('coupon-error');
+        const applyBtn  = document.querySelector('.btn-apply');
 
         successEl.style.display = 'none';
-        errorEl.style.display = 'none';
+        errorEl.style.display   = 'none';
 
         if (!code) {
-            errorEl.textContent = 'Please enter a coupon code.';
+            errorEl.textContent  = 'Please enter a coupon code.';
             errorEl.style.display = 'block';
             return;
         }
 
         // This shows a loading state on the button while the coupon is being validated
         applyBtn.textContent = 'Checking...';
-        applyBtn.disabled = true;
+        applyBtn.disabled    = true;
 
         try {
             const response = await fetch('/checkout/apply-coupon', {
-                method: 'POST',
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code, total: originalTotal })
+                body:    JSON.stringify({ code: code, total: originalTotal })
             });
             const data = await response.json();
 
@@ -257,8 +341,8 @@
                     : `£${parseFloat(data.discount_value).toFixed(2)} off`;
 
                 // This updates the order summary with the discounted price
-                document.getElementById('discount-row').style.display = 'flex';
-                document.getElementById('discount-label').textContent =
+                document.getElementById('discount-row').style.display  = 'flex';
+                document.getElementById('discount-label').textContent  =
                     `${code} (${discountDisplay})`;
                 document.getElementById('discount-amount').textContent =
                     `-£${appliedDiscount.toFixed(2)}`;
@@ -266,7 +350,7 @@
                 document.getElementById('final-price').textContent = `£${newTotal}`;
 
                 // This stores the coupon data in the hidden fields for form submission
-                document.getElementById('coupon_code_hidden').value = code;
+                document.getElementById('coupon_code_hidden').value    = code;
                 document.getElementById('discount_amount_hidden').value =
                     appliedDiscount.toFixed(2);
 
@@ -279,17 +363,17 @@
 
             } else {
                 // This shows the specific error message returned from the server
-                errorEl.textContent = data.message || 'Invalid or expired coupon code.';
+                errorEl.textContent  = data.message || 'Invalid or expired coupon code.';
                 errorEl.style.display = 'block';
                 applyBtn.textContent = 'Apply';
-                applyBtn.disabled = false;
+                applyBtn.disabled    = false;
             }
 
         } catch (err) {
-            errorEl.textContent = 'Something went wrong. Please try again.';
+            errorEl.textContent  = 'Something went wrong. Please try again.';
             errorEl.style.display = 'block';
             applyBtn.textContent = 'Apply';
-            applyBtn.disabled = false;
+            applyBtn.disabled    = false;
         }
     }
 
@@ -301,9 +385,9 @@
     // This opens the order confirmation modal
     function openConfirm() {
         const finalTotal = Math.max(0, originalTotal - appliedDiscount).toFixed(2);
-        const orderType = document.querySelector(
+        const orderType  = document.querySelector(
             'input[name="order_type"]:checked').value;
-        const payMethod = document.querySelector(
+        const payMethod  = document.querySelector(
             'input[name="payment_method"]:checked').value;
         const name = document.getElementById('full_name').value;
 
@@ -338,7 +422,7 @@
                 </span>
             </div>`;
 
-        document.getElementById('confirm-items-list').innerHTML = itemsHtml;
+        document.getElementById('confirm-items-list').innerHTML  = itemsHtml;
         document.getElementById('confirm-total-val').textContent = `£${finalTotal}`;
 
         // This shows the discount row in the modal if a coupon was applied
@@ -373,7 +457,7 @@
     document.getElementById('confirm-place-btn').addEventListener('click', async function() {
         // This disables the button immediately to prevent double submission
         this.textContent = 'Placing...';
-        this.disabled = true;
+        this.disabled    = true;
         closeConfirm();
 
         const isOnline = document.getElementById('pay_online').checked;
@@ -391,12 +475,12 @@
             if (error) {
                 // This hides the loader and shows the error if payment failed
                 document.getElementById('payment-loading').style.display = 'none';
-                document.getElementById('payment-errors').textContent = error.message;
+                document.getElementById('payment-errors').textContent    = error.message;
                 this.textContent = 'Yes, Place Order';
-                this.disabled = false;
+                this.disabled    = false;
             } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                document.getElementById('payment_status').value = 'paid';
-                document.getElementById('payment_intent_id').value = paymentIntent.id;
+                document.getElementById('payment_status').value      = 'paid';
+                document.getElementById('payment_intent_id').value   = paymentIntent.id;
                 // This submits the form after successful payment
                 document.getElementById('checkout-form').submit();
             }
@@ -410,57 +494,60 @@
     // This shows or hides the delivery address section based on the selected order type
     function toggleAddress() {
         const deliverySection = document.getElementById('delivery-address');
-        const isDelivery = document.querySelector(
+        const isDelivery      = document.querySelector(
             'input[name="order_type"]:checked').value === 'delivery';
-        deliverySection.style.display = isDelivery ? 'block' : 'none';
-        document.getElementById('address1').required = isDelivery;
-        document.getElementById('city').required = isDelivery;
-        document.getElementById('postcode').required = isDelivery;
+        deliverySection.style.display      = isDelivery ? 'block' : 'none';
+        document.getElementById('address1').required  = isDelivery;
+        document.getElementById('city').required      = isDelivery;
+        document.getElementById('postcode').required  = isDelivery;
     }
 
     // This shows or hides the Stripe payment element based on the selected payment method
     async function togglePaymentSection() {
-        const isOnline = document.getElementById('pay_online').checked;
+        const isOnline      = document.getElementById('pay_online').checked;
         const stripeSection = document.getElementById('stripe-section');
         stripeSection.style.display = isOnline ? 'block' : 'none';
 
         if (isOnline && !elements) {
             // This creates a payment intent and loads the Stripe payment element
             const response = await fetch('/checkout/create-payment-intent', {
-                method: 'POST',
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
-            const data = await response.json();
+            const data   = await response.json();
             clientSecret = data.clientSecret;
             document.getElementById('payment_intent_id').value = clientSecret;
 
-            elements = stripe.elements({ clientSecret });
+            elements      = stripe.elements({ clientSecret });
             paymentElement = elements.create('payment');
             paymentElement.mount('#payment-element');
         }
     }
 
-    // This highlights the selected order type option
+    // This highlights the selected order type option using CSS variables
     document.querySelectorAll('.order-type-option').forEach(option => {
         option.closest('label').addEventListener('click', function() {
             document.querySelectorAll('.order-type-option').forEach(opt => {
-                opt.style.background = 'white';
-                opt.style.borderColor = '#D4AF37';
+                opt.style.background   = '';
+                opt.style.borderColor  = '';
             });
-            this.querySelector('.order-type-option').style.background = '#FFF8E7';
-            this.querySelector('.order-type-option').style.borderColor = '#8B0000';
+            this.querySelector('.order-type-option').style.background  =
+                'color-mix(in srgb, var(--color-accent) 10%, var(--color-bg))';
+            this.querySelector('.order-type-option').style.borderColor =
+                'var(--color-primary)';
         });
     });
 
-    // This highlights the selected payment option
+    // This highlights the selected payment option using CSS variables
     document.querySelectorAll('.payment-option').forEach(option => {
         option.addEventListener('click', function() {
             document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.style.background = 'white';
-                opt.style.borderColor = '#D4AF37';
+                opt.style.background  = '';
+                opt.style.borderColor = '';
             });
-            this.style.background = '#FFF8E7';
-            this.style.borderColor = '#8B0000';
+            this.style.background  =
+                'color-mix(in srgb, var(--color-accent) 10%, var(--color-bg))';
+            this.style.borderColor = 'var(--color-primary)';
         });
     });
 </script>

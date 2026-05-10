@@ -73,13 +73,13 @@
 .menu-category-divider {
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(212,175,55,0.6), transparent);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 60%, transparent), transparent);
 }
 
 /* Menu item row */
 .menu-item {
     padding: 16px 0;
-    border-bottom: 1px solid rgba(212,175,55,0.2);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 0.4s ease, transform 0.4s ease;
@@ -108,7 +108,7 @@
 
 .menu-item-dots {
     flex: 1;
-    border-bottom: 2px dotted rgba(212,175,55,0.4);
+    border-bottom: 2px dotted color-mix(in srgb, var(--color-accent) 40%, transparent);
     margin-bottom: 4px;
 }
 

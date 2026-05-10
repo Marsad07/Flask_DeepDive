@@ -169,7 +169,7 @@
 
         if (guests > 0) {
             tables.forEach(t => {
-                if (parseInt(t.dataset.seats) < guests) {
+                if (parseInt(t.dataset.seats) !== guests) {
                     t.classList.add('unavailable');
                     t.classList.remove('selected');
                     if (tableInput.value === t.dataset.table) tableInput.value = '';
@@ -241,22 +241,29 @@
         document.body.style.overflow = 'hidden';
     }
 
-    function closeReservationConfirm() {
-        modal.classList.remove('open');
-        document.body.style.overflow = '';
+    function showReservationConfirm() {
+        // Validate all required fields before opening the modal
+        const date    = document.getElementById('resv_date').value;
+        const time    = document.getElementById('resv_time').value;
+        const guests  = document.getElementById('guests_num').value;
+        const name    = document.getElementById('fullname').value.trim();
+        const email   = document.getElementById('email').value.trim();
+        const phone   = document.getElementById('phoneNum').value.trim();
+
+        if (!name || !email || !phone || !date || !time || !guests) {
+            alert('Please fill in all fields before confirming.');
+            return;
+        }
+
+        if (!tableInput.value) {
+            tableError.style.display = 'block';
+            tableError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
-
-    function submitReservationForm() {
-        document.getElementById('reservation-form').submit();
-    }
-
-    modal.addEventListener('click', function(e) {
-        if (e.target === this) closeReservationConfirm();
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeReservationConfirm();
-    });
 </script>
 {% endblock %}
 {% endblock %}

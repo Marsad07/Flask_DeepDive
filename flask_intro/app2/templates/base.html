@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles2.css') }}">
 
     <!-- This is the Font Awesome stylesheet -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- This is for Google Fonts -->
+    <!-- This is for Google Fonts — kept on one line to avoid broken URL -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
@@ -50,7 +51,7 @@
             padding: 0;
         }
 
-        /* This is the restaurant name heading */
+        /* This is the restaurant name heading — always shows as text above the navbar on every page */
         .site-title {
             text-align: center;
             font-family: var(--font-heading);
@@ -73,7 +74,7 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             animation: slideDown 0.5s ease forwards;
             overflow: visible;
             position: relative;
@@ -102,7 +103,7 @@
         /* This highlights the active page in the navbar */
         ul.navbar li a.active {
             color: var(--color-accent);
-            background: rgba(139, 0, 0, 0.35);
+            background: rgba(139,0,0,0.35);
         }
 
         /* Desktop navbar slide down animation */
@@ -155,7 +156,7 @@
             background: var(--color-sidebar-bg);
             color: var(--color-sidebar-text);
             padding: 52px 40px 32px;
-            margin-top: 60px;
+            margin-top: 0px;
             font-family: Georgia, serif;
         }
 
@@ -184,7 +185,7 @@
 
         .footer-text {
             font-size: 14px;
-            color: rgba(255, 254, 242, 0.75);
+            color: rgba(255,254,242,0.75);
             line-height: 1.9;
             margin: 0;
             font-family: Georgia, serif;
@@ -198,16 +199,14 @@
         }
 
         .footer-links a {
-            color: rgba(255, 254, 242, 0.75);
+            color: rgba(255,254,242,0.75);
             text-decoration: none;
             font-size: 14px;
             transition: color 0.2s;
             font-family: Georgia, serif;
         }
 
-        .footer-links a:hover {
-            color: var(--color-accent);
-        }
+        .footer-links a:hover { color: var(--color-accent); }
 
         /* This is for the opening hours rows in the footer */
         .footer-hours-row {
@@ -216,14 +215,14 @@
             align-items: center;
             gap: 8px;
             font-size: 12px;
-            color: rgba(255, 254, 242, 0.75);
+            color: rgba(255,254,242,0.75);
             font-family: Georgia, serif;
             padding: 5px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+            border-bottom: 1px solid rgba(212,175,55,0.08);
         }
 
         .footer-hours-day {
-            color: rgba(255, 254, 242, 0.6);
+            color: rgba(255,254,242,0.6);
             flex-shrink: 0;
         }
 
@@ -237,7 +236,7 @@
         /* This is for the newsletter form in the footer */
         .footer-newsletter-text {
             font-size: 13px;
-            color: rgba(255, 254, 242, 0.65);
+            color: rgba(255,254,242,0.65);
             margin: 0 0 14px;
             line-height: 1.6;
             font-family: Georgia, serif;
@@ -251,9 +250,9 @@
 
         .footer-newsletter-input {
             padding: 10px 12px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255,255,255,0.07);
             color: var(--color-sidebar-text);
             font-family: Georgia, serif;
             font-size: 13px;
@@ -261,13 +260,8 @@
             transition: border-color 0.2s;
         }
 
-        .footer-newsletter-input::placeholder {
-            color: rgba(255, 254, 242, 0.35);
-        }
-
-        .footer-newsletter-input:focus {
-            border-color: var(--color-accent);
-        }
+        .footer-newsletter-input::placeholder { color: rgba(255,254,242,0.35); }
+        .footer-newsletter-input:focus        { border-color: var(--color-accent); }
 
         .footer-newsletter-btn {
             padding: 10px 14px;
@@ -299,11 +293,7 @@
             margin: 24px 0 14px;
         }
 
-        .footer-social-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .footer-social-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .footer-social-link {
             width: 38px;
@@ -315,32 +305,29 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            transition: background 0.2s, transform 0.2s, border-color 0.2s;
+            transition: background 0.2s, transform 0.2s;
         }
 
         .footer-social-link:hover {
             background: var(--color-primary);
-            border-color: var(--color-accent);
             transform: translateY(-3px);
         }
 
-        .footer-social-link i {
-            font-size: 16px;
-            color: var(--color-accent);
-        }
+        .footer-social-link i { font-size: 16px; color: var(--color-accent); }
 
         .footer-divider {
             height: 1px;
-            background: rgba(212, 175, 55, 0.2);
+            background: color-mix(in srgb, var(--color-accent) 20%, transparent);
             margin-bottom: 24px;
         }
 
         .footer-copyright {
             font-size: 13px;
-            color: rgba(212, 175, 55, 0.6);
             margin: 0;
             text-align: center;
             font-family: Georgia, serif;
+            color: var(--color-accent);
+            ...existing styles...
         }
 
         /* This makes the navbar responsive for mobile devices */
@@ -357,19 +344,14 @@
                 animation: slideIn 0.3s ease forwards;
             }
 
-            ul.navbar li {
-                width: 100%;
-                text-align: center;
-            }
+            ul.navbar li { width: 100%; text-align: center; }
 
             ul.navbar li a {
                 padding: 15px;
                 border-bottom: 1px solid #1A1410;
             }
 
-            .hamburger {
-                display: block;
-            }
+            .hamburger { display: block; }
 
             .site-title {
                 padding: 18px 70px 18px 20px;
@@ -377,21 +359,12 @@
                 font-size: 20px;
             }
 
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 36px;
-            }
-
-            .site-footer {
-                padding: 40px 24px 28px;
-            }
+            .footer-grid   { grid-template-columns: 1fr 1fr; gap: 36px; }
+            .site-footer   { padding: 40px 24px 28px; }
         }
 
         @media (max-width: 480px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
         }
 
         /* This is for mobile menu slide animation */
@@ -402,14 +375,11 @@
 
         {% block styles %}{% endblock %}
     </style>
-
     {% block head %}{% endblock %}
 </head>
 <body>
-    <!-- This is the restaurant name heading -->
-    <h1 class="site-title">
-        {{ branding.restaurant_name }}
-    </h1>
+    <!-- This is the restaurant name heading — always shows as plain text on every page -->
+    <h1 class="site-title">{{ branding.restaurant_name }}</h1>
 
     <!-- This is the hamburger menu button for mobile -->
     <button class="hamburger" onclick="toggleMenu()">
@@ -436,7 +406,7 @@
         <!-- This is the About link -->
         <li><a href="/about">About</a></li>
 
-        <!-- This is the Account dropdown (only if logged in) -->
+        <!-- This is the Account dropdown if the customer is logged in -->
         {% if current_user.is_authenticated %}
         <li class="dropdown">
             <a href="#">
@@ -447,24 +417,21 @@
             <ul class="dropdown-menu">
                 <!-- This is the Profile link -->
                 <li><a href="{{ url_for('customer_auth.customer_profile') }}">Profile</a></li>
-
                 <!-- This is the Logout link -->
                 <li><a href="{{ url_for('customer_auth.logout') }}">Logout</a></li>
             </ul>
         </li>
         {% else %}
-
-        <!-- This is the Login link -->
+        <!-- This is the Login link shown when not logged in -->
         <li><a href="{{ url_for('customer_auth.login') }}">Login</a></li>
-
         {% endif %}
+
     </ul>
 
-    <!-- This is where each page inserts its content -->
+    <!-- This is where each page inserts its own content -->
     <div class="content">
         {% block content %}{% endblock %}
     </div>
-
     <!-- This is the footer section -->
     <footer class="site-footer">
         <div class="site-footer-inner">
@@ -475,9 +442,7 @@
                 <!-- This is the About column -->
                 <div class="footer-col">
                     <h3 class="footer-col-title">About</h3>
-                    <p class="footer-text">
-                        {{ branding.footer_about }}
-                    </p>
+                    <p class="footer-text">{{ branding.footer_about }}</p>
                 </div>
 
                 <!-- This is the Quick Links column -->
@@ -503,7 +468,7 @@
                                 Closed
                             {% else %}
                                 {{ day.opening_time | string | replace(':00', '', 1) }}
-–
+                                –
                                 {{ day.closing_time | string | replace(':00', '', 1) }}
                             {% endif %}
                         </span>
@@ -517,10 +482,8 @@
                     <p class="footer-newsletter-text">
                         {{ branding.footer_newsletter_text }}
                     </p>
-
                     <form class="footer-newsletter-form" method="POST" action="/subscribe">
-                        <input type="email"
-                               name="email"
+                        <input type="email" name="email"
                                class="footer-newsletter-input"
                                placeholder="Enter your email">
                         <button type="submit" class="footer-newsletter-btn">
@@ -538,7 +501,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
             </div> <!-- end footer-grid -->
 
             <div class="footer-divider"></div>
@@ -550,25 +512,21 @@
         </div> <!-- end site-footer-inner -->
     </footer>
 
-    <!-- This is the JavaScript for the mobile menu -->
+    <!-- This is the JavaScript for the mobile hamburger menu -->
     <script>
         function toggleMenu() {
-            const navbar = document.getElementById("navbar");
-            navbar.classList.toggle("active");
+            document.getElementById("navbar").classList.toggle("active");
         }
     </script>
-
-    <!-- This is for dropdown hover on desktop -->
+    <!-- This is for the account dropdown hover on desktop -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const dropdown = document.querySelector(".dropdown");
-
             if (dropdown) {
                 dropdown.addEventListener("mouseenter", function () {
                     const menu = this.querySelector(".dropdown-menu");
                     if (menu) menu.style.display = "block";
                 });
-
                 dropdown.addEventListener("mouseleave", function () {
                     const menu = this.querySelector(".dropdown-menu");
                     if (menu) menu.style.display = "none";

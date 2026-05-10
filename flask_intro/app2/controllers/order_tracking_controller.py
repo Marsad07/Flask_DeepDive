@@ -5,26 +5,50 @@ from flask_socketio import join_room
 from app2 import socketio
 import time
 
+def _fetch_order_number_seq(cursor, order):
+    """Fetch the sequence number for an order so _build_order_number works."""
+    cursor.execute("""
+        SELECT COUNT(*) AS seq FROM customer_orders
+        WHERE DATE(created_at) = DATE(%s)
+          AND order_id <= %s
+    """, (order['created_at'], order['order_id']))
+    row = cursor.fetchone()
+    order['_seq'] = row['seq'] if row else 1
+    return order
+
+def _build_order_number(order):
+    """Build the ORD-YYYYMMDD-NNN string from an order dict in Python,
+    avoiding SQL DATE_FORMAT / %% escaping conflicts with the MySQL driver."""
+    date_str = order['created_at'].strftime('%Y%m%d')
+    seq      = order.get('_seq', 1)
+    return f"ORD-{date_str}-{str(seq).zfill(3)}"
+
 def track_order(order_number):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    verified = False
-    order = None
-    items = []
-    error = None
-    restaurant = None
-    route_coords = None
-    customer_lat = None
-    customer_lng = None
+    verified        = False
+    order           = None
+    items           = []
+    error           = None
+    restaurant      = None
+    route_coords    = None
+    customer_lat    = None
+    customer_lng    = None
+    multiple_orders = None
+    verified_email  = None
 
     # Check if logged in customer or guest
     customer_id = session.get('customer_id')
     if customer_id:
         customer_email = session.get('customer_email')
     else:
-        customer_email = request.form.get('guest_email')
+        # Accept email from POST (verify form) or GET (auto-verify from picker link)
+        customer_email = request.form.get('guest_email') or request.args.get('email')
 
-    if request.method == 'POST' or customer_id:
+    # direct=1 is appended by picker card links so we skip showing the picker again
+    arrived_from_picker = request.args.get('direct') == '1'
+
+    if request.method == 'POST' or customer_id or request.args.get('email'):
         cursor.execute("""
             SELECT * FROM customer_orders 
             WHERE CONCAT('ORD-', DATE_FORMAT(created_at, '%Y%m%d'), '-', 
@@ -36,16 +60,40 @@ def track_order(order_number):
 
         if order:
             if customer_id:
-                verified = True
+                verified       = True
+                verified_email = customer_email
             elif customer_email and customer_email.lower() == order['guest_email'].lower():
-                verified = True
+                verified       = True
+                verified_email = customer_email
             else:
                 error = "We couldn't find an order with that email. Please try again."
                 order = None
         else:
             error = "Order not found"
 
-    if order and verified:
+        # If the guest has multiple active orders, show a picker instead of jumping
+        # straight to tracking — only applies to guests, not logged-in customers,
+        # and not when the user has already chosen from the picker (arrived_from_picker)
+        if verified and verified_email and not customer_id and not arrived_from_picker:
+            cursor.execute("""
+                SELECT * FROM customer_orders
+                WHERE LOWER(guest_email) = LOWER(%s)
+                  AND order_status NOT IN ('cancelled', 'completed')
+                ORDER BY created_at DESC
+            """, (verified_email,))
+            active_orders = cursor.fetchall()
+
+            # Only show the picker when there is more than one active order
+            if len(active_orders) > 1:
+                # Build order_number for each row in Python to avoid %% escaping issues
+                seq_cursor = db.cursor(dictionary=True)
+                for o in active_orders:
+                    _fetch_order_number_seq(seq_cursor, o)
+                    o['order_number'] = _build_order_number(o)
+                seq_cursor.close()
+                multiple_orders = active_orders
+
+    if order and verified and not multiple_orders:
         # Fetch order items
         db2 = get_db()
         cursor2 = db2.cursor(dictionary=True)
@@ -67,7 +115,7 @@ def track_order(order_number):
         cursor3.close()
         db3.close()
 
-        # Calculate delivery route if applicable
+        # Calculate delivery route if applicable — collection orders skip this
         if order['order_type'] == 'delivery' and restaurant and order.get('guest_delivery_address'):
             api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6'
                        'IjlhM2ZkYzcyOTQ4YzQ3YzE4NjlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
@@ -99,6 +147,8 @@ def track_order(order_number):
         error=error,
         order_number=order_number,
         verified=verified,
+        verified_email=verified_email,
+        multiple_orders=multiple_orders,
         restaurant=restaurant,
         route_coords=route_coords,
         customer_lat=customer_lat,

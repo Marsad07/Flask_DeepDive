@@ -2,13 +2,8 @@ from flask import render_template, request, redirect, url_for, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from app2.database import get_db
 from app2 import socketio
-from flask_socketio import join_room
 import secrets
 from flask_mailman import EmailMessage
-
-@socketio.on('join_kitchen')
-def handle_join_kitchen():
-    join_room('kitchen')
 
 def staff_login():
     if request.method == "POST":
@@ -100,11 +95,16 @@ def kitchen_update_order_status(order_id):
         'new_status': new_status
     }, room=f'order_{order_id}')
 
+    socketio.emit('kitchen_update', {
+        'order_id': order_id,
+        'new_status': new_status
+    }, room='kitchen')
+
     return redirect(url_for('staff.kitchen_display'))
 
 def driver_orders():
     if 'staff_id' not in session or session.get('staff_role') != 'driver':
-        return redirect(url_for('staff.staff_login'))
+        return redirect(url_for('staff.driver_orders'))
 
     driver_id = session['staff_id']
     db = get_db()

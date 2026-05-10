@@ -278,79 +278,94 @@
   </div>
 </div>
 <script>
+    // This toggles between text name and logo upload sections
+    function toggleLogoSection() {
+        const select      = document.getElementById("use_logo_select");
+        const logoSection = document.getElementById("logo-section");
+        const textSection = document.getElementById("text-section");
+
+        if (select.value === "true") {
+            logoSection.style.display = "block";
+            textSection.style.display = "none";
+        } else {
+            logoSection.style.display = "none";
+            textSection.style.display = "block";
+        }
+    }
+
     // Opens the modal with custom title + message + confirm action
     function openModal(title, message, onConfirm) {
-      document.getElementById("modal-title").innerText   = title;
-      document.getElementById("modal-message").innerText = message;
+        document.getElementById("modal-title").innerText   = title;
+        document.getElementById("modal-message").innerText = message;
 
-      const confirmBtn   = document.getElementById("modal-confirm-btn");
-      confirmBtn.onclick = onConfirm;
+        const confirmBtn   = document.getElementById("modal-confirm-btn");
+        confirmBtn.onclick = onConfirm;
 
-      document.getElementById("confirm-modal").style.display = "flex";
+        document.getElementById("confirm-modal").classList.add("open");
     }
 
     // Close modal
     function closeModal() {
-      document.getElementById("confirm-modal").style.display = "none";
+        document.getElementById("confirm-modal").classList.remove("open");
     }
 
     // Branding
     function confirmBranding() {
-      openModal(
-        "Save Branding",
-        "Are you sure you want to update the homepage branding?",
-        () => document.getElementById("branding-form").submit()
-      );
+        openModal(
+            "Save Branding",
+            "Are you sure you want to update the homepage branding?",
+            () => document.getElementById("branding-form").submit()
+        );
     }
 
     // Footer about
     function confirmFooterAbout() {
-      openModal(
-        "Update Footer About",
-        "Are you sure you want to update the footer about text?",
-        () => document.getElementById("footer-about-form").submit()
-      );
+        openModal(
+            "Update Footer About",
+            "Are you sure you want to update the footer about text?",
+            () => document.getElementById("footer-about-form").submit()
+        );
     }
 
     // Dish update
     function confirmDish(dishKey) {
-      openModal(
-        "Update Dish",
-        "Are you sure you want to update this dish?",
-        () => document.getElementById(`dish-form-${dishKey}`).submit()
-      );
+        openModal(
+            "Update Dish",
+            "Are you sure you want to update this dish?",
+            () => document.getElementById(`dish-form-${dishKey}`).submit()
+        );
     }
 
     // Adding review
     function confirmAddReview() {
-      openModal(
-        "Add Review",
-        "Are you sure you want to add this new review?",
-        () => document.getElementById("add-review-form").submit()
-      );
+        openModal(
+            "Add Review",
+            "Are you sure you want to add this new review?",
+            () => document.getElementById("add-review-form").submit()
+        );
     }
 
     // Updating review
     function confirmUpdateReview(reviewId) {
-      openModal(
-        "Update Review",
-        "Are you sure you want to update this review?",
-        () => document.getElementById(`review-form-${reviewId}`).submit()
-      );
+        openModal(
+            "Update Review",
+            "Are you sure you want to update this review?",
+            () => document.getElementById(`review-form-${reviewId}`).submit()
+        );
     }
 
     // Deleting review
     function confirmDeleteReview(reviewId, reviewerName) {
-      openModal(
-        "Delete Review",
-        `Are you sure you want to delete the review by "${reviewerName}"? This cannot be undone.`,
-        () => document.getElementById(`delete-review-form-${reviewId}`).submit()
-      );
+        openModal(
+            "Delete Review",
+            `Are you sure you want to delete the review by "${reviewerName}"? This cannot be undone.`,
+            () => document.getElementById(`delete-review-form-${reviewId}`).submit()
+        );
     }
 
-    // Close modal when clicking outside
-    document.getElementById("confirm-modal").addEventListener("click", function (e) {
-      if (e.target === this) closeModal();
+    // Close modal when clicking outside the box
+    document.getElementById("confirm-modal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
     });
 </script>
 {% endblock %}

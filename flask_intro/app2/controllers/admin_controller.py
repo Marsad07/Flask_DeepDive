@@ -78,7 +78,7 @@ def dashboard():
 
     cursor.execute(
         "SELECT COALESCE(SUM(total_price), 0) as revenue FROM customer_orders "
-        "WHERE DATE(order_date) = CURDATE() AND order_status != 'cancelled'"
+        "WHERE DATE(order_date) = CURDATE() AND order_status <> 'cancelled'"
     )
     today_revenue = cursor.fetchone()['revenue']
 
@@ -137,17 +137,68 @@ def logout():
 def view_reservations():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
+
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT * FROM reservations_restaurant 
-        ORDER BY reservation_date DESC, reservation_time DESC
-    """)
+    filter_type = request.args.get('filter', '')
+    search      = request.args.get('search', '').strip()
+
+    base_query = "SELECT * FROM reservations_restaurant"
+    conditions = []
+    params     = []
+
+    if filter_type == 'today':
+        conditions.append("reservation_date = CURDATE()")
+    elif filter_type == 'upcoming':
+        conditions.append("reservation_date >= CURDATE()")
+    elif filter_type == 'past':
+        conditions.append("reservation_date < CURDATE()")
+    elif filter_type in ('Confirmed', 'Cancelled', 'Pending'):
+        conditions.append("reservation_status = %s")
+        params.append(filter_type)
+
+    if search:
+        conditions.append("""
+            (customer_fullname LIKE %s
+             OR customer_email LIKE %s
+             OR customer_phonenum LIKE %s)
+        """)
+        like = f"%{search}%"
+        params.extend([like, like, like])
+
+    if conditions:
+        base_query += " WHERE " + " AND ".join(conditions)
+
+    base_query += " ORDER BY reservation_date DESC, reservation_time DESC"
+    cursor.execute(base_query, params)
     all_reservations = cursor.fetchall()
+
+    # Summary counts for stat cards
+    cursor.execute("SELECT COUNT(*) AS c FROM reservations_restaurant WHERE reservation_date = CURDATE()")
+    today_count = cursor.fetchone()['c']
+
+    cursor.execute("SELECT COUNT(*) AS c FROM reservations_restaurant "
+                   "WHERE reservation_date >= CURDATE() AND reservation_status <> 'Cancelled'")
+    upcoming_count = cursor.fetchone()['c']
+
+    cursor.execute("SELECT COUNT(*) AS c FROM reservations_restaurant WHERE reservation_status = 'Cancelled'")
+    cancelled_count = cursor.fetchone()['c']
+
+    cursor.execute("SELECT COUNT(*) AS c FROM reservations_restaurant")
+    total_count = cursor.fetchone()['c']
+
     cursor.close()
     db.close()
-
-    return render_template('admin/view_reservations.html', reservations=all_reservations)
+    return render_template(
+        'admin/view_reservations.html',
+        reservations=all_reservations,
+        filter_type=filter_type,
+        search=search,
+        today_count=today_count,
+        upcoming_count=upcoming_count,
+        cancelled_count=cancelled_count,
+        total_count=total_count
+    )
 
 def manage_menu():
     if 'admin_id' not in session:
@@ -347,28 +398,74 @@ def view_all_orders():
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    filter_type = request.args.get('filter')
+    filter_type = request.args.get('filter', '')
+    search      = request.args.get('search', '').strip()
 
     base_query = """
         SELECT co.*, ca.customer_fullname, ca.customer_email
         FROM customer_orders co
         LEFT JOIN customer_accounts ca ON co.customer_id = ca.customer_id
     """
-    params = []
-    if filter_type == "today":
-        base_query += " WHERE co.order_date = CURDATE()"
-    elif filter_type == "delivery":
-        base_query += " WHERE co.order_type = 'delivery'"
-    elif filter_type in ["pending", "preparing", "ready", "completed", "cancelled"]:
-        base_query += " WHERE co.order_status = %s"
+    conditions = []
+    params     = []
+
+    # Status / type filters
+    if filter_type == 'today':
+        conditions.append("co.order_date = CURDATE()")
+    elif filter_type == 'delivery':
+        conditions.append("co.order_type = 'delivery'")
+    elif filter_type == 'collection':
+        conditions.append("co.order_type = 'collection'")
+    elif filter_type in ('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'):
+        conditions.append("co.order_status = %s")
         params.append(filter_type)
+
+    if search:
+        conditions.append("""
+            (co.guest_fullname LIKE %s
+             OR co.guest_email LIKE %s
+             OR ca.customer_fullname LIKE %s
+             OR ca.customer_email LIKE %s
+             OR CAST(co.order_id AS CHAR) LIKE %s)
+        """)
+        like = f"%{search}%"
+        params.extend([like, like, like, like, like])
+
+    if conditions:
+        base_query += " WHERE " + " AND ".join(conditions)
+
     base_query += " ORDER BY co.order_date DESC, co.order_time DESC"
 
     cursor.execute(base_query, params)
     orders = cursor.fetchall()
+
+    # Summary counts for stat cards
+    cursor.execute("SELECT COUNT(*) AS c FROM customer_orders WHERE order_date = CURDATE()")
+    today_count = cursor.fetchone()['c']
+
+    cursor.execute("SELECT COUNT(*) AS c FROM customer_orders"
+                   " WHERE order_status = 'cancelled' AND order_date = CURDATE()")
+    active_count = cursor.fetchone()['c']
+
+    cursor.execute("SELECT COALESCE(SUM(total_price),0) AS t FROM customer_orders WHERE order_date = CURDATE()")
+    today_revenue = cursor.fetchone()['t']
+
+    cursor.execute("SELECT COUNT(*) AS c FROM customer_orders"
+                   " WHERE order_status = 'cancelled' AND order_date = CURDATE()")
+    cancelled_today = cursor.fetchone()['c']
+
     cursor.close()
     db.close()
-    return render_template('admin/view_all_orders.html', orders=orders)
+    return render_template(
+        'admin/view_all_orders.html',
+        orders=orders,
+        filter_type=filter_type,
+        search=search,
+        today_count=today_count,
+        active_count=active_count,
+        today_revenue=today_revenue,
+        cancelled_today=cancelled_today
+    )
 
 def view_customer_order(order_id):
     db = get_db()
@@ -463,7 +560,7 @@ def update_order_status(order_id):
     socketio.emit('kitchen_update', {
         'order_id': order_id,
         'new_status': new_status
-    }, room='kitchen.css')
+    }, room='kitchen')
     return redirect(url_for('admin.view_all_orders'))
 
 def get_delivery_minutes(delivery_address):
@@ -637,35 +734,19 @@ def offer_driver(order_id):
         WHERE order_id = %s
     """, (order_id,))
     existing = cursor.fetchone()
-
     if existing["driver_offer_id"] == driver_id:
         status = existing["driver_offer_status"]
-        if status == "pending":
-            return """
-            <script>
-                window.onload = function() {
-                    window.parent.showDriverWarning(
-                    'This driver has already been offered this order and has not responded yet.');
-                }
-            </script>
-            """
-        if status == "declined":
-            return """
-            <script>
-                window.onload = function() {
-                    window.parent.showDriverWarning('This driver has already declined this order.');
-                }
-            </script>
-            """
+        messages = {
+            "pending":  "This driver has already been offered this order and has not responded yet.",
+            "declined": "This driver has already declined this order.",
+            "accepted": "This driver has already accepted this order."
+        }
+        if status in messages:
+            cursor.close()
+            db.close()
+            flash(messages[status], "driver_warning")
+            return redirect(url_for('admin.view_customer_order', order_id=order_id))
 
-        if status == "accepted":
-            return """
-            <script>
-                window.onload = function() {
-                    window.parent.showDriverWarning('This driver has already accepted this order.');
-                }
-            </script>
-            """
     cursor.execute("""
         SELECT 
             customer_id,
@@ -690,7 +771,7 @@ def offer_driver(order_id):
     if not customer_name:
         customer_name = order["guest_fullname"]
 
-    address = order["guest_delivery_address"]
+    address     = order["guest_delivery_address"]
     total_price = order["total_price"]
 
     cursor.execute("""
@@ -702,15 +783,14 @@ def offer_driver(order_id):
         WHERE order_id = %s
     """, (driver_id, order_id))
     db.commit()
-
     cursor.close()
     db.close()
 
     socketio.emit("driver_offer", {
-        "order_id": order_id,
+        "order_id":      order_id,
         "customer_name": customer_name,
-        "address": address,
-        "total_price": float(total_price),
+        "address":       address,
+        "total_price":   float(total_price),
     }, room=f"driver_{driver_id}")
 
     return redirect(url_for('admin.view_customer_order', order_id=order_id))
@@ -1167,44 +1247,75 @@ def admin_settings():
     cursor.execute("SELECT * FROM admin_restaurant WHERE admin_id = %s",
                    (session['admin_id'],))
     admin = cursor.fetchone()
+
+    if not admin:
+        cursor.execute("SELECT * FROM staff_accounts WHERE staff_id = %s",
+                       (session['admin_id'],))
+        staff = cursor.fetchone()
+        if staff:
+            admin = {
+                'admin_id':       staff['staff_id'],
+                'admin_username': staff['staff_username'],
+                'admin_fullname': staff['full_name'],
+                'admin_email':    staff['email'],
+                'role':           staff['role'],
+                'last_login':     staff['last_login'],
+                'created_at':     staff['created_at'],
+            }
+
     cursor.close()
     db.close()
-
     return render_template('admin/settings.html', admin=admin)
 
 def update_admin_settings():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    action = request.form.get('action')
+    action   = request.form.get('action')
     admin_id = session['admin_id']
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
+    # Check which table this admin lives in
+    cursor.execute("SELECT admin_id FROM admin_restaurant WHERE admin_id = %s", (admin_id,))
+    is_admin_table = cursor.fetchone() is not None
+
     if action == 'details':
         fullname = request.form.get('admin_fullname')
-        email = request.form.get('admin_email')
+        email    = request.form.get('admin_email')
         username = request.form.get('admin_username')
 
-        cursor.execute("""
-            UPDATE admin_restaurant
-            SET admin_fullname = %s, admin_email = %s, admin_username = %s
-            WHERE admin_id = %s
-        """, (fullname, email, username, admin_id))
+        if is_admin_table:
+            cursor.execute("""
+                UPDATE admin_restaurant
+                SET admin_fullname = %s, admin_email = %s, admin_username = %s
+                WHERE admin_id = %s
+            """, (fullname, email, username, admin_id))
+        else:
+            cursor.execute("""
+                UPDATE staff_accounts
+                SET full_name = %s, email = %s, staff_username = %s
+                WHERE staff_id = %s
+            """, (fullname, email, username, admin_id))
+
         db.commit()
         session['admin_username'] = username
         session['toast_message'] = 'Account details updated successfully.'
 
     elif action == 'password':
-        current_password = request.form.get('current_password')
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
+        current_password  = request.form.get('current_password')
+        new_password      = request.form.get('new_password')
+        confirm_password  = request.form.get('confirm_password')
 
-        cursor.execute("SELECT password_hash FROM admin_restaurant WHERE admin_id = %s",
-                       (admin_id,))
-        admin = cursor.fetchone()
+        if is_admin_table:
+            cursor.execute("SELECT password_hash FROM admin_restaurant WHERE admin_id = %s",
+                           (admin_id,))
+        else:
+            cursor.execute("SELECT password_hash FROM staff_accounts WHERE staff_id = %s",
+                           (admin_id,))
+        row = cursor.fetchone()
 
-        if not check_password_hash(admin['password_hash'], current_password):
+        if not check_password_hash(row['password_hash'], current_password):
             session['toast_message'] = 'Current password is incorrect.'
         elif new_password != confirm_password:
             session['toast_message'] = 'New passwords do not match.'
@@ -1212,10 +1323,14 @@ def update_admin_settings():
             session['toast_message'] = 'Password must be at least 8 characters.'
         else:
             hashed = generate_password_hash(new_password)
-            cursor.execute("""
-                UPDATE admin_restaurant SET password_hash = %s
-                WHERE admin_id = %s
-            """, (hashed, admin_id))
+            if is_admin_table:
+                cursor.execute("""
+                    UPDATE admin_restaurant SET password_hash = %s WHERE admin_id = %s
+                """, (hashed, admin_id))
+            else:
+                cursor.execute("""
+                    UPDATE staff_accounts SET password_hash = %s WHERE staff_id = %s
+                """, (hashed, admin_id))
             db.commit()
             session['toast_message'] = 'Password updated successfully.'
 

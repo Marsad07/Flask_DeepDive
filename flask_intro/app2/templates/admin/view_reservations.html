@@ -1,18 +1,76 @@
 {% extends "admin_base.html" %}
 
-
-
 {% block admin_content %}
 <div class="dash-page">
     <!-- Page header -->
     <div class="dash-header">
         <div>
             <h1>All Reservations</h1>
+            <p class="dash-welcome">Manage and track every table booking</p>
         </div>
-        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Back to Dashboard</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Dashboard</a>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="dash-stats dash-stats-4" style="margin-bottom: 32px;">
+        <div class="stat-card stat-card-dark">
+            <div class="stat-number">{{ total_count }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card stat-card-red">
+            <div class="stat-number">{{ today_count }}</div>
+            <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-card stat-card-gold">
+            <div class="stat-number">{{ upcoming_count }}</div>
+            <div class="stat-label">Upcoming</div>
+        </div>
+        <div class="stat-card stat-card-brown">
+            <div class="stat-number">{{ cancelled_count }}</div>
+            <div class="stat-label">Cancelled</div>
+        </div>
+    </div>
+    <!-- Search and filters -->
+    <div class="dash-card dash-card-body" style="margin-bottom: 24px;">
+        <form method="get" id="filter-form">
+            <div class="form-row" style="align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+
+                <!-- Search input -->
+                <div style="flex: 1; min-width: 220px;">
+                    <label class="form-label">Search</label>
+                    <input type="text"
+                           name="search"
+                           class="form-input"
+                           placeholder="Name, email or phone..."
+                           value="{{ search }}">
+                </div>
+
+                <!-- Filter pills -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;
+                             align-items: center; padding-bottom: 2px;">
+                    {% set filters = [
+                        ('', 'All'),
+                        ('today', 'Today'),
+                        ('upcoming', 'Upcoming'),
+                        ('past', 'Past'),
+                        ('Confirmed', 'Confirmed'),
+                        ('Pending', 'Pending'),
+                        ('Cancelled', 'Cancelled')
+                    ] %}
+                    {% for val, label in filters %}
+                    <button type="submit"
+                            name="filter"
+                            value="{{ val }}"
+                            class="coupon-filter-btn {{ 'active' if filter_type == val }}">
+                        {{ label }}
+                    </button>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </form>
     </div>
     <!-- Reservations table -->
-    <p class="dash-section-title">All Bookings</p>
     <div class="dash-card">
         {% if reservations %}
         <table class="dash-table">
@@ -24,54 +82,89 @@
                     <th class="center">Guests</th>
                     <th class="center">Table</th>
                     <th>Status</th>
+                    <th>Special Requests</th>
                     <th class="center">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for r in reservations %}
                 <tr>
-                    <td data-label="Customer">
+                    <td>
                         <p class="resv-customer-name">{{ r.customer_fullname }}</p>
                         <p class="resv-customer-email">{{ r.customer_email }}</p>
+                        <p class="resv-customer-email">{{ r.customer_phonenum }}</p>
                     </td>
-                    <td data-label="Date">{{ r.reservation_date }}</td>
-                    <td data-label="Time">{{ r.reservation_time }}</td>
-                    <td data-label="Guests" class="center">{{ r.num_of_guests }}</td>
-                    <td data-label="Table" class="center">{{ r.table_number }}</td>
-                    <td data-label="Status">
+                    <td>{{ r.reservation_date }}</td>
+                    <td>{{ r.reservation_time }}</td>
+                    <td class="center">{{ r.num_of_guests }}</td>
+                    <td class="center">{{ r.table_number }}</td>
+                    <td>
                         <span class="dash-resv-badge"
-                              data-status="{{ r.status }}">{{ r.status }}</span>
+                              data-status="{{ r.reservation_status }}">
+                            {{ r.reservation_status }}
+                        </span>
                     </td>
-                    <td data-label="Actions" class="center">
-                        <div class="row-actions">
+                    <td>
+                        {% if r.special_requests %}
+                        <span style="font-size: 13px; color: var(--color-text-muted);
+                                     font-style: italic;">
+                            {{ r.special_requests }}
+                        </span>
+                        {% else %}
+                        <span style="font-size: 12px; color: var(--color-text-muted);">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="center">
+                        <div class="row-actions" style="justify-content: center;">
                             <a href="{{ url_for('admin.edit_reservation', id=r.customer_id) }}"
                                class="btn-small btn-small-gold">Edit</a>
+                            {% if r.reservation_status != 'Cancelled' %}
                             <form method="POST"
                                   action="{{ url_for('admin.cancel_reservation', id=r.customer_id) }}"
                                   id="cancel-form-{{ r.customer_id }}"
                                   class="inline-form">
                                 <button type="button"
                                         class="btn-small btn-small-red"
-                                        onclick="showCancelConfirm({{ r.customer_id }}, '{{ r.customer_fullname }}')">
+                                        onclick="showCancelConfirm({{ r.customer_id }},
+                                                 '{{ r.customer_fullname }}')">
                                     Cancel
                                 </button>
                             </form>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <!-- Result count -->
+        <p style="padding: 14px 24px; font-size: 13px; color: var(--color-text-muted);
+                   border-top: 1px solid rgba(0,0,0,0.05); margin: 0;">
+            Showing {{ reservations|length }} reservation{{ 's' if reservations|length != 1 }}
+            {% if search %} matching "<strong>{{ search }}</strong>"{% endif %}
+            {% if filter_type %} · filtered by <strong>{{ filter_type }}</strong>{% endif %}
+        </p>
 
         {% else %}
-        <p class="dash-empty">No reservations found.</p>
+        <p class="dash-empty">
+            {% if search or filter_type %}
+                No reservations match your search or filter.
+                <a href="{{ url_for('admin.view_reservations') }}"
+                   style="color: var(--color-primary); font-weight: 700;">Clear filters</a>
+            {% else %}
+                No reservations yet.
+            {% endif %}
+        </p>
         {% endif %}
     </div>
 </div>
-<div id="cancel-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+<!-- Cancel confirmation modal -->
+<div id="cancel-modal" class="modal-overlay" role="dialog"
+     aria-modal="true" aria-labelledby="cancel-modal-title">
     <div class="modal-box">
         <p class="modal-title" id="cancel-modal-title">Cancel Reservation</p>
-        <p class="modal-message">Are you sure you want to cancel the reservation for
+        <p class="modal-message">
+            Are you sure you want to cancel the reservation for
             <strong id="cancel-name"></strong>? This cannot be undone.
         </p>
         <div class="modal-actions">
@@ -113,6 +206,3 @@
     document.querySelectorAll('.dash-card, .dash-header').forEach(el => observer.observe(el));
 </script>
 {% endblock %}
-
-
-

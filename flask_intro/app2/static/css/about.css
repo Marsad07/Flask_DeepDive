@@ -71,7 +71,7 @@
 .about-section {
     margin-bottom: 48px;
     padding-bottom: 48px;
-    border-bottom: 1px solid rgba(212,175,55,0.2);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease;

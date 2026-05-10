@@ -141,7 +141,9 @@
     }
 
     const socket = io();
-    socket.emit('join_kitchen');
+    socket.on('connect', function() {
+        socket.emit('join_kitchen');
+    });
 
     if (!sessionStorage.getItem('audioUnlocked')) {
         sessionStorage.setItem('audioUnlocked', 'false');

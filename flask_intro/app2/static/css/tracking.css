@@ -176,7 +176,10 @@
 }
 
 .track-payment-badge.paid    { background: #d4edda; color: #155724; }
-.track-payment-badge.pending { background: var(--color-surface)3cd; color: #856404; }
+.track-payment-badge.pending {
+    background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
+    color: var(--color-text-muted);
+}
 
 /* Map */
 .track-map {
@@ -389,4 +392,226 @@
     line-height: 1.7;
     font-family: var(--font-body);
     margin: 0 0 24px;
+}
+
+/* Field group and save button — used on the verify form */
+.resv-field-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.resv-field-group label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 7px;
+    font-family: var(--font-body);
+}
+
+.resv-field-group input {
+    padding: 12px 14px;
+    border: 1.5px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.resv-field-group input:focus {
+    border-color: var(--color-accent);
+}
+
+/* Save/submit button */
+.resv-btn-save {
+    padding: 13px;
+    background: var(--color-primary);
+    color: var(--color-accent);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.resv-btn-save:hover {
+    background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+/* Order picker — shown when guest has multiple active orders */
+.track-order-picker {
+    background: var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+    border-radius: var(--radius);
+    padding: 36px;
+    max-width: 600px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+
+.track-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.track-order-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--color-bg);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.track-order-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.track-order-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.track-order-card-ref {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 1px;
+}
+
+.track-order-card-meta {
+    font-family: Georgia, serif;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.track-order-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.track-order-card-total {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+/* Status badges on picker cards */
+.track-order-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.track-order-status-badge.status-pending {
+    background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface));
+    color: var(--color-text-muted);
+}
+.track-order-status-badge.status-confirmed {
+    background: color-mix(in srgb, var(--color-primary) 15%, var(--color-surface));
+    color: var(--color-primary);
+}
+.track-order-status-badge.status-preparing {
+    background: color-mix(in srgb, var(--color-accent) 25%, var(--color-surface));
+    color: var(--color-text);
+}
+.track-order-status-badge.status-ready {
+    background: color-mix(in srgb, var(--color-primary) 20%, var(--color-surface));
+    color: var(--color-primary);
+}
+
+/* Collection tracking hero — shown instead of the map for collection orders */
+.track-collection-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 32px;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    background: var(--color-surface);
+    transition: background 0.4s;
+}
+
+/* Hero background shifts subtly per status */
+.track-collection-hero.status-hero-pending   { background: var(--color-surface); }
+.track-collection-hero.status-hero-confirmed { background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); }
+.track-collection-hero.status-hero-preparing { background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); }
+.track-collection-hero.status-hero-ready     { background: color-mix(in srgb, var(--color-primary) 15%, var(--color-surface)); border-color: var(--color-primary); }
+.track-collection-hero.status-hero-completed { background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface)); }
+
+.track-collection-hero-icon {
+    font-size: 52px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.track-collection-hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.track-collection-status {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.track-collection-eta {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* Collection reference card — the "show at counter" block */
+.track-collection-ref-card {
+    text-align: center;
+}
+
+.track-collection-ref-code {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg));
+    border: 2px dashed color-mix(in srgb, var(--color-primary) 40%, transparent);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    margin: 12px 0 8px;
+}
+
+.track-collection-ref-hint {
+    font-family: Georgia, serif;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0;
 }

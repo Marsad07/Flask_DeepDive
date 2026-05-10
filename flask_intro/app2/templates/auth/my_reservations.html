@@ -20,11 +20,12 @@
         <tbody>
             {% for r in reservations %}
             <tr>
-                <td>{{ r.reservation_date }}</td>
-                <td>{{ r.reservation_time }}</td>
-                <td>{{ r.table_number }}</td>
-                <td>{{ r.num_of_guests }}</td>
-                <td>{{ r.reservation_status }}</td>
+                <td data-label="Date">{{ r.reservation_date }}</td>
+                <td data-label="Time">{{ r.reservation_time }}</td>
+                <td data-label="Table">{{ r.table_number }}</td>
+                <td data-label="Guests">{{ r.num_of_guests }}</td>
+                <td data-label="Status">{{ r.reservation_status }}</td>
+                <td data-label="Actions">
                 <td>
                     {% if r.reservation_status != 'Cancelled' %}
                     <a href="{{ url_for('reservations.modify_reservation', resv_id=r.customer_id) }}"

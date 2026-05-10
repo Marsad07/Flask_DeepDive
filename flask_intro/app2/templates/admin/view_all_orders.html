@@ -1,193 +1,222 @@
 {% extends "admin_base.html" %}
 
 {% block admin_content %}
-<div class="menu-container">
-    <h1>ALL TAKEAWAY ORDERS</h1>
+<div class="dash-page">
+    <!-- Page header -->
+    <div class="dash-header">
+        <div>
+            <h1>All Orders</h1>
+            <p class="dash-welcome">Manage and track every takeaway order</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Dashboard</a>
+    </div>
 
-    <a href="{{ url_for('admin.dashboard') }}"
-       style="display: inline-block; color: var(--color-primary); text-decoration: none; margin: 20px 0; font-weight: bold;">
-        ← Back to Dashboard
-    </a>
+    <!-- Stat cards -->
+    <div class="dash-stats dash-stats-4" style="margin-bottom: 32px;">
+        <div class="stat-card stat-card-dark">
+            <div class="stat-number">{{ today_count }}</div>
+            <div class="stat-label">Orders Today</div>
+        </div>
+        <div class="stat-card stat-card-red">
+            <div class="stat-number">{{ active_count }}</div>
+            <div class="stat-label">Active Orders</div>
+        </div>
+        <div class="stat-card stat-card-gold">
+            <div class="stat-number">£{{ "%.2f"|format(today_revenue) }}</div>
+            <div class="stat-label">Today's Revenue</div>
+        </div>
+        <div class="stat-card stat-card-brown">
+            <div class="stat-number">{{ cancelled_today }}</div>
+            <div class="stat-label">Cancelled Today</div>
+        </div>
+    </div>
 
-    <div style="background: var(--color-accen); padding: 30px; border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
-        {% if orders %}
-            <!-- This is the filter dropdown -->
-            <form method="get" style="margin-bottom: 20px;">
-                <select name="filter" onchange="this.form.submit()"
-                        style="padding: 10px; border-radius: 6px; border: 2px solid #D4AF37; width: 100%; max-width: 250px;">
-                    <option value="">All Orders</option>
-                    <option value="today">Today</option>
-                    <option value="delivery">Delivery</option>
-                    <option value="collection">Collection</option>
-                    <option value="pending">Pending</option>
-                    <option value="preparing">Preparing</option>
-                    <option value="ready">Ready</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </form>
-            <!-- This is the desktop table view -->
-            <div class="desktop-table">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: var(--color-sidebar-bg); color: var(--color-accent);">
-                            <th style="padding: 15px; text-align: left;">Order ID</th>
-                            <th style="padding: 15px; text-align: left;">Customer</th>
-                            <th style="padding: 15px; text-align: left;">Type</th>
-                            <th style="padding: 15px; text-align: left;">Total</th>
-                            <th style="padding: 15px; text-align: left;">Status</th>
-                            <th style="padding: 15px; text-align: left;">Date</th>
-                            <th style="padding: 15px; text-align: left;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr style="border-bottom: 1px solid #E8DFD0;">
-                            <td style="padding: 15px;">#{{ order.order_id }}</td>
-                            <td style="padding: 15px;">
-                                {% if order.customer_fullname %}
-                                    <strong>{{ order.customer_fullname }}</strong><br>
-                                    <small style="color: #5C4033;">{{ order.customer_email }}</small>
-                                {% else %}
-                                    <strong>{{ order.guest_fullname }}</strong><br>
-                                    <small style="color: #5C4033;">{{ order.guest_email }}</small>
-                                {% endif %}
-                            </td>
-                            <td style="padding: 15px; text-transform: capitalize;">
-                                {% if order.order_type == 'collection' %}🏪{% else %}🚗{% endif %}
-                                {{ order.order_type }}
-                            </td>
-                            <td style="padding: 15px; font-weight: bold; color: var(--color-primary);">
-                                £{{ "%.2f"|format(order.total_price) }}
-                            </td>
-                            <td style="padding: 15px;">
-                                <span style="background:
-                                    {% if order.order_status == 'completed' %}#28a745
-                                    {% elif order.order_status == 'preparing' %}#ffc107
-                                    {% elif order.order_status == 'ready' %}#17a2b8
-                                    {% elif order.order_status == 'cancelled' %}#dc3545
-                                    {% else %}#6c757d{% endif %};
-                                    color: white; padding: 6px 12px; border-radius: 6px;
-                                    font-size: 12px; font-weight: bold; text-transform: uppercase;">
-                                    {{ order.order_status }}
-                                </span>
-                            </td>
-                            <td style="padding: 15px;">
-                                {{ order.order_date.strftime('%d/%m/%Y') }}<br>
-                                <small style="color: #5C4033;">{{ order.order_time }}</small>
-                            </td>
-                            <td style="padding: 15px;">
-                                <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
-                                   style="background: var(--color-primary); color: var(--color-accent); padding: 8px 16px;
-                                          text-decoration: none; border-radius: 6px; font-size: 13px;
-                                          font-weight: bold; display: inline-block; transition: all 0.3s ease;"
-                                   onmouseover="this.style.background='#660000'"
-                                   onmouseout="this.style.background='#8B0000'">
-                                    View Order
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Search and filters -->
+    <div class="dash-card dash-card-body" style="margin-bottom: 24px;">
+        <form method="get" id="filter-form">
+            <div class="form-row" style="align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+
+                <!-- Search input -->
+                <div style="flex: 1; min-width: 220px;">
+                    <label class="form-label">Search</label>
+                    <input type="text"
+                           name="search"
+                           class="form-input"
+                           placeholder="Name, email or order ID..."
+                           value="{{ search }}">
+                </div>
+
+                <!-- Filter pills -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-bottom: 2px;">
+                    {% set filters = [
+                        ('', 'All'),
+                        ('today', 'Today'),
+                        ('delivery', '🚗 Delivery'),
+                        ('collection', '🏪 Collection'),
+                        ('pending', 'Pending'),
+                        ('confirmed', 'Confirmed'),
+                        ('preparing', 'Preparing'),
+                        ('ready', 'Ready'),
+                        ('completed', 'Completed'),
+                        ('cancelled', 'Cancelled')
+                    ] %}
+                    {% for val, label in filters %}
+                    <button type="submit"
+                            name="filter"
+                            value="{{ val }}"
+                            class="coupon-filter-btn {{ 'active' if filter_type == val }}">
+                        {{ label }}
+                    </button>
+                    {% endfor %}
+                </div>
+
             </div>
-            <!-- This is the mobile card view -->
-            <div class="mobile-cards">
-                {% for order in orders %}
-                <div style="background: #F5F0E8; padding: 20px; border-radius: 12px; margin-bottom: 15px;
-                            border-left: 5px solid #8B0000;">
-                    <div style="display: flex; justify-content: space-between;
-                     align-items: start; margin-bottom: 15px;">
-                        <div>
-                            <p style="margin: 0; font-weight: bold; font-size: 18px; color: var(--color-text);">
-                                Order #{{ order.order_id }}
-                            </p>
-                            <p style="margin: 5px 0 0 0; color: #5C4033; font-size: 14px;">
-                                {{ order.order_date.strftime('%d/%m/%Y') }} • {{ order.order_time }}
-                            </p>
-                        </div>
-                        <span style="background:
-                            {% if order.order_status == 'completed' %}#28a745
-                            {% elif order.order_status == 'preparing' %}#ffc107
-                            {% elif order.order_status == 'ready' %}#17a2b8
-                            {% elif order.order_status == 'cancelled' %}#dc3545
-                            {% else %}#6c757d{% endif %};
-                            color: white; padding: 5px 10px; border-radius: 6px;
-                            font-size: 11px; font-weight: bold; text-transform: uppercase;">
-                            {{ order.order_status }}
-                        </span>
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Customer:</p>
-                        <p style="margin: 0; font-weight: bold; color: var(--color-text);">
+        </form>
+    </div>
+    <!-- Orders table -->
+    <div class="dash-card">
+        {% if orders %}
+        <!-- Desktop table -->
+        <div class="desktop-table">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date & Time</th>
+                        <th class="center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>
+                            <span style="font-family: var(--font-heading); font-weight: 700;
+                                         color: var(--color-text); font-size: 13px;">
+                                #{{ order.order_id }}
+                            </span>
+                        </td>
+                        <td>
                             {% if order.customer_fullname %}
-                                {{ order.customer_fullname }}
+                                <p class="resv-customer-name">{{ order.customer_fullname }}</p>
+                                <p class="resv-customer-email">{{ order.customer_email }}</p>
                             {% else %}
-                                {{ order.guest_fullname }}
+                                <p class="resv-customer-name">{{ order.guest_fullname }}</p>
+                                <p class="resv-customer-email">{{ order.guest_email }}</p>
                             {% endif %}
+                        </td>
+                        <td>
+                            <span style="font-size: 13px; font-weight: 600; color: var(--color-text);">
+                                {% if order.order_type == 'delivery' %}🚗{% else %}🏪{% endif %}
+                                {{ order.order_type | capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size: 13px; color: var(--color-text-muted);">
+                                —
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; color: var(--color-primary); font-size: 15px;">
+                                £{{ "%.2f"|format(order.total_price) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="dash-resv-badge"
+                                  data-status="{{ order.order_status }}">
+                                {{ order.order_status | capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size: 13px; color: var(--color-text);">
+                                {{ order.order_date.strftime('%d %b %Y') }}
+                            </span><br>
+                            <span style="font-size: 12px; color: var(--color-text-muted);">
+                                {{ order.order_time }}
+                            </span>
+                        </td>
+                        <td class="center">
+                            <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
+                               class="btn-small btn-small-gold">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Mobile cards -->
+        <div class="mobile-cards" style="padding: 16px;">
+            {% for order in orders %}
+            <div style="background: var(--color-bg); border: 1px solid var(--color-accent);
+                        border-radius: var(--radius); padding: 18px; margin-bottom: 12px;
+                        border-left: 4px solid var(--color-primary);">
+                <div style="display: flex; justify-content: space-between;
+                             align-items: flex-start; margin-bottom: 12px;">
+                    <div>
+                        <p style="margin: 0; font-family: var(--font-heading); font-weight: 700;
+                                   font-size: 16px; color: var(--color-text);">
+                            #{{ order.order_id }}
+                        </p>
+                        <p style="margin: 4px 0 0; font-size: 12px; color: var(--color-text-muted);">
+                            {{ order.order_date.strftime('%d %b %Y') }} · {{ order.order_time }}
                         </p>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin: 15px 0;">
-                        <div>
-                            <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Type:</p>
-                            <p style="margin: 0; font-weight: bold; color: var(--color-text); text-transform: capitalize;">
-                                {% if order.order_type == 'collection' %}🏪{% else %}🚗{% endif %}
-                                {{ order.order_type }}
-                            </p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 0 0 5px 0; color: #5C4033; font-size: 13px;">Total:</p>
-                            <p style="margin: 0; font-weight: bold; color: var(--color-primary); font-size: 20px;">
-                                £{{ "%.2f"|format(order.total_price) }}
-                            </p>
-                        </div>
-                    </div>
-                    <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
-                       style="background: var(--color-primary); color: var(--color-accent); padding: 12px 0; width: 100%;
-                              text-decoration: none; border-radius: 8px; font-weight: bold;
-                              display: block; text-align: center; margin-top: 15px; transition: all 0.3s ease;"
-                       onmouseover="this.style.background='#660000'"
-                       onmouseout="this.style.background='#8B0000'">
-                        View Order Details
-                    </a>
+                    <span class="dash-resv-badge" data-status="{{ order.order_status }}">
+                        {{ order.order_status | capitalize }}
+                    </span>
                 </div>
-                {% endfor %}
+                <p style="margin: 0 0 4px; font-size: 14px; font-weight: 700; color: var(--color-text);">
+                    {% if order.customer_fullname %}{{ order.customer_fullname }}
+                    {% else %}{{ order.guest_fullname }}{% endif %}
+                </p>
+                <p style="margin: 0 0 12px; font-size: 12px; color: var(--color-text-muted);">
+                    {% if order.customer_email %}{{ order.customer_email }}
+                    {% else %}{{ order.guest_email }}{% endif %}
+                </p>
+                <div style="display: flex; justify-content: space-between;
+                             align-items: center; margin-bottom: 14px;">
+                    <span style="font-size: 13px; color: var(--color-text);">
+                        {% if order.order_type == 'delivery' %}🚗{% else %}🏪{% endif %}
+                        {{ order.order_type | capitalize }}
+                    </span>
+                    <span style="font-weight: 700; color: var(--color-primary); font-size: 18px;">
+                        £{{ "%.2f"|format(order.total_price) }}
+                    </span>
+                </div>
+                <a href="{{ url_for('admin.view_customer_order', order_id=order.order_id) }}"
+                   class="btn-primary"
+                   style="display: block; text-align: center; width: 100%; box-sizing: border-box;">
+                    View Order
+                </a>
             </div>
+            {% endfor %}
+        </div>
+
+        <!-- Result count -->
+        <p style="padding: 14px 24px; font-size: 13px; color: var(--color-text-muted);
+                   border-top: 1px solid rgba(0,0,0,0.05); margin: 0;">
+            Showing {{ orders|length }} order{{ 's' if orders|length != 1 }}
+            {% if search %} matching "<strong>{{ search }}</strong>"{% endif %}
+            {% if filter_type %} · filtered by <strong>{{ filter_type }}</strong>{% endif %}
+        </p>
+
         {% else %}
-            <p style="text-align: center; padding: 50px; color: #5C4033; font-size: 18px;">
-                No takeaway orders found.
-            </p>
+        <p class="dash-empty">
+            {% if search or filter_type %}
+                No orders match your search or filter.
+                <a href="{{ url_for('admin.view_all_orders') }}"
+                   style="color: var(--color-primary); font-weight: 700;">Clear filters</a>
+            {% else %}
+                No orders yet.
+            {% endif %}
+        </p>
         {% endif %}
     </div>
 </div>
-<!-- This makes it responsive for all devices -->
-<style>
-.mobile-cards {
-    display: none;
-}
-
-.desktop-table {
-    display: block;
-}
-
-/* This is for mobile devices */
-@media (max-width: 768px) {
-    .desktop-table {
-        display: none;
-    }
-
-    .mobile-cards {
-        display: block;
-    }
-
-    .menu-container {
-        padding: 20px 10px !important;
-    }
-
-    .menu-container h1 {
-        font-size: 28px !important;
-    }
-}
-</style>
 {% endblock %}
