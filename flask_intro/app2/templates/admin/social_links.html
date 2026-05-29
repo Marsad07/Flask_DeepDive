@@ -181,43 +181,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    // This is for the edit modal
-    function openEdit(id, platform, url, iconClass, order, isActive) {
-        document.getElementById('edit-platform').value = platform;
-        document.getElementById('edit-url').value      = url;
-        document.getElementById('edit-icon').value     = iconClass;
-        document.getElementById('edit-order').value    = order;
-        document.getElementById('edit-active').value   = isActive;
-        document.getElementById('edit-form').action    = '/admin/social-links/edit/' + id;
-        document.getElementById('edit-modal').classList.add('open');
-    }
-
-    function closeEdit() {
-        document.getElementById('edit-modal').classList.remove('open');
-    }
-
-    document.getElementById('edit-modal').addEventListener('click', function(e) {
-        if (e.target === this) closeEdit();
-    });
-
-    // This is for the delete confirmation modal
-    function showDeleteConfirm(id, platform) {
-        document.getElementById('delete-message').textContent =
-            'Are you sure you want to remove the ' + platform + ' link?';
-        document.getElementById('delete-confirm-btn').onclick = function() {
-            document.getElementById('delete-form-' + id).submit();
-        };
-        document.getElementById('delete-modal').classList.add('open');
-    }
-
-    function closeDeleteConfirm() {
-        document.getElementById('delete-modal').classList.remove('open');
-    }
-
-    document.getElementById('delete-modal').addEventListener('click', function(e) {
-        if (e.target === this) closeDeleteConfirm();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}

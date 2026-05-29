@@ -62,46 +62,7 @@
         </div>
     </div>
 </div>
-<script>
-    function showDeleteConfirm(itemId, itemName) {
-        document.getElementById('delete-item-name').textContent = itemName;
-        document.getElementById('confirm-delete-btn').onclick = function () {
-            document.getElementById('delete-form-' + itemId).submit();
-        };
-        document.getElementById('delete-modal').classList.add('open');
-    }
-
-    function closeDeleteConfirm() {
-        document.getElementById('delete-modal').classList.remove('open');
-    }
-
-    // Close modal when clicking the backdrop
-    document.getElementById('delete-modal').addEventListener('click', function (e) {
-        if (e.target === this) closeDeleteConfirm();
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeDeleteConfirm();
-    });
-
-    // Scroll-reveal animation
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, { threshold: 0.08 });
-
-    document.querySelectorAll('.category-card, .category-heading').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(16px)';
-        el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-        observer.observe(el);
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
 
 

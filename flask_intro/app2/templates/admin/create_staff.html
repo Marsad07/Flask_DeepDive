@@ -48,24 +48,9 @@
         </div>
     </div>
 </div>
-<script>
-function showModal(title, message, onConfirm) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-message').textContent = message;
-    document.getElementById('modal-confirm-btn').onclick = function() {
-        closeModal();
-        onConfirm();
-    };
-    document.getElementById('confirm-modal').style.display = 'flex';
-}
-function closeModal() {
-    document.getElementById('confirm-modal').style.display = 'none';
-}
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
+
 
 
 

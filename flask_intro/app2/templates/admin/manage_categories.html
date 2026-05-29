@@ -74,29 +74,5 @@
     </div>
   </div>
 </div>
-<script>
-  // This opens the confirmation modal for deleting a category
-  function confirmDeleteCategory(catId, catName) {
-    document.getElementById("modal-title").innerText = "Delete Category";
-    document.getElementById("modal-message").innerText =
-      `Are you sure you want to delete "${catName}"? This cannot be undone.`;
-
-    const confirmBtn = document.getElementById("modal-confirm-btn");
-    confirmBtn.onclick = function () {
-      document.getElementById(`delete-cat-${catId}`).submit();
-    };
-
-    document.getElementById("confirm-modal").style.display = "flex";
-  }
-
-  // This closes the modal
-  function closeModal() {
-    document.getElementById("confirm-modal").style.display = "none";
-  }
-</script>
-
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
-
-
-
-

@@ -103,41 +103,5 @@
         </div>
     </div>
 </div>
-<script>
-function showConfirm(type, sectionId) {
-    document.getElementById('confirm-title').textContent = 'Save Changes';
-    document.getElementById('confirm-message').textContent =
-        'Are you sure you want to update this section?';
-    document.getElementById('confirm-modal').classList.add('open');
-    document.getElementById('confirm-yes').onclick = function() {
-        closeConfirm();
-        document.getElementById('edit-form-' + sectionId).submit();
-    };
-}
-
-function closeConfirm() {
-    document.getElementById('confirm-modal').classList.remove('open');
-}
-
-document.getElementById('confirm-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeConfirm();
-});
-
-function showDeleteConfirm(id, heading) {
-    document.getElementById('delete-message').textContent =
-        'Are you sure you want to delete the "' + heading + '" section? This cannot be undone.';
-    document.getElementById('delete-confirm-btn').onclick = function() {
-        document.getElementById('delete-form-' + id).submit();
-    };
-    document.getElementById('delete-modal').classList.add('open');
-}
-
-function closeDeleteConfirm() {
-    document.getElementById('delete-modal').classList.remove('open');
-}
-
-document.getElementById('delete-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteConfirm();
-});
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}

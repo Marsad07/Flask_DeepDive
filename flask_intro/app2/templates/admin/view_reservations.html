@@ -173,36 +173,5 @@
         </div>
     </div>
 </div>
-<script>
-    function showCancelConfirm(customerId, name) {
-        document.getElementById('cancel-name').textContent = name;
-        document.getElementById('cancel-confirm-btn').onclick = function () {
-            document.getElementById('cancel-form-' + customerId).submit();
-        };
-        document.getElementById('cancel-modal').classList.add('open');
-    }
-
-    function closeCancelConfirm() {
-        document.getElementById('cancel-modal').classList.remove('open');
-    }
-
-    // Close on backdrop click
-    document.getElementById('cancel-modal').addEventListener('click', function (e) {
-        if (e.target === this) closeCancelConfirm();
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeCancelConfirm();
-    });
-
-    // Scroll-reveal animation
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('visible');
-        });
-    }, { threshold: 0.05 });
-
-    document.querySelectorAll('.dash-card, .dash-header').forEach(el => observer.observe(el));
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}

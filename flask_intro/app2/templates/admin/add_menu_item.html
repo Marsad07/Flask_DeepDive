@@ -54,55 +54,7 @@
         </div>
     </div>
 </div>
-<script>
-    function selectCategory(name, btn) {
-        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        document.getElementById('selected-category').value = name;
-    }
-
-    function showConfirm() {
-        const name     = document.getElementById('item_name').value.trim();
-        const category = document.getElementById('selected-category').value;
-        const desc     = document.getElementById('description').value.trim();
-        const price    = document.getElementById('price').value;
-
-        if (!name) {
-            alert('Please enter an item name.');
-            return;
-        }
-        if (!category) {
-            alert('Please select a category.');
-            return;
-        }
-        if (!desc) {
-            alert('Please enter a description.');
-            return;
-        }
-        if (!price || parseFloat(price) < 0) {
-            alert('Please enter a valid price.');
-            return;
-        }
-
-        document.getElementById('confirm-modal').classList.add('open');
-    }
-
-    function closeConfirm() {
-        document.getElementById('confirm-modal').classList.remove('open');
-    }
-
-    function submitForm() {
-        document.getElementById('add-form').submit();
-    }
-
-    document.getElementById('confirm-modal').addEventListener('click', function (e) {
-        if (e.target === this) closeConfirm();
-    });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeConfirm();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
 
 

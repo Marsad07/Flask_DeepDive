@@ -68,31 +68,7 @@
         </div>
     </div>
 </div>
-<script>
-    // This opens the confirmation modal for disabling staff
-    function confirmDisableStaff(staffId, staffName) {
-        document.getElementById("modal-title").innerText = "Disable Staff Member";
-        document.getElementById("modal-message").innerText =
-            `Are you sure you want to disable "${staffName}"? They will no longer be able to log in.`;
-
-        const confirmBtn = document.getElementById("modal-confirm-btn");
-        confirmBtn.onclick = function () {
-            window.location = `/admin/staff/disable/${staffId}`;
-        };
-
-        document.getElementById("confirm-modal").style.display = "flex";
-    }
-
-    // This closes the modal
-    function closeModal() {
-        document.getElementById("confirm-modal").style.display = "none";
-    }
-
-    // Close modal when clicking outside the box
-    document.getElementById("confirm-modal").addEventListener("click", function(e) {
-        if (e.target === this) closeModal();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
 
 

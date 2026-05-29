@@ -1,7 +1,5 @@
 {% extends "admin_base.html" %}
 
-
-
 {% block admin_content %}
 <div class="dash-page">
   <!-- This is for the top header row -->
@@ -64,27 +62,7 @@
     </div>
   </div>
 </div>
-<script>
-  // This opens the confirmation modal
-  function openConfirm() {
-    document.getElementById("confirm-modal").style.display = "flex";
-  }
-
-  // This closes the modal
-  function closeConfirm() {
-    document.getElementById("confirm-modal").style.display = "none";
-  }
-
-  // This submits the form after confirmation
-  function submitContactForm() {
-    document.getElementById("contact-form").submit();
-  }
-
-  // This closes modal when clicking outside the box
-  document.getElementById("confirm-modal").addEventListener("click", function(e) {
-    if (e.target === this) closeConfirm();
-  });
-</script>
+<script src="{{ url_for('static', filename='js/admin_modals.js') }}"></script>
 {% endblock %}
 
 
