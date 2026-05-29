@@ -268,81 +268,12 @@ def forgot_password():
 
             reset_url = url_for('customer_auth.reset_password', token=token, _external=True)
             try:
-                html_body = f'''<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body bgcolor="#F8F4EC" style="margin: 0; padding: 0;">
-    <table width="100%" bgcolor="#F8F4EC" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table width="600" cellpadding="0" cellspacing="0" border="0"
-                       style="max-width: 600px; width: 100%;">
-                    <tr>
-                        <td bgcolor="#2C2416" align="center"
-                            style="padding: 30px; border-radius: 12px 12px 0 0;">
-                            <h1 style="color: #D4AF37; margin: 0; font-size: 28px;
-                                letter-spacing: 3px; font-family: Georgia, serif;">
-                                RESTAURANT NAME
-                            </h1>
-                            <p style="color: #D4AF37; margin: 8px 0 0; font-size: 14px;
-                                letter-spacing: 2px; font-family: Georgia, serif;">
-                                PASSWORD RESET
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td bgcolor="#FFFFFF" style="padding: 30px;">
-                            <p style="color: #2C2416; font-size: 16px;
-                                font-family: Georgia, serif; margin: 0 0 10px;">
-                                Hi {customer['customer_fullname']},
-                            </p>
-                            <p style="color: #5C4033; font-size: 15px; line-height: 1.6;
-                                font-family: Georgia, serif; margin: 0 0 20px;">
-                                We received a request to reset your password. Click the button
-                                below to set a new one. This link will expire in 1 hour.
-                            </p>
-                            <table width="100%" cellpadding="0" cellspacing="0"
-                                   border="0" style="margin: 30px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{reset_url}"
-                                           style="background-color: #8B0000; color: #D4AF37;
-                                            padding: 14px 35px; text-decoration: none;
-                                            border-radius: 8px; font-size: 15px;
-                                            font-weight: bold; letter-spacing: 2px;
-                                            text-transform: uppercase;
-                                            font-family: Georgia, serif;
-                                            display: inline-block;">
-                                            RESET PASSWORD
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            <p style="color: #5C4033; font-size: 13px; line-height: 1.6;
-                                font-family: Georgia, serif; margin: 0;">
-                                If you didn't request a password reset you can safely
-                                ignore this email.
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td bgcolor="#2C2416" align="center"
-                            style="padding: 20px; border-radius: 0 0 12px 12px;">
-                            <p style="color: #D4AF37; margin: 0; font-size: 13px;
-                                letter-spacing: 1px; font-family: Georgia, serif;">
-                                © 2026 Restaurant Name. All rights reserved.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>'''
+                # Send password reset email — HTML rendered from template, not built inline
+                html_body = render_template(
+                    'emails/password_reset_email.html',
+                    customer_fullname=customer['customer_fullname'],
+                    reset_url=reset_url
+                )
                 msg = EmailMessage(
                     subject='Password Reset Request',
                     body=html_body,

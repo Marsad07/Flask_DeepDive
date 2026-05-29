@@ -171,155 +171,20 @@ def process_order():
     # Emit new order to kitchen
     socketio.emit('new_order', {'order_id': order_id}, room='kitchen')
 
-    # Send confirmation email
+    # Send confirmation email — HTML is rendered from a Jinja template, not built inline
     try:
-        discount_row = ""
-        if discount_amount > 0:
-            discount_row = f"""
-                <tr>
-                    <td style="padding:10px 0;color:#5C4033;font-size:14px;
-                     font-family:Georgia,serif;border-bottom:1px solid #E8DFD0;">
-                        Discount ({coupon_code})
-                    </td>
-                    <td align="right" style="padding:10px 0;color:#28a745;font-weight:bold;
-                     font-size:14px;font-family:Georgia,serif;border-bottom:1px solid #E8DFD0;">
-                        -£{discount_amount:.2f}
-                    </td>
-                </tr>"""
         track_url = url_for('orders.track_order', order_number=order_number, _external=True)
-        html_body = f'''<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light only">
-    <meta name="supported-color-schemes" content="light">
-    <style>
-        @media (prefers-color-scheme: dark) {{
-            .email-body {{ background-color: #1A1410 !important; color: #FFFEF2 !important; }}
-            .order-ref-box {{ background-color: var(--color-text) !important; }}
-            p {{ color: #FFFEF2 !important; }}
-        }}
-    </style>
-</head>
-<body bgcolor="#F8F4EC" style="margin:0;padding:0;">
-    <table width="100%" bgcolor="#F8F4EC" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-            <td align="center" style="padding:40px 20px;">
-                <table width="600" cellpadding="0" cellspacing="0" border="0"
-                       style="max-width:600px;width:100%;">
-                    <tr>
-                        <td bgcolor="#2C2416" align="center"
-                            style="padding:30px;border-radius:12px 12px 0 0;">
-                            <h1 style="color:#FFD700;margin:0;font-size:28px;
-                             letter-spacing:3px;font-family:Georgia,serif;">
-                                RESTAURANT NAME
-                            </h1>
-                            <p style="color:#D4AF37;margin:8px 0 0;font-size:14px;
-                             letter-spacing:2px;font-family:Georgia,serif;">
-                                ORDER CONFIRMATION
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="email-body" bgcolor="#FFFFFF" style="padding:30px;">
-                            <p style="color:#2C2416;font-size:16px;font-family:Georgia,serif;
-                             margin:0 0 10px;">
-                                Hi <strong>{full_name}</strong>,
-                            </p>
-                            <p style="color:#5C4033;font-size:15px;line-height:1.6;
-                             font-family:Georgia,serif;margin:0 0 20px;">
-                                Thank you for your order! We've received it and will get started soon.
-                            </p>
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                                   style="margin:0 0 20px;">
-                                <tr>
-                                    <td class="order-ref-box" bgcolor="#F8F4EC"
-                                        style="padding:15px 20px;border-radius:8px;
-                                         border-left:4px solid #8B0000;">
-                                        <p style="margin:0;color:#5C4033;font-size:13px;
-                                         font-family:Georgia,serif;letter-spacing:1px;">
-                                            ORDER REFERENCE
-                                        </p>
-                                        <p style="margin:5px 0 0;color:#8B0000;font-size:22px;
-                                         font-weight:bold;font-family:Georgia,serif;">
-                                            {order_number}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td style="padding:10px 0;color:#5C4033;font-size:14px;
-                                     font-family:Georgia,serif;border-bottom:1px solid #E8DFD0;">
-                                        Order Type
-                                    </td>
-                                    <td align="right" style="padding:10px 0;color:#2C2416;
-                                     font-weight:bold;font-size:14px;font-family:Georgia,serif;
-                                     border-bottom:1px solid #E8DFD0;">
-                                        {order_type.capitalize()}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding:10px 0;color:#5C4033;font-size:14px;
-                                     font-family:Georgia,serif;border-bottom:1px solid #E8DFD0;">
-                                        Payment
-                                    </td>
-                                    <td align="right" style="padding:10px 0;color:#2C2416;
-                                     font-weight:bold;font-size:14px;font-family:Georgia,serif;
-                                     border-bottom:1px solid #E8DFD0;">
-                                        {payment_display}
-                                    </td>
-                                </tr>
-                                {discount_row}
-                                <tr>
-                                    <td style="padding:10px 0;color:#5C4033;font-size:14px;
-                                     font-family:Georgia,serif;">
-                                        Total
-                                    </td>
-                                    <td align="right" style="padding:10px 0;color:#8B0000;
-                                     font-weight:bold;font-size:18px;font-family:Georgia,serif;">
-                                        £{total:.2f}
-                                    </td>
-                                </tr>
-                            </table>
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                                   style="margin:30px 0;">
-                                <tr>
-                                <td align="center">
-                                    <a href="{track_url}"
-                                       style="background-color:#8B0000;color:#FFD700;
-                                        padding:14px 35px;text-decoration:none;border-radius:8px;
-                                        font-size:15px;font-weight:bold;letter-spacing:2px;
-                                        text-transform:uppercase;font-family:Georgia,serif;
-                                        display:inline-block;">
-                                        TRACK YOUR ORDER
-                                    </a>
-                                </td>
-                            </tr>
-                            </table>
-                            <p style="color:#5C4033;font-size:14px;line-height:1.6;
-                             font-family:Georgia,serif;margin:0;">
-                                If you have any questions about your order, please don't hesitate
-                                to contact us.
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td bgcolor="#2C2416" align="center"
-                            style="padding:20px;border-radius:0 0 12px 12px;">
-                            <p style="color:#D4AF37;margin:0;font-size:13px;
-                             letter-spacing:1px;font-family:Georgia,serif;">
-                                © 2026 Restaurant Name. All rights reserved.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>'''
+        html_body = render_template(
+            'emails/order_confirmation_email.html',
+            full_name=full_name,
+            order_number=order_number,
+            order_type=order_type,
+            payment_display=payment_display,
+            discount_amount=discount_amount,
+            coupon_code=coupon_code,
+            total=total,
+            track_url=track_url
+        )
         msg = EmailMessage(
             subject=f'Order Confirmation - {order_number}',
             body=html_body,
@@ -367,6 +232,7 @@ def order_confirmation(order_number):
 def create_payment_intent():
     stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
     cart = session.get('cart', {})
+
     # Reads discount from request body so the intent amount matches what the customer pays
     body = request.get_json(silent=True, force=True) or {}
     discount_amount = float(body.get('discount_amount', 0) or 0)
@@ -379,5 +245,6 @@ def create_payment_intent():
         currency='gbp',
         payment_method_types=['card'],
     )
+
     # Return both values — clientSecret for Stripe.js, paymentIntentId to save on the order
     return {'clientSecret': intent.client_secret, 'paymentIntentId': intent.id}

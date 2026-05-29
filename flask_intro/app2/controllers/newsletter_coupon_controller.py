@@ -163,64 +163,19 @@ def create_coupon():
             """, (code, discount_type, discount_value, assigned_email, uses_limit, expires_at))
             db.commit()
 
-            # If assigned to an email, send them the code
+            # If assigned to an email, send them the code via email template
             if assigned_email:
                 try:
                     discount_display = (
                         f"{discount_value}%" if discount_type == "percent"
                         else f"£{discount_value}"
                     )
-                    html_body = f"""
-                    <body bgcolor="#F8F4EC" style="margin:0;padding:0;font-family:Georgia,serif;">
-                        <table width="100%" bgcolor="#F8F4EC" cellpadding="0" cellspacing="0">
-                            <tr><td align="center" style="padding:40px 20px;">
-                                <table width="600" cellpadding="0" cellspacing="0"
-                                       style="max-width:600px;width:100%;">
-                                    <tr>
-                                        <td bgcolor="#2C2416" align="center"
-                                            style="padding:30px;border-radius:12px 12px 0 0;">
-                                            <h1 style="color:#FFD700;margin:0;font-size:28px;
-                                                       letter-spacing:3px;">
-                                                You've got a discount!
-                                            </h1>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td bgcolor="#FFFFFF" style="padding:30px;">
-                                            <p style="color:#2C2416;font-size:16px;margin:0 0 16px;">
-                                                Here is your exclusive discount code:
-                                            </p>
-                                            <div style="background:#F8F4EC;border-left:4px solid #8B0000;
-                                                        padding:20px;border-radius:8px;
-                                                        text-align:center;margin-bottom:20px;">
-                                                <p style="font-size:32px;font-weight:bold;
-                                                          color:#8B0000;margin:0;
-                                                          letter-spacing:4px;">
-                                                    {code}
-                                                </p>
-                                                <p style="color:#5C4033;font-size:14px;margin:8px 0 0;">
-                                                    {discount_display} off your order
-                                                </p>
-                                            </div>
-                                            <p style="color:#5C4033;font-size:13px;margin:0;">
-                                                Use this code at checkout.
-                                                {'Expires ' + str(expires_at) if expires_at else 'No expiry date.'}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td bgcolor="#2C2416" align="center"
-                                            style="padding:20px;border-radius:0 0 12px 12px;">
-                                            <p style="color:#D4AF37;margin:0;font-size:13px;">
-                                                © 2026 Restaurant. All rights reserved.
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td></tr>
-                        </table>
-                    </body>
-                    """
+                    html_body = render_template(
+                        'emails/coupon_email.html',
+                        code=code,
+                        discount_display=discount_display,
+                        expires_at=expires_at
+                    )
                     msg = EmailMessage(
                         subject='Your Exclusive Discount Code',
                         body=html_body,
