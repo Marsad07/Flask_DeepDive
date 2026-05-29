@@ -1,88 +1,82 @@
 from flask import render_template, request, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash
+from flask_login import login_user, logout_user
 from app2.database import get_db, staff_redirect
-from app2 import mail, login_manager
+from app2 import mail
 from app2.models.customer_user import CustomerUser
+from app2.schemas import RegisterSchema, UpdateProfileSchema
 from flask_mailman import EmailMessage
+from marshmallow import ValidationError
 import secrets
 from datetime import datetime, timedelta
 
 @staff_redirect
 def customer_login():
     if request.method == "POST":
-        customer_email = request.form['customer_email']
-        customer_password = request.form['customer_password']
+        email    = request.form['customer_email']
+        password = request.form['customer_password']
 
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM customer_accounts WHERE customer_email = %s", (customer_email,))
-        user = cursor.fetchone()
-        cursor.close()
-        db.close()
+        # Use model method instead of raw SQL
+        user = CustomerUser.get_by_email(email)
 
-        if user and check_password_hash(user['customer_password_hash'], customer_password):
-            # Log in with Flask-Login
-            customer_user = CustomerUser(user)
-            login_user(customer_user)
+        if user and user.check_password(password):
+            login_user(user)
 
-            # Keep session data for your existing session-based checks
-            session['customer_id'] = user['customer_id']
-            session['customer_name'] = user['customer_fullname']
-            session['customer_email'] = user['customer_email']
-            session['customer_phonenum'] = user['customer_phonenum']
+            # Keep session data for existing session-based checks
+            session['customer_id']    = user.customer_id
+            session['customer_name']  = user.customer_fullname
+            session['customer_email'] = user.customer_email
             return redirect(url_for('customer_auth.customer_dashboard'))
-        else:
-            return render_template('auth/login.html', error="Incorrect email or password")
+
+        return render_template('auth/login.html', error="Incorrect email or password")
 
     return render_template('auth/login.html')
 
 @staff_redirect
 def customer_register():
     if request.method == "POST":
-        customer_fullname = request.form['customer_fullname']
-        customer_email = request.form['customer_email']
-        customer_phonenum = request.form['customer_phonenum']
-        customer_password = request.form['customer_password']
+        # Validates registration form data using Marshmallow
+        schema = RegisterSchema()
+        try:
+            validated = schema.load(request.form)
+        except ValidationError as err:
+            first_error = next(iter(err.messages.values()))[0]
+            return render_template('auth/register.html', error=first_error)
 
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
+        fullname = validated['customer_fullname']
+        email    = validated['customer_email']
+        phone    = validated['customer_phonenum']
+        password = validated['customer_password']
 
-        cursor.execute("SELECT * FROM customer_accounts WHERE customer_email = %s", (customer_email,))
-        user = cursor.fetchone()
-
-        if user:
-            cursor.close()
-            db.close()
+        # Check if email already exists using model method
+        existing = CustomerUser.get_by_email(email)
+        if existing:
             return render_template('auth/register.html',
                                    error="An account with this email already exists")
 
-        hashed_password = generate_password_hash(customer_password)
-
+        # I use raw SQL here to include phone number since model doesn't have it as a column yet
+        # TODO: add customer_phonenum to CustomerUser model
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        hashed = generate_password_hash(password)
         cursor.execute("""
-            INSERT INTO customer_accounts (customer_fullname, customer_email, customer_phonenum, customer_password_hash)
+            INSERT INTO customer_accounts 
+            (customer_fullname, customer_email, customer_phonenum, customer_password_hash)
             VALUES (%s, %s, %s, %s)
-        """, (customer_fullname, customer_email, customer_phonenum, hashed_password))
+        """, (fullname, email, phone, hashed))
         db.commit()
-
         new_id = cursor.lastrowid
-
-        # Log in with Flask-Login
-        new_user_row = {
-            "customer_id": new_id,
-            "customer_fullname": customer_fullname,
-            "customer_email": customer_email
-        }
-        login_user(CustomerUser(new_user_row))
-
-        session['customer_id'] = new_id
-        session['customer_name'] = customer_fullname
-        session['customer_email'] = customer_email
-
         cursor.close()
         db.close()
-        return redirect(url_for('customer_auth.customer_dashboard'))
 
+        # Fetch the new user via model and log them in
+        new_user = CustomerUser.get_by_id(new_id)
+        login_user(new_user)
+
+        session['customer_id']    = new_id
+        session['customer_name']  = fullname
+        session['customer_email'] = email
+        return redirect(url_for('customer_auth.customer_dashboard'))
     return render_template('auth/register.html')
 
 def customer_logout():
@@ -102,10 +96,12 @@ def customer_dashboard():
     cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s", (customer_id,))
     customer = cursor.fetchone()
 
-    cursor.execute("SELECT COUNT(*) as count FROM customer_orders WHERE customer_id = %s", (customer_id,))
+    cursor.execute("SELECT COUNT(*) as count FROM customer_orders WHERE customer_id = %s",
+                   (customer_id,))
     total_orders = cursor.fetchone()['count']
 
-    cursor.execute("SELECT SUM(total_price) as total FROM customer_orders WHERE customer_id = %s", (customer_id,))
+    cursor.execute("SELECT SUM(total_price) as total FROM customer_orders WHERE customer_id = %s",
+                   (customer_id,))
     total_spent = cursor.fetchone()['total'] or 0
 
     cursor.execute("""
@@ -126,7 +122,6 @@ def customer_dashboard():
         LIMIT 5
     """, (customer_id,))
     recent_orders = cursor.fetchall()
-
     cursor.close()
     db.close()
 
@@ -138,24 +133,6 @@ def customer_dashboard():
                            recent_orders=recent_orders)
 
 @staff_redirect
-def customer_order_history():
-    if 'customer_id' not in session:
-        return redirect(url_for('customer_auth.login'))
-
-    customer_id = session['customer_id']
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT * FROM customer_orders
-        WHERE customer_id = %s
-        ORDER BY order_date DESC, order_time DESC
-    """, (customer_id,))
-    orders = cursor.fetchall()
-    cursor.close()
-    db.close()
-
-    return render_template('auth/customer_order_history.html', orders=orders)
-
 def customer_profile_settings():
     if 'customer_id' not in session:
         return redirect(url_for('customer_auth.login'))
@@ -163,12 +140,10 @@ def customer_profile_settings():
     customer_id = session['customer_id']
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s", (customer_id,))
     customer = cursor.fetchone()
     cursor.close()
     db.close()
-
     return render_template('auth/customer_profile.html', customer=customer)
 
 @staff_redirect
@@ -181,11 +156,25 @@ def update_profile():
     cursor = db.cursor(dictionary=True)
 
     if request.method == "POST":
-        fullname = request.form.get('customer_fullname')
-        email = request.form.get('customer_email')
-        phone = request.form.get('customer_phonenum')
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
+        # Validate profile update form data using Marshmallow
+        schema = UpdateProfileSchema()
+        try:
+            validated = schema.load(request.form)
+        except ValidationError as err:
+            first_error = next(iter(err.messages.values()))[0]
+            cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s",
+                           (customer_id,))
+            customer = cursor.fetchone()
+            cursor.close()
+            db.close()
+            return render_template('auth/customer_profile.html',
+                                   customer=customer, error=first_error)
+
+        fullname     = validated['customer_fullname']
+        email        = validated['customer_email']
+        phone        = validated['customer_phonenum']
+        new_password = validated.get('new_password')
+        confirm      = request.form.get('confirm_password')
 
         cursor.execute("""
             UPDATE customer_accounts 
@@ -194,7 +183,7 @@ def update_profile():
         """, (fullname, email, phone, customer_id))
 
         if new_password:
-            if new_password == confirm_password:
+            if new_password == confirm:
                 hashed = generate_password_hash(new_password)
                 cursor.execute("""
                     UPDATE customer_accounts 
@@ -202,7 +191,8 @@ def update_profile():
                     WHERE customer_id = %s
                 """, (hashed, customer_id))
             else:
-                cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s", (customer_id,))
+                cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s",
+                               (customer_id,))
                 customer = cursor.fetchone()
                 cursor.close()
                 db.close()
@@ -211,14 +201,16 @@ def update_profile():
                                        error="Passwords do not match!")
 
         db.commit()
-        session['customer_name'] = fullname
+        session['customer_name']  = fullname
         session['customer_email'] = email
+
         cursor.execute("SELECT * FROM customer_accounts WHERE customer_id = %s", (customer_id,))
         customer = cursor.fetchone()
         cursor.close()
         db.close()
         return render_template('auth/customer_profile.html',
-                               customer=customer, success="Profile updated successfully!")
+                               customer=customer,
+                               success="Profile updated successfully!")
 
     cursor.close()
     db.close()
@@ -228,11 +220,10 @@ def update_profile():
 def order_history():
     customer_id = session.get('customer_id')
     if not customer_id:
-        return redirect(url_for('customer_auth.login'))  # FIXED: was 'auth.login_page'
+        return redirect(url_for('customer_auth.login'))
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("""
         SELECT 
             order_id,
@@ -250,26 +241,23 @@ def order_history():
         WHERE customer_id = %s
         ORDER BY created_at DESC
     """, (customer_id,))
-
     orders = cursor.fetchall()
     cursor.close()
     db.close()
     return render_template("auth/order_history.html", orders=orders)
 
-
 @staff_redirect
 def forgot_password():
     if request.method == "POST":
-        email = request.form.get('email')
-
-        db = get_db()
+        email  = request.form.get('email')
+        db     = get_db()
         cursor = db.cursor(dictionary=True)
 
         cursor.execute("SELECT * FROM customer_accounts WHERE customer_email = %s", (email,))
         customer = cursor.fetchone()
 
         if customer:
-            token = secrets.token_urlsafe(32)
+            token      = secrets.token_urlsafe(32)
             expires_at = datetime.now() + timedelta(hours=1)
 
             cursor.execute("""
@@ -290,52 +278,61 @@ def forgot_password():
     <table width="100%" bgcolor="#F8F4EC" cellpadding="0" cellspacing="0" border="0">
         <tr>
             <td align="center" style="padding: 40px 20px;">
-                <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
+                <table width="600" cellpadding="0" cellspacing="0" border="0"
+                       style="max-width: 600px; width: 100%;">
                     <tr>
-                        <td bgcolor="#2C2416" align="center" style="padding: 30px; border-radius: 12px 12px 0 0;">
-                            <h1 style="color: var(--color-accent); margin: 0; font-size: 28px;
-                            letter-spacing: 3px; font-family: Georgia, serif;">
+                        <td bgcolor="#2C2416" align="center"
+                            style="padding: 30px; border-radius: 12px 12px 0 0;">
+                            <h1 style="color: #D4AF37; margin: 0; font-size: 28px;
+                                letter-spacing: 3px; font-family: Georgia, serif;">
                                 RESTAURANT NAME
                             </h1>
-                            <p style="color: var(--color-accent); margin: 8px 0 0 0; font-size: 14px; letter-spacing: 2px;
-                             font-family: Georgia, serif;">
+                            <p style="color: #D4AF37; margin: 8px 0 0; font-size: 14px;
+                                letter-spacing: 2px; font-family: Georgia, serif;">
                                 PASSWORD RESET
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td bgcolor="#FFFFFF" style="padding: 30px;">
-                            <p style="color: var(--color-text); font-size: 16px; font-family: Georgia, serif; margin: 0 0 10px 0;">
+                            <p style="color: #2C2416; font-size: 16px;
+                                font-family: Georgia, serif; margin: 0 0 10px;">
                                 Hi {customer['customer_fullname']},
                             </p>
-                            <p style="color: #5C4033; font-size: 15px; line-height: 1.6; font-family: Georgia, serif;
-                             margin: 0 0 20px 0;">
-                                We received a request to reset your password. Click the button below to set a new one. 
-                                This link will expire in 1 hour.
+                            <p style="color: #5C4033; font-size: 15px; line-height: 1.6;
+                                font-family: Georgia, serif; margin: 0 0 20px;">
+                                We received a request to reset your password. Click the button
+                                below to set a new one. This link will expire in 1 hour.
                             </p>
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 30px 0;">
+                            <table width="100%" cellpadding="0" cellspacing="0"
+                                   border="0" style="margin: 30px 0;">
                                 <tr>
                                     <td align="center">
-                                        <a href="{reset_url}" style="background-color: var(--color-primary); color: var(--color-accent);
-                                         padding: 14px 35px; text-decoration: none; border-radius: 8px;
-                                          font-size: 15px; font-weight: bold; letter-spacing: 2px;
-                                           text-transform: uppercase; font-family: Georgia, serif;
+                                        <a href="{reset_url}"
+                                           style="background-color: #8B0000; color: #D4AF37;
+                                            padding: 14px 35px; text-decoration: none;
+                                            border-radius: 8px; font-size: 15px;
+                                            font-weight: bold; letter-spacing: 2px;
+                                            text-transform: uppercase;
+                                            font-family: Georgia, serif;
                                             display: inline-block;">
                                             RESET PASSWORD
                                         </a>
                                     </td>
                                 </tr>
                             </table>
-                            <p style="color: #5C4033; font-size: 13px; line-height: 1.6; font-family: Georgia,
-                             serif; margin: 0;">
-                                If you didn't request a password reset you can safely ignore this email.
+                            <p style="color: #5C4033; font-size: 13px; line-height: 1.6;
+                                font-family: Georgia, serif; margin: 0;">
+                                If you didn't request a password reset you can safely
+                                ignore this email.
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <td bgcolor="#2C2416" align="center" style="padding: 20px; border-radius: 0 0 12px 12px;">
-                            <p style="color: var(--color-accent); margin: 0;
-                             font-size: 13px; letter-spacing: 1px; font-family: Georgia, serif;">
+                        <td bgcolor="#2C2416" align="center"
+                            style="padding: 20px; border-radius: 0 0 12px 12px;">
+                            <p style="color: #D4AF37; margin: 0; font-size: 13px;
+                                letter-spacing: 1px; font-family: Georgia, serif;">
                                 © 2026 Restaurant Name. All rights reserved.
                             </p>
                         </td>
@@ -382,9 +379,9 @@ def reset_password(token):
 
     if request.method == "POST":
         new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
+        confirm      = request.form.get('confirm_password')
 
-        if new_password != confirm_password:
+        if new_password != confirm:
             cursor.close()
             db.close()
             return render_template('auth/reset_password.html',
@@ -396,7 +393,6 @@ def reset_password(token):
             UPDATE customer_accounts SET customer_password_hash = %s 
             WHERE customer_email = %s
         """, (hashed, reset['customer_email']))
-
         cursor.execute("UPDATE password_resets SET used = 1 WHERE token = %s", (token,))
         db.commit()
         cursor.close()

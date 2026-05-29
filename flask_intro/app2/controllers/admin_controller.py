@@ -344,6 +344,7 @@ def view_analytics():
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
+    # --- Reservations stats ---
     cursor.execute("SELECT COUNT(*) FROM reservations_restaurant")
     total_reservations = cursor.fetchone()['COUNT(*)']
 
@@ -355,7 +356,8 @@ def view_analytics():
 
     cursor.execute("SELECT table_number, COUNT(*) FROM reservations_restaurant"
                    " GROUP BY table_number ORDER BY COUNT(*) DESC LIMIT 1")
-    popular_table = cursor.fetchone()['table_number']
+    row = cursor.fetchone()
+    popular_table = row['table_number'] if row else '—'
 
     cursor.execute("""
         SELECT DAYNAME(reservation_date) as day, COUNT(*) as count 
@@ -381,6 +383,74 @@ def view_analytics():
         ORDER BY YEAR(reservation_date), MONTH(reservation_date)
     """)
     monthly_trend = cursor.fetchall()
+
+    # --- Order stats ---
+    cursor.execute("SELECT COUNT(*) AS c FROM customer_orders")
+    row = cursor.fetchone()
+    total_orders = row['c'] if row else 0
+
+    cursor.execute("""
+        SELECT COUNT(*) AS c FROM customer_orders 
+        WHERE MONTH(order_date) = MONTH(NOW()) AND YEAR(order_date) = YEAR(NOW())
+    """)
+    row = cursor.fetchone()
+    total_monthly_orders = row['c'] if row else 0
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS t FROM customer_orders 
+        WHERE order_status != 'cancelled'
+    """)
+    total_revenue = float(cursor.fetchone()['t'])
+
+    cursor.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS t FROM customer_orders 
+        WHERE order_status != 'cancelled'
+        AND MONTH(order_date) = MONTH(NOW()) AND YEAR(order_date) = YEAR(NOW())
+    """)
+    monthly_revenue = float(cursor.fetchone()['t'])
+
+    cursor.execute("""
+        SELECT oi.item_name, SUM(oi.quantity) AS total_qty
+        FROM order_items oi
+        JOIN customer_orders co ON oi.order_id = co.order_id
+        WHERE co.order_status != 'cancelled'
+        GROUP BY oi.item_name
+        ORDER BY total_qty DESC
+        LIMIT 10
+    """)
+    top_items_qty = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT oi.item_name, ROUND(SUM(oi.quantity * oi.item_price), 2) AS total_revenue
+        FROM order_items oi
+        JOIN customer_orders co ON oi.order_id = co.order_id
+        WHERE co.order_status != 'cancelled'
+        GROUP BY oi.item_name
+        ORDER BY total_revenue DESC
+        LIMIT 10
+    """)
+    top_items_revenue = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT MONTHNAME(order_date) AS month,
+               ROUND(SUM(total_price), 2) AS revenue,
+               COUNT(*) AS order_count
+        FROM customer_orders
+        WHERE order_status != 'cancelled'
+        AND order_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY MONTH(order_date), YEAR(order_date), MONTHNAME(order_date)
+        ORDER BY YEAR(order_date), MONTH(order_date)
+    """)
+    revenue_trend = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT order_type, COUNT(*) AS count
+        FROM customer_orders
+        WHERE order_status != 'cancelled'
+        GROUP BY order_type
+    """)
+    orders_by_type = cursor.fetchall()
+
     cursor.close()
     db.close()
     return render_template('admin/view_analytics.html',
@@ -390,7 +460,15 @@ def view_analytics():
                            popular_table=popular_table,
                            bookings_by_day=bookings_by_day,
                            bookings_by_time=bookings_by_time,
-                           monthly_trend=monthly_trend)
+                           monthly_trend=monthly_trend,
+                           total_orders=total_orders,
+                           total_monthly_orders=total_monthly_orders,
+                           total_revenue=total_revenue,
+                           monthly_revenue=monthly_revenue,
+                           top_items_qty=top_items_qty,
+                           top_items_revenue=top_items_revenue,
+                           revenue_trend=revenue_trend,
+                           orders_by_type=orders_by_type)
 
 def view_all_orders():
     if 'admin_id' not in session:

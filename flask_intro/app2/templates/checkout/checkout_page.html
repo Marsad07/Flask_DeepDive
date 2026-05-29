@@ -232,9 +232,12 @@
 
         let valid = true;
 
-        // This checks that the name field is not empty
+        // This checks that the name field is not empty and contains at least two words
         if (!name) {
             showError('full_name', 'Please enter your full name.');
+            valid = false;
+        } else if (name.split(' ').filter(w => w.length > 0).length < 2) {
+            showError('full_name', 'Please enter your first and last name.');
             valid = false;
         }
 

@@ -1,7 +1,9 @@
 from datetime import datetime
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, Response
 from flask_mailman import EmailMessage
 from app2.database import get_db
+from app2.schemas import CouponCreateSchema
+from marshmallow import ValidationError
 import random
 import string
 from datetime import date
@@ -29,7 +31,7 @@ def delete_newsletter_subscriber(email):
 def send_newsletter():
     if request.method == "POST":
         subject = request.form.get("subject")
-        body = request.form.get("body")
+        body    = request.form.get("body")
 
         db = get_db()
         cursor = db.cursor(dictionary=True)
@@ -63,7 +65,9 @@ def send_newsletter():
 def export_subscribers():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT customer_email, subscribe_time FROM newsletter_subs ORDER BY subscribe_time DESC")
+    cursor.execute(
+        "SELECT customer_email, subscribe_time FROM newsletter_subs ORDER BY subscribe_time DESC"
+    )
     subscribers = cursor.fetchall()
     cursor.close()
     db.close()
@@ -72,7 +76,6 @@ def export_subscribers():
     for sub in subscribers:
         csv_content += f"{sub['customer_email']},{sub['subscribe_time']}\n"
 
-    from flask import Response
     return Response(
         csv_content,
         mimetype='text/csv',
@@ -96,19 +99,60 @@ def manage_coupons():
                            subscribers=subscribers,
                            customers=customers,
                            today=date.today())
+
 def create_coupon():
     if request.method == "POST":
-        code = request.form.get("code", "").strip().upper()
-        discount_type = request.form.get("discount_type")
-        discount_value = request.form.get("discount_value")
-        assigned_email = request.form.get("assigned_email", "").strip() or None
-        uses_limit = request.form.get("uses_limit", 1)
-        expires_at = request.form.get("expires_at") or None
+        # Validates coupon form data using Marshmallow before inserting
+        schema = CouponCreateSchema()
+        try:
+            validated = schema.load(request.form)
+        except ValidationError as err:
+            # Reloads the coupons page with the first validation error shown
+            first_error = next(iter(err.messages.values()))[0]
+            db = get_db()
+            cursor = db.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM coupons ORDER BY created_at DESC")
+            coupons = cursor.fetchall()
+            cursor.execute("SELECT customer_email FROM newsletter_subs")
+            subscribers = cursor.fetchall()
+            cursor.execute("SELECT customer_fullname, customer_email FROM customer_accounts")
+            customers = cursor.fetchall()
+            cursor.close()
+            db.close()
+            return render_template('admin/coupons.html',
+                                   coupons=coupons,
+                                   subscribers=subscribers,
+                                   customers=customers,
+                                   today=date.today(),
+                                   error=first_error)
 
-        # Auto generate code if left blank
-        if not code:
-            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        code           = validated.get('code') or ''.join(
+                            random.choices(string.ascii_uppercase + string.digits, k=8)
+                         )
+        discount_type  = validated['discount_type']
+        discount_value = validated['discount_value']
+        assigned_email = validated.get('assigned_email')
+        uses_limit     = validated.get('uses_limit', 1)
+        expires_at     = validated.get('expires_at')
 
+        # Extra check for percent discounts which cannot exceed 100
+        if discount_type == 'percent' and discount_value > 100:
+            db = get_db()
+            cursor = db.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM coupons ORDER BY created_at DESC")
+            coupons = cursor.fetchall()
+            cursor.execute("SELECT customer_email FROM newsletter_subs")
+            subscribers = cursor.fetchall()
+            cursor.execute("SELECT customer_fullname, customer_email FROM customer_accounts")
+            customers = cursor.fetchall()
+            cursor.close()
+            db.close()
+            return render_template('admin/coupons.html',
+                                   coupons=coupons,
+                                   subscribers=subscribers,
+                                   customers=customers,
+                                   today=date.today(),
+                                   error="Percent discount cannot exceed 100%.")
         db = get_db()
         cursor = db.cursor()
         try:
@@ -159,8 +203,8 @@ def create_coupon():
                                                 </p>
                                             </div>
                                             <p style="color:#5C4033;font-size:13px;margin:0;">
-                                                Use this code at checkout. 
-                                                {'Expires ' + expires_at if expires_at else 'No expiry date.'}
+                                                Use this code at checkout.
+                                                {'Expires ' + str(expires_at) if expires_at else 'No expiry date.'}
                                             </p>
                                         </td>
                                     </tr>
@@ -193,7 +237,6 @@ def create_coupon():
         finally:
             cursor.close()
             db.close()
-
     return redirect(url_for('admin.manage_coupons'))
 
 def delete_coupon(coupon_id):

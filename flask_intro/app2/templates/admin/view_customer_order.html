@@ -24,7 +24,7 @@
     <!-- This is the order info + status update card -->
     <div class="dash-card dash-card-body" style="margin-bottom: 20px;">
 
-        <!-- This is the order details grid -->
+        <!-- This is the order details grid — includes payment method -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                     gap: 16px; margin-bottom: 24px;">
             <div>
@@ -49,6 +49,27 @@
                 <p class="form-label">Total</p>
                 <p style="margin: 0; font-weight: 700; color: var(--color-primary); font-size: 18px;">
                     £{{ "%.2f"|format(order.total_price) }}
+                </p>
+            </div>
+            <!-- This shows how the customer paid -->
+            <div>
+                <p class="form-label">Payment</p>
+                <p style="margin: 0; color: var(--color-text);">
+                    {% if order.payment_method == 'card_online' %}
+                        💳 Card online
+                    {% elif order.payment_method == 'cash' %}
+                        💵 Cash
+                    {% elif order.payment_method == 'card_on_delivery' %}
+                        💳 Card on delivery
+                    {% else %}
+                        {{ order.payment_method | replace('_', ' ') | capitalize if order.payment_method else '—' }}
+                    {% endif %}
+                </p>
+                <!-- This shows paid/pending status beneath the method -->
+                <p style="margin: 4px 0 0; font-size: 12px;
+                          color: {{ '#28a745' if order.payment_status == 'paid' else 'var(--color-text-muted)' }};
+                          font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                    {{ order.payment_status | capitalize if order.payment_status else '' }}
                 </p>
             </div>
         </div>
@@ -85,6 +106,7 @@
             </form>
         </div>
     </div>
+
     <!-- This is for offering the driver — only shown for delivery orders -->
     {% if order.order_type == "delivery" %}
     <div class="dash-card dash-card-body" style="margin-bottom: 20px;">
@@ -110,6 +132,7 @@
         </form>
     </div>
     {% endif %}
+
     <!-- This is the items ordered table -->
     <p class="dash-section-title">Items Ordered</p>
     <div class="dash-card">
@@ -143,6 +166,87 @@
             </tbody>
         </table>
     </div>
+
+    <!-- This is the refund section — only shown for card online orders that are paid -->
+    {% if order.payment_method == 'card_online' and order.payment_status == 'paid' %}
+    <p class="dash-section-title" style="margin-top: 28px;">Refund</p>
+    <div class="dash-card dash-card-body" style="margin-bottom: 20px;">
+
+        <!-- This shows a confirmation banner if a full refund has already been issued -->
+        {% if order.refund_status == 'refunded' %}
+            <div class="info-banner" style="margin-bottom: 0;">
+                ✓ Full refund of <strong>£{{ "%.2f"|format(order.refund_amount) }}</strong>
+                issued on {{ order.refunded_at.strftime('%d %b %Y at %H:%M') }}.
+            </div>
+
+        <!-- This shows a partial refund banner and allows a further refund -->
+        {% elif order.refund_status == 'partial' %}
+            <div class="info-banner" style="margin-bottom: 16px;">
+                ✓ Partial refund of <strong>£{{ "%.2f"|format(order.refund_amount) }}</strong>
+                issued on {{ order.refunded_at.strftime('%d %b %Y at %H:%M') }}.
+            </div>
+            <button onclick="document.getElementById('refund-panel').style.display='block'"
+                    class="btn-primary">
+                Issue Further Refund
+            </button>
+
+        <!-- This is the default state — no refund issued yet -->
+        {% else %}
+            <p style="font-size: 14px; color: var(--color-text-muted); margin: 0 0 16px;">
+                This order was paid by card (£{{ "%.2f"|format(order.total_price) }}).
+                You can issue a full or partial refund directly to the customer's card.
+            </p>
+            <button onclick="document.getElementById('refund-panel').style.display='block'"
+                    class="btn-primary">
+                Issue Refund
+            </button>
+        {% endif %}
+
+        <!-- This is the refund form — hidden until the button above is clicked -->
+        <div id="refund-panel" style="display: none; margin-top: 20px;
+             border-top: 1px solid rgba(0,0,0,0.07); padding-top: 20px;">
+
+            <!-- This lets the admin choose full or partial refund -->
+            <div class="form-row" style="margin-bottom: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px;
+                              font-size: 14px; cursor: pointer;">
+                    <input type="radio" name="refund_type" value="full" checked
+                           onchange="togglePartial(this)">
+                    Full refund — £{{ "%.2f"|format(order.total_price) }}
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px;
+                              font-size: 14px; cursor: pointer;">
+                    <input type="radio" name="refund_type" value="partial"
+                           onchange="togglePartial(this)">
+                    Partial refund
+                </label>
+            </div>
+
+            <!-- This input is only shown when partial is selected -->
+            <div id="partial-amount-row" style="display: none; margin-bottom: 16px;">
+                <input type="number" id="partial_amount" min="0.01"
+                       max="{{ '%.2f'|format(order.total_price) }}"
+                       step="0.01" placeholder="Amount to refund (£)"
+                       class="form-input" style="max-width: 200px;">
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- This opens the confirmation modal instead of submitting directly -->
+                <button onclick="openRefundModal({{ order.order_id }})"
+                        class="btn-danger" id="refund-submit-btn">
+                    Confirm Refund
+                </button>
+                <button onclick="document.getElementById('refund-panel').style.display='none'"
+                        class="btn-back" type="button">
+                    Cancel
+                </button>
+                <!-- This spinner shows while the Stripe API call is in flight -->
+                <span id="refund-spinner" style="display: none; font-size: 13px;
+                      color: var(--color-text-muted);">Processing...</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <!-- This is the admin toast notification for driver responses -->
@@ -159,6 +263,22 @@
         <p id="driver-warning-text" class="modal-message"></p>
         <div class="modal-actions">
             <button onclick="closeDriverWarning()" class="modal-btn-confirm">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- This is the refund confirmation modal -->
+<div id="refund-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Confirm Refund</h3>
+        <p id="refund-modal-message" class="modal-message"></p>
+        <p class="modal-message modal-warning">This cannot be undone.</p>
+        <div class="modal-actions">
+            <button onclick="closeRefundModal()" class="modal-btn-cancel">Cancel</button>
+            <button onclick="executeRefund()" class="modal-btn-confirm"
+                    id="refund-modal-confirm-btn">
+                Yes, Refund
+            </button>
         </div>
     </div>
 </div>
@@ -199,5 +319,83 @@
     document.getElementById("driver-warning-modal").addEventListener("click", function(e) {
         if (e.target === this) closeDriverWarning();
     });
+
+    // This shows/hides the partial amount input depending on refund type selection
+    function togglePartial(radio) {
+        document.getElementById('partial-amount-row').style.display =
+            radio.value === 'partial' ? 'block' : 'none';
+    }
+
+    // This stores the pending refund order id while the modal is open
+    let pendingRefundOrderId = null;
+
+    // This validates the form and opens the refund confirmation modal
+    function openRefundModal(orderId) {
+        const type    = document.querySelector('input[name="refund_type"]:checked').value;
+        const partial = document.getElementById('partial_amount').value;
+
+        if (type === 'partial' && (!partial || parseFloat(partial) <= 0)) {
+            alert('Please enter a valid refund amount.');
+            return;
+        }
+
+        pendingRefundOrderId = orderId;
+
+        const message = type === 'full'
+            ? 'Issue a full refund for this order?'
+            : `Issue a partial refund of £${parseFloat(partial).toFixed(2)} for this order?`;
+
+        document.getElementById('refund-modal-message').textContent = message;
+        document.getElementById('refund-modal-confirm-btn').disabled    = false;
+        document.getElementById('refund-modal-confirm-btn').textContent = 'Yes, Refund';
+        document.getElementById('refund-modal').classList.add('open');
+    }
+
+    // This closes the refund modal without doing anything
+    function closeRefundModal() {
+        document.getElementById('refund-modal').classList.remove('open');
+        pendingRefundOrderId = null;
+    }
+
+    // This closes the modal when clicking the backdrop
+    document.getElementById('refund-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeRefundModal();
+    });
+
+    // This fires after the admin confirms in the modal — calls the refund endpoint
+    function executeRefund() {
+        const type       = document.querySelector('input[name="refund_type"]:checked').value;
+        const partial    = document.getElementById('partial_amount').value;
+        const btn        = document.getElementById('refund-submit-btn');
+        const spinner    = document.getElementById('refund-spinner');
+        const confirmBtn = document.getElementById('refund-modal-confirm-btn');
+
+        confirmBtn.disabled    = true;
+        confirmBtn.textContent = 'Processing...';
+
+        const body = new FormData();
+        body.append('refund_type', type);
+        if (type === 'partial') body.append('partial_amount', partial);
+
+        fetch(`/admin/order/${pendingRefundOrderId}/refund`, { method: 'POST', body })
+            .then(r => r.json())
+            .then(data => {
+                closeRefundModal();
+                if (data.success) {
+                    // Reload the page to show the confirmed refund banner
+                    location.reload();
+                } else {
+                    alert('Refund failed: ' + data.message);
+                    btn.disabled          = false;
+                    spinner.style.display = 'none';
+                }
+            })
+            .catch(() => {
+                closeRefundModal();
+                alert('Network error — please try again.');
+                btn.disabled          = false;
+                spinner.style.display = 'none';
+            });
+    }
 </script>
 {% endblock %}

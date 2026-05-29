@@ -14,6 +14,8 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                driver_details, update_footer_about, admin_settings,
                                                update_admin_settings, manage_theme)
 
+from app2.controllers.admin_orders_controller import refund_order
+
 from app2.controllers.newsletter_coupon_controller import (
     manage_newsletter,
     delete_newsletter_subscriber,
@@ -46,6 +48,7 @@ admin_bp.route("/analytics")(view_analytics)
 admin_bp.route("/view_all_orders")(view_all_orders)
 admin_bp.route("/customer_order/<int:order_id>")(view_customer_order)
 admin_bp.route("/update_order_status/<int:order_id>", methods=["POST"])(update_order_status)
+admin_bp.route("/order/<int:order_id>/refund", methods=["POST"])(refund_order)
 admin_bp.route("/categories", methods=["GET", "POST"])(manage_categories)
 admin_bp.route("/categories/delete/<int:category_id>", methods=["POST"])(delete_category)
 admin_bp.route("/image_manager", methods=["GET", "POST"])(image_manager)
@@ -81,7 +84,6 @@ admin_bp.route('/tables/add', methods=['POST'])(add_table)
 admin_bp.route('/tables/delete/<int:table_id>', methods=['POST'])(delete_table)
 admin_bp.route('/tables/update/<int:table_id>', methods=['POST'])(update_table)
 
-
 admin_bp.route('/staff')(manage_staff)
 admin_bp.route('/staff/create', methods=['GET', 'POST'])(create_staff)
 admin_bp.route('/staff/<int:staff_id>/edit', methods=['GET', 'POST'])(edit_staff)
@@ -89,12 +91,10 @@ admin_bp.route('/staff/<int:staff_id>/disable')(disable_staff)
 admin_bp.route('/staff/<int:staff_id>/reset-default')(reset_staff_default)
 admin_bp.route('/staff/<int:staff_id>/reset-email')(reset_staff_email)
 
-
 admin_bp.route("/newsletter")(manage_newsletter)
 admin_bp.route("/newsletter/delete/<email>", methods=["POST"])(delete_newsletter_subscriber)
 admin_bp.route("/newsletter/send", methods=["POST"])(send_newsletter)
 admin_bp.route("/newsletter/export")(export_subscribers)
-
 
 admin_bp.route("/coupons")(manage_coupons)
 admin_bp.route("/coupons/create", methods=["POST"])(create_coupon)

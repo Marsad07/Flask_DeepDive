@@ -10,4 +10,4 @@ checkout_bp.route("/")(checkout_page)
 checkout_bp.route("/process", methods=["POST"])(process_order)
 checkout_bp.route("/confirmation/<order_number>")(order_confirmation)
 checkout_bp.route('/create-payment-intent', methods=['POST'])(lambda: jsonify(create_payment_intent()))
-checkout_bp.route('/apply-coupon', methods=['POST'])(apply_coupon)  # ADD THIS
+checkout_bp.route('/apply-coupon', methods=['POST'])(apply_coupon)

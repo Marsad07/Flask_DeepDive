@@ -27,6 +27,7 @@ body {
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .admin-main {
@@ -1559,8 +1560,9 @@ body {
     align-items: center;
     gap: 12px;
     max-width: 360px;
-    transform: translateX(120%);
+    transform: translateX(calc(100% + 24px));
     transition: transform 0.35s ease;
+    overflow: hidden;
 }
 
 .staff-toast.show { transform: translateX(0); }

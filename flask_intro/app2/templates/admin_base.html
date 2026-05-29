@@ -94,9 +94,7 @@
         {% block admin_content %}{% endblock %}
     </main>
 </div>
-<script>
-    document.querySelector('.admin-dropdown-toggle').addEventListener('click', function () {
-        document.getElementById('adminDropdownMenu').classList.toggle('open');
-    });
-</script>
+
+<!-- This loads the sidebar dropdown script from static file -->
+<script src="{{ url_for('static', filename='js/admin_sidebar.js') }}"></script>
 {% endblock %}

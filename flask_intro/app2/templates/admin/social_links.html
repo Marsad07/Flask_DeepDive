@@ -1,122 +1,115 @@
 {% extends "admin_base.html" %}
 {% block admin_content %}
-<div class="menu-container">
-    <h1>SOCIAL MEDIA LINKS</h1>
-    <!-- This is for adding new links-->
-    <div style="background: var(--color-surface); padding: 25px; border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
-        <h3 style="color: var(--color-text); font-family: Georgia, serif; margin-bottom: 20px;">
-            Add New Link
-        </h3>
-        <form action="{{ url_for('admin.add_social_link') }}" method="POST" class="inline-form"
-              style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+<div class="dash-page">
 
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">Platform</label>
-                <input type="text" name="platform" placeholder="e.g. Instagram"
-                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
-                              font-family: Georgia, serif; width: 150px;">
+    <!-- This is the page header -->
+    <div class="dash-header">
+        <div>
+            <h1>Social Media Links</h1>
+            <p class="dash-welcome">Manage the links shown in your site footer</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-back">← Dashboard</a>
+    </div>
+
+    <!-- This is for adding new links -->
+    <p class="dash-section-title">Add New Link</p>
+    <div class="dash-card dash-card-body" style="margin-bottom: 28px;">
+        <form action="{{ url_for('admin.add_social_link') }}" method="POST" class="inline-form">
+            <div class="form-row">
+                <div class="form-group" style="min-width: 150px;">
+                    <label class="form-label">Platform</label>
+                    <input type="text" name="platform" placeholder="e.g. Instagram"
+                           class="form-input">
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 220px;">
+                    <label class="form-label">URL</label>
+                    <input type="text" name="url" placeholder="https://instagram.com/..."
+                           class="form-input">
+                </div>
+                <div class="form-group" style="min-width: 180px;">
+                    <label class="form-label">
+                        Icon Class
+                        <a href="https://fontawesome.com/icons?d=gallery&s=brands" target="_blank"
+                           style="color: var(--color-primary); font-size: 11px; margin-left: 4px;
+                                  font-weight: 400; text-transform: none;">
+                            (Font Awesome brands ↗)
+                        </a>
+                    </label>
+                    <input type="text" name="icon_class" placeholder="fab fa-instagram"
+                           class="form-input">
+                </div>
+                <div class="form-group" style="width: 80px;">
+                    <label class="form-label">Order</label>
+                    <input type="number" name="display_order" value="0" min="0"
+                           class="form-input">
+                </div>
+                <div style="padding-bottom: 20px;">
+                    <button type="submit" class="btn-primary">Add Link</button>
+                </div>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">URL</label>
-                <input type="text" name="url" placeholder="https://instagram.com/..."
-                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
-                              font-family: Georgia, serif; width: 250px;">
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">
-                    Icon Class
-                    <a href="https://fontawesome.com/icons?d=gallery&s=brands" target="_blank"
-                       style="color: var(--color-primary); font-size: 12px; margin-left: 5px;">
-                        (Font Awesome brands)
-                    </a>
-                </label>
-                <input type="text" name="icon_class" placeholder="fab fa-instagram"
-                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
-                              font-family: Georgia, serif; width: 180px;">
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-                <label style="font-size: 13px; font-weight: bold; color: var(--color-text);">Order</label>
-                <input type="number" name="display_order" value="0" min="0"
-                       style="padding: 10px; border: 2px solid #D4AF37; border-radius: 6px;
-                              font-family: Georgia, serif; width: 70px;">
-            </div>
-
-            <button type="submit"
-                    style="padding: 10px 25px; background: var(--color-primary); color: var(--color-accent);
-                           border: none; border-radius: 6px; font-family: Georgia, serif;
-                           font-size: 15px; font-weight: bold; cursor: pointer;">
-                Add Link
-            </button>
         </form>
     </div>
-    <!-- This shows the existing links -->
-    <div style="background: var(--color-surface); padding: 25px; border-radius: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;">
-        <h3 style="color: var(--color-text); font-family: Georgia, serif; margin-bottom: 20px;">
-            Current Links
-        </h3>
 
+    <!-- This shows the existing links -->
+    <p class="dash-section-title">Current Links</p>
+    <div class="dash-card">
         {% if links %}
-        <table style="width: 100%; border-collapse: collapse;">
+        <table class="dash-table">
             <thead>
-                <tr style="background: var(--color-sidebar-bg); color: var(--color-accent);">
-                    <th style="padding: 12px; text-align: left;">Platform</th>
-                    <th style="padding: 12px; text-align: left;">URL</th>
-                    <th style="padding: 12px; text-align: left;">Icon</th>
-                    <th style="padding: 12px; text-align: left;">Order</th>
-                    <th style="padding: 12px; text-align: left;">Active</th>
-                    <th style="padding: 12px; text-align: left;">Actions</th>
+                <tr>
+                    <th>Platform</th>
+                    <th>URL</th>
+                    <th>Icon Class</th>
+                    <th>Order</th>
+                    <th>Active</th>
+                    <th class="center">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for link in links %}
-                <tr style="border-bottom: 1px solid #E8DFD0;">
-                    <td style="padding: 12px;">
-                        <i class="{{ link.icon_class }}" style="margin-right: 8px; color: var(--color-primary);"></i>
-                        {{ link.platform }}
+                <tr>
+                    <td>
+                        <i class="{{ link.icon_class }}"
+                           style="margin-right: 8px; color: var(--color-primary);"></i>
+                        <span class="cat-name">{{ link.platform }}</span>
                     </td>
-                    <td style="padding: 12px;">
+                    <td>
                         <a href="{{ link.url }}" target="_blank"
-                           style="color: var(--color-primary); word-break: break-all;">
+                           style="color: var(--color-primary); word-break: break-all;
+                                  font-size: 13px;">
                             {{ link.url }}
                         </a>
                     </td>
-                    <td style="padding: 12px; font-family: monospace; font-size: 13px;">
-                        {{ link.icon_class }}
+                    <td>
+                        <span style="font-family: monospace; font-size: 12px;
+                                     color: var(--color-text-muted);">
+                            {{ link.icon_class }}
+                        </span>
                     </td>
-                    <td style="padding: 12px;">{{ link.display_order }}</td>
-                    <td style="padding: 12px;">
+                    <td>{{ link.display_order }}</td>
+                    <td>
                         {% if link.is_active %}
-                            <span style="color: green; font-weight: bold;">✓ Yes</span>
+                            <span class="dash-resv-badge" data-status="confirmed">Active</span>
                         {% else %}
-                            <span style="color: #999;">✗ No</span>
+                            <span class="dash-resv-badge" data-status="cancelled">Inactive</span>
                         {% endif %}
                     </td>
-                    <td style="padding: 12px;">
-                        <div style="display: flex; gap: 8px;">
+                    <td class="center">
+                        <div class="row-actions">
                             <!-- Edit button triggers modal -->
                             <button onclick="openEdit({{ link.id }}, '{{ link.platform }}',
                                             '{{ link.url }}', '{{ link.icon_class }}',
                                             {{ link.display_order }}, {{ 1 if link.is_active else 0 }})"
-                                    style="padding: 6px 14px; background: var(--color-accent); color: var(--color-text);
-                                           border: none; border-radius: 4px; cursor: pointer;
-                                           font-family: Georgia, serif; font-size: 13px; font-weight: bold;">
+                                    class="btn-edit">
                                 Edit
                             </button>
-
                             <!-- Delete button triggers confirmation modal -->
                             <form id="delete-form-{{ link.id }}"
                                   action="{{ url_for('admin.delete_social_link', link_id=link.id) }}"
                                   method="POST" class="inline-form">
                                 <button type="button"
                                         onclick="showDeleteConfirm({{ link.id }}, '{{ link.platform }}')"
-                                        style="padding: 6px 14px; background: var(--color-primary); color: white;
-                                               border: none; border-radius: 4px; cursor: pointer;
-                                               font-family: Georgia, serif; font-size: 13px;">
+                                        class="btn-delete">
                                     Remove
                                 </button>
                             </form>
@@ -127,133 +120,104 @@
             </tbody>
         </table>
         {% else %}
-            <p style="color: #666; font-family: Georgia, serif;">
-                No social links yet. Add one above.
-            </p>
+            <p class="dash-empty">No social links yet. Add one above.</p>
         {% endif %}
     </div>
 </div>
-<!-- This is for editing the social media links -->
-<div id="edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
-     height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:500px;
-                width:90%; font-family:Georgia, serif; border-top:5px solid #8B0000;">
-        <h3 style="color:#2C2416; margin-bottom:20px;">Edit Social Link</h3>
+
+<!-- This is the edit modal -->
+<div id="edit-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; text-align: left;">
+        <h3 class="modal-title">Edit Social Link</h3>
         <form id="edit-form" method="POST" class="inline-form">
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; font-weight:bold; margin-bottom:5px;">Platform</label>
-                <input type="text" id="edit-platform" name="platform"
-                       style="width:100%; padding:10px; border:2px solid #D4AF37;
-                              border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+            <div class="form-group">
+                <label class="form-label">Platform</label>
+                <input type="text" id="edit-platform" name="platform" class="form-input">
             </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; font-weight:bold; margin-bottom:5px;">URL</label>
-                <input type="text" id="edit-url" name="url"
-                       style="width:100%; padding:10px; border:2px solid #D4AF37;
-                              border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+            <div class="form-group">
+                <label class="form-label">URL</label>
+                <input type="text" id="edit-url" name="url" class="form-input">
             </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display:block; font-weight:bold; margin-bottom:5px;">Icon Class</label>
-                <input type="text" id="edit-icon" name="icon_class"
-                       style="width:100%; padding:10px; border:2px solid #D4AF37;
-                              border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+            <div class="form-group">
+                <label class="form-label">Icon Class</label>
+                <input type="text" id="edit-icon" name="icon_class" class="form-input">
             </div>
-            <div style="display:flex; gap:15px; margin-bottom:15px;">
-                <div style="flex:1;">
-                    <label style="display:block; font-weight:bold; margin-bottom:5px;">Order</label>
-                    <input type="number" id="edit-order" name="display_order" min="0"
-                           style="width:100%; padding:10px; border:2px solid #D4AF37;
-                                  border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Order</label>
+                    <input type="number" id="edit-order" name="display_order"
+                           min="0" class="form-input">
                 </div>
-                <div style="flex:1;">
-                    <label style="display:block; font-weight:bold; margin-bottom:5px;">Active</label>
-                    <select id="edit-active" name="is_active"
-                            style="width:100%; padding:10px; border:2px solid #D4AF37;
-                                   border-radius:6px; font-family:Georgia,serif; box-sizing:border-box;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Active</label>
+                    <select id="edit-active" name="is_active" class="form-select">
                         <option value="1">Yes</option>
                         <option value="0">No</option>
                     </select>
                 </div>
             </div>
-            <div style="display:flex; gap:15px; justify-content:flex-end; margin-top:20px;">
+            <div class="modal-actions">
                 <button type="button" onclick="closeEdit()"
-                        style="padding:10px 25px; background:white; color:#2C2416;
-                               border:2px solid #D4AF37; border-radius:8px;
-                               font-family:Georgia,serif; font-weight:bold; cursor:pointer;">
+                        class="modal-btn-cancel">
                     Cancel
                 </button>
-                <button type="submit"
-                        style="padding:10px 25px; background:#8B0000; color:#FFD700;
-                               border:none; border-radius:8px; font-family:Georgia,serif;
-                               font-weight:bold; cursor:pointer;">
+                <button type="submit" class="modal-btn-confirm">
                     Save Changes
                 </button>
             </div>
         </form>
     </div>
 </div>
+
 <!-- This is the delete confirmation modal -->
-<div id="delete-modal" style="display:none; position:fixed; top:0; left:0; width:100%;
-     height:100%; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center;">
-    <div style="background:#FFFEF2; border-radius:12px; padding:40px; max-width:400px;
-                width:90%; text-align:center; font-family:Georgia, serif; border-top:5px solid #8B0000;">
-        <h3 style="color:#2C2416; font-size:22px; margin-bottom:15px;">Remove Social Link</h3>
-        <p id="delete-message" style="color:#5C4033; font-size:16px; margin-bottom:30px;"></p>
-        <div style="display:flex; gap:15px; justify-content:center;">
-            <button onclick="closeDeleteConfirm()"
-                style="padding:12px 30px; background:white; color:#2C2416;
-                       border:2px solid #D4AF37; border-radius:8px; font-family:Georgia, serif;
-                       font-size:16px; font-weight:bold; cursor:pointer;">
-                Cancel
-            </button>
-            <button id="delete-confirm-btn"
-                style="padding:12px 30px; background:#8B0000; color:#FFD700;
-                       border:none; border-radius:8px; font-family:Georgia, serif;
-                       font-size:16px; font-weight:bold; cursor:pointer;">
-                Yes, Remove
-            </button>
+<div id="delete-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Remove Social Link</h3>
+        <p id="delete-message" class="modal-message"></p>
+        <p class="modal-message modal-warning">This will remove it from your site footer.</p>
+        <div class="modal-actions">
+            <button onclick="closeDeleteConfirm()" class="modal-btn-cancel">Cancel</button>
+            <button id="delete-confirm-btn" class="modal-btn-confirm">Yes, Remove</button>
         </div>
     </div>
 </div>
+
 <script>
-// This is for the edit modal
-function openEdit(id, platform, url, iconClass, order, isActive) {
-    document.getElementById('edit-platform').value = platform;
-    document.getElementById('edit-url').value = url;
-    document.getElementById('edit-icon').value = iconClass;
-    document.getElementById('edit-order').value = order;
-    document.getElementById('edit-active').value = isActive;
-    document.getElementById('edit-form').action = '/admin/social-links/edit/' + id;
-    document.getElementById('edit-modal').style.display = 'flex';
-}
+    // This is for the edit modal
+    function openEdit(id, platform, url, iconClass, order, isActive) {
+        document.getElementById('edit-platform').value = platform;
+        document.getElementById('edit-url').value      = url;
+        document.getElementById('edit-icon').value     = iconClass;
+        document.getElementById('edit-order').value    = order;
+        document.getElementById('edit-active').value   = isActive;
+        document.getElementById('edit-form').action    = '/admin/social-links/edit/' + id;
+        document.getElementById('edit-modal').classList.add('open');
+    }
 
-function closeEdit() {
-    document.getElementById('edit-modal').style.display = 'none';
-}
+    function closeEdit() {
+        document.getElementById('edit-modal').classList.remove('open');
+    }
 
-document.getElementById('edit-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeEdit();
-});
+    document.getElementById('edit-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeEdit();
+    });
 
-// This is for the delete confirmation modal
-function showDeleteConfirm(id, platform) {
-    document.getElementById('delete-message').textContent =
-        'Are you sure you want to remove the ' + platform + ' link from your footer?';
-    document.getElementById('delete-confirm-btn').onclick = function() {
-        document.getElementById('delete-form-' + id).submit();
-    };
-    document.getElementById('delete-modal').style.display = 'flex';
-}
+    // This is for the delete confirmation modal
+    function showDeleteConfirm(id, platform) {
+        document.getElementById('delete-message').textContent =
+            'Are you sure you want to remove the ' + platform + ' link?';
+        document.getElementById('delete-confirm-btn').onclick = function() {
+            document.getElementById('delete-form-' + id).submit();
+        };
+        document.getElementById('delete-modal').classList.add('open');
+    }
 
-function closeDeleteConfirm() {
-    document.getElementById('delete-modal').style.display = 'none';
-}
+    function closeDeleteConfirm() {
+        document.getElementById('delete-modal').classList.remove('open');
+    }
 
-document.getElementById('delete-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteConfirm();
-});
+    document.getElementById('delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteConfirm();
+    });
 </script>
 {% endblock %}
-
-
-

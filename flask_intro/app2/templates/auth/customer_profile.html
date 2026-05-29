@@ -1,9 +1,7 @@
 {% extends "customer_base.html" %}
-
 {% block customer_content %}
 
 <h1 class="customer-page-title">Profile Settings</h1>
-
 <!-- Toast for success/error -->
 {% if success %}
 <div id="toast" class="customer-toast success show">
@@ -25,6 +23,7 @@
               action="{{ url_for('customer_auth.update_profile') }}"
               class="customer-profile-form"
               id="profile-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <p class="customer-profile-section-title" style="margin-top: 0;">Account Information</p>
 
@@ -65,7 +64,6 @@
                     onclick="showConfirm()">
                 Update Profile
             </button>
-
         </form>
     </div>
 </div>
@@ -82,9 +80,7 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
-
 {% block scripts %}
 <script>
     function showConfirm() {
