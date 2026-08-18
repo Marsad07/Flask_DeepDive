@@ -11,4 +11,4 @@ stripe==11.3.0
 requests==2.32.3
 python-dotenv==1.2.1
 gunicorn==25.1.0
-eventlet==0.38.0
+eventlet==0.41.2
