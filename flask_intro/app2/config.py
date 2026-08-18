@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class BaseConfig:
     """Base configuration — shared across all environments."""
 
@@ -22,6 +21,9 @@ class BaseConfig:
     STRIPE_PUBLIC_KEY  = os.getenv("STRIPE_PUBLIC_KEY")
     STRIPE_SECRET_KEY  = os.getenv("STRIPE_SECRET_KEY")
 
+    # Geocoding
+    ORS_API_KEY = os.getenv("ORS_API_KEY")
+
     # Mail
     MAIL_SERVER         = "smtp.gmail.com"
     MAIL_PORT           = 587
@@ -36,6 +38,9 @@ class BaseConfig:
     DB_USER     = os.getenv("DB_USER", "root")
     DB_PASSWORD = os.getenv("DB_PASSWORD")
     DB_NAME     = os.getenv("DB_NAME", "reservations_restaurant_db")
+
+    # Geocoding
+    ORS_API_KEY = os.getenv("ORS_API_KEY")
 
     @classmethod
     def get_db_uri(cls):

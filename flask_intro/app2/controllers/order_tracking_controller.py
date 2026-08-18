@@ -1,4 +1,4 @@
-from flask import render_template, request, session
+from flask import render_template, request, session, current_app
 import requests
 from app2.database import get_db
 from flask_socketio import join_room
@@ -117,8 +117,7 @@ def track_order(order_number):
 
         # Calculate delivery route if applicable — collection orders skip this
         if order['order_type'] == 'delivery' and restaurant and order.get('guest_delivery_address'):
-            api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6'
-                       'IjlhM2ZkYzcyOTQ4YzQ3YzE4NjlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
+            api_key = current_app.config['ORS_API_KEY']
             route_coords, customer_lat, customer_lng = get_route_coordinates(
                 float(restaurant['latitude']),
                 float(restaurant['longitude']),

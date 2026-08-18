@@ -11,6 +11,12 @@ from app2.models.homepage_model import (get_branding, update_branding, get_all_r
                                          update_review, add_review, delete_review,
                                          get_dishes, update_dish)
 from app2.models.themeSettings_model import get_theme, save_theme
+from app2.models.menu_model import MenuItem
+from app2.models.order_model import Order
+from app2.models.staff_model import StaffAccount
+from app2.models.social_link_model import SocialLink
+from app2.models.table_model import RestaurantTable
+
 GOOGLE_FONTS = [
     'Lato', 'Roboto', 'Open Sans', 'Montserrat', 'Raleway',
     'Nunito', 'Poppins', 'Inter', 'Source Sans Pro', 'Ubuntu'
@@ -103,6 +109,7 @@ def dashboard():
     """)
     recent_orders = cursor.fetchall()
 
+    # Uses StaffAccount model to get drivers on duty
     cursor.execute("""
         SELECT s.staff_id, s.full_name, s.is_available, s.is_active,
                o.order_id as current_order
@@ -203,13 +210,9 @@ def view_reservations():
 def manage_menu():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM menu_items ORDER BY category, item_name")
-    menu_items = cursor.fetchall()
-    cursor.close()
-    db.close()
 
+    # Uses MenuItem model instead of raw SQL
+    menu_items = MenuItem.query.order_by(MenuItem.category, MenuItem.item_name).all()
     return render_template('admin/manage_menu.html', menu_items=menu_items)
 
 def add_menu_item():
@@ -217,69 +220,49 @@ def add_menu_item():
         return redirect(url_for('admin.admin_login'))
 
     if request.method == "POST":
-        item_name = request.form.get("item_name")
-        category = request.form.get("category")
-        description = request.form.get("description")
-        price = request.form.get("price")
-
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute(
-            """INSERT INTO menu_items (item_name, category, description, price) 
-               VALUES (%s, %s, %s, %s)""",
-            (item_name, category, description, price)
+        # Uses MenuItem model to create a new item
+        MenuItem.create(
+            item_name=request.form.get("item_name"),
+            category=request.form.get("category"),
+            description=request.form.get("description"),
+            price=request.form.get("price")
         )
-        db.commit()
-        cursor.close()
-        db.close()
-
         return redirect(url_for('admin.manage_menu'))
+
     categories = get_category()
     return render_template('admin/add_menu_item.html', categories=categories)
 
 def edit_menu_item(item_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
 
-    if request.method == "POST":
-        item_name = request.form.get("item_name")
-        category = request.form.get("category")
-        description = request.form.get("description")
-        price = request.form.get("price")
-        is_available = request.form.get("is_available") == "1"
-        prep_time = request.form.get("prep_time")
-
-        cursor.execute(
-            """UPDATE menu_items 
-               SET item_name=%s, category=%s, description=%s, price=%s, is_available=%s, prep_time=%s 
-               WHERE item_id=%s""",
-            (item_name, category, description, price, is_available, prep_time, item_id)
-        )
-        db.commit()
-        cursor.close()
-        db.close()
+    # Uses MenuItem model to get and update the item
+    item = MenuItem.get_by_id(item_id)
+    if not item:
         return redirect(url_for('admin.manage_menu'))
 
-    cursor.execute("SELECT * FROM menu_items WHERE item_id = %s", (item_id,))
-    item = cursor.fetchone()
-    cursor.close()
-    db.close()
+    if request.method == "POST":
+        item.update(
+            item_name=request.form.get("item_name"),
+            category=request.form.get("category"),
+            description=request.form.get("description"),
+            price=request.form.get("price"),
+            is_available=request.form.get("is_available") == "1"
+        )
+        return redirect(url_for('admin.manage_menu'))
+
     categories = get_category()
     return render_template('admin/edit_menu_item.html', item=item, categories=categories)
 
 def delete_menu_item(item_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM menu_items WHERE item_id = %s", (item_id,))
-    db.commit()
-    cursor.close()
-    db.close()
-    return redirect(url_for('admin.manage_menu'))
 
+    # Uses MenuItem model to delete the item
+    item = MenuItem.get_by_id(item_id)
+    if item:
+        item.delete()
+    return redirect(url_for('admin.manage_menu'))
 
 def update_hours():
     if 'admin_id' not in session:
@@ -293,8 +276,7 @@ def update_hours():
         lat, lng = None, None
         if address:
             try:
-                api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlhM2ZkYzcyOTQ4YzQ3YzE4N'
-                           'jlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
+                api_key = current_app.config['ORS_API_KEY']
                 geocode_response = requests.get(
                     'https://api.openrouteservice.org/geocode/search',
                     params={'api_key': api_key, 'text': address, 'size': 1}
@@ -384,7 +366,7 @@ def view_analytics():
     """)
     monthly_trend = cursor.fetchall()
 
-    # --- Order stats ---
+    # --- Order stats --- uses Order model methods where possible
     cursor.execute("SELECT COUNT(*) AS c FROM customer_orders")
     row = cursor.fetchone()
     total_orders = row['c'] if row else 0
@@ -546,28 +528,26 @@ def view_all_orders():
     )
 
 def view_customer_order(order_id):
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM customer_orders WHERE order_id = %s", (order_id,))
-    order = cursor.fetchone()
-
+    # Uses Order model to get the order
+    order = Order.get_by_id(order_id)
     if not order:
-        cursor.close()
-        db.close()
         return "Order not found", 404
 
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
     customer = None
-    if order.get("customer_id"):
+    if order.customer_id:
         cursor.execute("""
             SELECT customer_fullname, customer_email
             FROM customer_accounts
             WHERE customer_id = %s
-        """, (order["customer_id"],))
+        """, (order.customer_id,))
         customer = cursor.fetchone()
     else:
         customer = {
-            "customer_fullname": order.get("guest_fullname"),
-            "customer_email": order.get("guest_email")
+            "customer_fullname": order.guest_fullname,
+            "customer_email": order.guest_email
         }
 
     cursor.execute("""
@@ -577,12 +557,8 @@ def view_customer_order(order_id):
     """, (order_id,))
     items = cursor.fetchall()
 
-    cursor.execute("""
-          SELECT staff_id, staff_username, full_name
-          FROM staff_accounts
-          WHERE role = 'driver' AND is_active = 1
-      """)
-    drivers = cursor.fetchall()
+    # Uses StaffAccount model to get active drivers
+    drivers = StaffAccount.get_drivers()
 
     cursor.close()
     db.close()
@@ -642,8 +618,7 @@ def update_order_status(order_id):
     return redirect(url_for('admin.view_all_orders'))
 
 def get_delivery_minutes(delivery_address):
-    api_key = ('eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlhM2ZkYzcyOTQ4YzQ3YzE4'
-               'NjlkYWI3MmNhMmYwMjFkIiwiaCI6Im11cm11cjY0In0=')
+    api_key = current_app.config['ORS_API_KEY']
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -787,18 +762,11 @@ def update_dish_item():
 def assign_driver(order_id):
     driver_id = request.form.get("driver_id")
 
-    db = get_db()
-    cursor = db.cursor()
+    # Uses Order model to update assigned driver
+    order = Order.get_by_id(order_id)
+    if order:
+        order.update(assigned_driver_id=driver_id)
 
-    cursor.execute("""
-        UPDATE customer_orders
-        SET assigned_driver_id = %s
-        WHERE order_id = %s
-    """, (driver_id, order_id))
-
-    db.commit()
-    cursor.close()
-    db.close()
     return redirect(url_for('admin.view_customer_order', order_id=order_id))
 
 def offer_driver(order_id):
@@ -863,7 +831,7 @@ def offer_driver(order_id):
     db.commit()
     cursor.close()
     db.close()
-
+    print(f"DEBUG emitting to room: driver_{driver_id}")
     socketio.emit("driver_offer", {
         "order_id":      order_id,
         "customer_name": customer_name,
@@ -905,32 +873,21 @@ def manage_social_links():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM social_links ORDER BY display_order ASC")
-    links = cursor.fetchall()
-    cursor.close()
-    db.close()
+    # Uses SocialLink model to get all links
+    links = SocialLink.query.order_by(SocialLink.display_order).all()
     return render_template("admin/social_links.html", links=links)
 
 def add_social_link():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    platform = request.form.get('platform')
-    url = request.form.get('url')
-    icon_class = request.form.get('icon_class')
-    display_order = request.form.get('display_order', 0)
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-            INSERT INTO social_links (platform, url, icon_class, display_order)
-            VALUES (%s, %s, %s, %s)
-        """, (platform, url, icon_class, display_order))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses SocialLink model to create a new link
+    SocialLink.create(
+        platform=request.form.get('platform'),
+        url=request.form.get('url'),
+        icon_class=request.form.get('icon_class'),
+        display_order=request.form.get('display_order', 0)
+    )
     flash('Social link added', 'success')
     return redirect(url_for('admin.manage_social_links'))
 
@@ -938,23 +895,16 @@ def edit_social_link(link_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    url = request.form.get('url')
-    icon_class = request.form.get('icon_class')
-    platform = request.form.get('platform')
-    display_order = request.form.get('display_order', 0)
-    is_active = request.form.get('is_active', 1)
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-            UPDATE social_links 
-            SET url = %s, icon_class = %s, platform = %s, 
-                display_order = %s, is_active = %s
-            WHERE id = %s
-        """, (url, icon_class, platform, display_order, is_active, link_id))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses SocialLink model to update the link
+    link = SocialLink.get_by_id(link_id)
+    if link:
+        link.update(
+            url=request.form.get('url'),
+            icon_class=request.form.get('icon_class'),
+            platform=request.form.get('platform'),
+            display_order=request.form.get('display_order', 0),
+            is_active=request.form.get('is_active', 1)
+        )
     flash('Social link updated', 'success')
     return redirect(url_for('admin.manage_social_links'))
 
@@ -962,12 +912,10 @@ def delete_social_link(link_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("DELETE FROM social_links WHERE id = %s", (link_id,))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses SocialLink model to delete the link
+    link = SocialLink.get_by_id(link_id)
+    if link:
+        link.delete()
     flash('Social link removed', 'success')
     return redirect(url_for('admin.manage_social_links'))
 
@@ -982,7 +930,6 @@ def manage_about():
     cursor.close()
     db.close()
     return render_template('admin/manage_about.html', sections=sections)
-
 
 def update_about_section(section_id):
     if 'admin_id' not in session:
@@ -1002,7 +949,6 @@ def update_about_section(section_id):
     db.close()
     flash('Section updated', 'success')
     return redirect(url_for('admin.manage_about'))
-
 
 def add_about_section():
     if 'admin_id' not in session:
@@ -1029,7 +975,6 @@ def add_about_section():
     db.close()
     flash('Section added', 'success')
     return redirect(url_for('admin.manage_about'))
-
 
 def delete_about_section(section_id):
     if 'admin_id' not in session:
@@ -1066,23 +1011,19 @@ def manage_drivers():
     drivers = cursor.fetchall()
     cursor.close()
     db.close()
-    return render_template('admin/drivers.html', drivers=drivers)
-
+    return render_template('admin/manage_drivers.html', drivers=drivers)
 
 def toggle_driver_active(staff_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        UPDATE staff_accounts 
-        SET is_active = NOT is_active 
-        WHERE staff_id = %s AND role = 'driver'
-    """, (staff_id,))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses StaffAccount model to toggle active status
+    staff = StaffAccount.get_by_id(staff_id)
+    if staff and staff.role == 'driver':
+        if staff.is_active:
+            staff.disable()
+        else:
+            staff.enable()
     flash('Driver status updated', 'success')
     return redirect(url_for('admin.manage_drivers'))
 
@@ -1090,12 +1031,8 @@ def manage_tables():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM restaurant_customer_tables ORDER BY table_number ASC")
-    tables = cursor.fetchall()
-    cursor.close()
-    db.close()
+    # Uses RestaurantTable model to get all tables
+    tables = RestaurantTable.query.order_by(RestaurantTable.table_number).all()
     return render_template('admin/manage_tables.html', tables=tables)
 
 def save_table_positions():
@@ -1104,17 +1041,13 @@ def save_table_positions():
 
     import json
     positions = request.json.get('positions', [])
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
+
+    # Uses RestaurantTable model to update positions
     for pos in positions:
-        cursor.execute("""
-            UPDATE restaurant_customer_tables 
-            SET pos_x = %s, pos_y = %s 
-            WHERE table_id = %s
-        """, (pos['x'], pos['y'], pos['id']))
-    db.commit()
-    cursor.close()
-    db.close()
+        table = RestaurantTable.get_by_id(pos['id'])
+        if table:
+            table.update(pos_x=pos['x'], pos_y=pos['y'])
+
     socketio.emit('tables_updated', positions)
     return {'success': True}
 
@@ -1122,20 +1055,15 @@ def add_table():
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    table_number = request.form.get('table_number')
-    seats = request.form.get('seats')
-    location = request.form.get('location')
-    shape = request.form.get('shape')
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        INSERT INTO restaurant_customer_tables (table_number, seats, location, shape, pos_x, pos_y)
-        VALUES (%s, %s, %s, %s, 50, 50)
-    """, (table_number, seats, location, shape))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses RestaurantTable model to create a new table
+    RestaurantTable.create(
+        table_number=request.form.get('table_number'),
+        seats=request.form.get('seats'),
+        location=request.form.get('location'),
+        shape=request.form.get('shape'),
+        pos_x=50,
+        pos_y=50
+    )
     flash('Table added', 'success')
     return redirect(url_for('admin.manage_tables'))
 
@@ -1143,12 +1071,10 @@ def delete_table(table_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("DELETE FROM restaurant_customer_tables WHERE table_id = %s", (table_id,))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses RestaurantTable model to delete the table
+    table = RestaurantTable.get_by_id(table_id)
+    if table:
+        table.delete()
     flash('Table removed', 'success')
     return redirect(url_for('admin.manage_tables'))
 
@@ -1156,21 +1082,15 @@ def update_table(table_id):
     if 'admin_id' not in session:
         return redirect(url_for('admin.admin_login'))
 
-    seats = request.form.get('seats')
-    location = request.form.get('location')
-    shape = request.form.get('shape')
-    is_active = request.form.get('is_active', 1)
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        UPDATE restaurant_customer_tables 
-        SET seats = %s, location = %s, shape = %s, is_active = %s
-        WHERE table_id = %s
-    """, (seats, location, shape, is_active, table_id))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses RestaurantTable model to update the table
+    table = RestaurantTable.get_by_id(table_id)
+    if table:
+        table.update(
+            seats=request.form.get('seats'),
+            location=request.form.get('location'),
+            shape=request.form.get('shape'),
+            is_active=request.form.get('is_active', 1)
+        )
     flash('Table updated', 'success')
     return redirect(url_for('admin.manage_tables'))
 
@@ -1251,33 +1171,11 @@ def disable_staff(staff_id):
     if 'admin_id' not in session:
         return redirect(url_for('staff.staff_login'))
 
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("UPDATE staff_accounts SET is_active = 0 WHERE staff_id = %s", (staff_id,))
-    db.commit()
-    cursor.close()
-    db.close()
+    # Uses StaffAccount model to disable the staff member
+    staff = StaffAccount.get_by_id(staff_id)
+    if staff:
+        staff.disable()
     return redirect(url_for('admin.manage_staff'))
-
-def manage_drivers():
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT s.staff_id, s.full_name, s.staff_username, s.is_active,
-        (
-            SELECT COUNT(*) FROM customer_orders o
-            WHERE o.assigned_driver_id = s.staff_id
-            AND o.order_status IN ('assigned', 'on_the_way')
-        ) AS active_orders
-        FROM staff_accounts s
-        WHERE s.role = 'driver'
-        ORDER BY s.full_name ASC
-    """)
-
-    drivers = cursor.fetchall()
-    cursor.close()
-    return render_template("admin/manage_drivers.html", drivers=drivers)
 
 def driver_details(driver_id):
     db = get_db()
@@ -1440,5 +1338,3 @@ def manage_theme():
                            theme=theme,
                            body_fonts=GOOGLE_FONTS,
                            heading_fonts=HEADING_FONTS)
-
-
