@@ -5,13 +5,15 @@ class MenuItem(BaseModel):
     """Maps to the menu_items table."""
     __tablename__ = "menu_items"
 
-    id           = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    item_name    = db.Column(db.String(255), nullable=False)
-    description  = db.Column(db.Text, nullable=True)
-    price        = db.Column(db.Numeric(10, 2), nullable=False)
-    category     = db.Column(db.String(255), nullable=True)
-    image_url    = db.Column(db.String(255), nullable=True)
-    is_available = db.Column(db.Boolean, default=True)
+    item_id              = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    item_name            = db.Column(db.String(100), nullable=False)
+    category             = db.Column(db.String(100), nullable=True)
+    description          = db.Column(db.Text,        nullable=True)
+    price                = db.Column(db.Numeric(10, 2), nullable=False)
+    is_available         = db.Column(db.Boolean,     default=True)
+    available_for_takeaway = db.Column(db.Boolean,   default=True)
+    available_for_delivery = db.Column(db.Boolean,   default=True)
+    prep_time            = db.Column(db.Integer,     default=5)
 
     # Domain methods
     @classmethod
@@ -44,7 +46,7 @@ class MenuCategory(BaseModel):
     """Maps to the menu_categories table."""
     __tablename__ = "menu_categories"
 
-    id            = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category_id   = db.Column(db.Integer, primary_key=True, autoincrement=True)
     category_name = db.Column(db.String(255), nullable=False, unique=True)
 
     def __repr__(self):
