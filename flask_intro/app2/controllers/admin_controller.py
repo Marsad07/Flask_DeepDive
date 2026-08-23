@@ -109,7 +109,6 @@ def dashboard():
     """)
     recent_orders = cursor.fetchall()
 
-    # Uses StaffAccount model to get drivers on duty
     cursor.execute("""
         SELECT s.staff_id, s.full_name, s.is_available, s.is_active,
                o.order_id as current_order
@@ -139,7 +138,7 @@ def dashboard():
 
 def logout():
     session.clear()
-    return redirect(url_for('staff.staff_login'))
+    return redirect(url_for('admin.admin_login'))
 
 def view_reservations():
     if 'admin_id' not in session:
