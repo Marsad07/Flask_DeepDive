@@ -24,3 +24,7 @@ def image_manager_controller():
         "dish2": get_image("dish2"),
         "dish3": get_image("dish3"),
     }
+
+def remove_image(image_key):
+    set_image(image_key, None)
+    return redirect(url_for("admin.image_manager"))

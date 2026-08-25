@@ -6,6 +6,7 @@ from app2.schemas import CouponCreateSchema
 from marshmallow import ValidationError
 import random
 import string
+import traceback
 from datetime import date
 
 # Newsletter
@@ -102,12 +103,14 @@ def manage_coupons():
 
 def create_coupon():
     if request.method == "POST":
-        # Validates coupon form data using Marshmallow before inserting
+        print("DEBUG form data:", dict(request.form))
+
         schema = CouponCreateSchema()
         try:
             validated = schema.load(request.form)
+            print("DEBUG validated:", validated)
         except ValidationError as err:
-            # Reloads the coupons page with the first validation error shown
+            print("DEBUG validation error:", err.messages)
             first_error = next(iter(err.messages.values()))[0]
             db = get_db()
             cursor = db.cursor(dictionary=True)
@@ -131,11 +134,16 @@ def create_coupon():
                          )
         discount_type  = validated['discount_type']
         discount_value = validated['discount_value']
-        assigned_email = validated.get('assigned_email')
+        assigned_email = validated.get('assigned_email') or None
         uses_limit     = validated.get('uses_limit', 1)
         expires_at     = validated.get('expires_at')
+        send_to        = validated.get('send_to', 'none')
 
-        # Extra check for percent discounts which cannot exceed 100
+        if assigned_email == '':
+            assigned_email = None
+
+        print(f"DEBUG code={code} type={discount_type} value={discount_value} send_to={send_to} assigned={assigned_email}")
+
         if discount_type == 'percent' and discount_value > 100:
             db = get_db()
             cursor = db.cursor(dictionary=True)
@@ -153,45 +161,86 @@ def create_coupon():
                                    customers=customers,
                                    today=date.today(),
                                    error="Percent discount cannot exceed 100%.")
+
+        # Build list of emails to send to based on send_to selection
+        bulk_emails = []
+        if send_to in ('all_subscribers', 'all_everyone'):
+            db2 = get_db()
+            cursor2 = db2.cursor(dictionary=True)
+            cursor2.execute("SELECT customer_email FROM newsletter_subs")
+            bulk_emails += [r['customer_email'] for r in cursor2.fetchall()]
+            cursor2.close()
+            db2.close()
+        if send_to in ('all_customers', 'all_everyone'):
+            db2 = get_db()
+            cursor2 = db2.cursor(dictionary=True)
+            cursor2.execute("SELECT customer_email FROM customer_accounts")
+            bulk_emails += [r['customer_email'] for r in cursor2.fetchall()]
+            cursor2.close()
+            db2.close()
+        if send_to == 'one' and assigned_email:
+            bulk_emails = [assigned_email]
+
+        bulk_emails = list(set(bulk_emails))
+        print(f"DEBUG bulk_emails: {bulk_emails}")
+
         db = get_db()
         cursor = db.cursor()
         try:
-            cursor.execute("""
-                INSERT INTO coupons
-                (code, discount_type, discount_value, assigned_email, uses_limit, expires_at)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (code, discount_type, discount_value, assigned_email, uses_limit, expires_at))
-            db.commit()
+            if bulk_emails:
+                for recipient_email in bulk_emails:
+                    unique_code = ''.join(
+                        random.choices(string.ascii_uppercase + string.digits, k=8)
+                    )
+                    print(f"DEBUG inserting coupon {unique_code} for {recipient_email}")
+                    cursor.execute("""
+                        INSERT INTO coupons
+                        (code, discount_type, discount_value, assigned_email, uses_limit, expires_at)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (unique_code, discount_type, discount_value,
+                          recipient_email, 1, expires_at))
+                    db.commit()
 
-            # If assigned to an email, send them the code via email template
-            if assigned_email:
-                try:
-                    discount_display = (
-                        f"{discount_value}%" if discount_type == "percent"
-                        else f"£{discount_value}"
-                    )
-                    html_body = render_template(
-                        'emails/coupon_email.html',
-                        code=code,
-                        discount_display=discount_display,
-                        expires_at=expires_at
-                    )
-                    msg = EmailMessage(
-                        subject='Your Exclusive Discount Code',
-                        body=html_body,
-                        from_email=None,
-                        to=[assigned_email]
-                    )
-                    msg.content_subtype = 'html'
-                    msg.send()
-                except Exception as e:
-                    print(f"Coupon email error: {e}")
+                    try:
+                        discount_display = (
+                            f"{discount_value}%" if discount_type == "percent"
+                            else f"£{discount_value}"
+                        )
+                        html_body = render_template(
+                            'emails/coupon_email.html',
+                            code=unique_code,
+                            discount_display=discount_display,
+                            expires_at=expires_at
+                        )
+                        msg = EmailMessage(
+                            subject='Your Exclusive Discount Code',
+                            body=html_body,
+                            from_email=None,
+                            to=[recipient_email]
+                        )
+                        msg.content_subtype = 'html'
+                        msg.send()
+                        print(f"DEBUG email sent to {recipient_email}")
+                    except Exception as e:
+                        print(f"Coupon email error for {recipient_email}: {e}")
+                        traceback.print_exc()
+            else:
+                print(f"DEBUG inserting single coupon {code}")
+                cursor.execute("""
+                    INSERT INTO coupons
+                    (code, discount_type, discount_value, assigned_email, uses_limit, expires_at)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (code, discount_type, discount_value, assigned_email, uses_limit, expires_at))
+                db.commit()
+                print("DEBUG single coupon inserted")
 
         except Exception as e:
             print(f"Coupon create error: {e}")
+            traceback.print_exc()
         finally:
             cursor.close()
             db.close()
+
     return redirect(url_for('admin.manage_coupons'))
 
 def delete_coupon(coupon_id):

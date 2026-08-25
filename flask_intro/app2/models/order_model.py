@@ -17,7 +17,7 @@ class Order(BaseModel):
     payment_status         = db.Column(db.String(50),  default="pending")
     payment_method         = db.Column(db.String(50),  nullable=True)
     special_instructions   = db.Column(db.Text,        nullable=True)
-    # Using String for date/time — db.Date and db.Time cause issues with SQLite in tests
+    # Using String for date/time and db.Date and db.Time cause issues with SQLite in tests
     order_date             = db.Column(db.String(20),  nullable=True)
     order_time             = db.Column(db.String(20),  nullable=True)
     coupon_code            = db.Column(db.String(50),  nullable=True)

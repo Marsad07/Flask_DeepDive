@@ -34,14 +34,19 @@ class CheckoutSchema(Schema):
             error="Invalid payment method."
         )
     )
-    # Delivery address fields as its only required when order_type is delivery
-    address_line1 = fields.Str(load_default=None)
-    address_line2 = fields.Str(load_default=None)
-    city          = fields.Str(load_default=None)
-    postcode      = fields.Str(load_default=None)
+    # Delivery address fields — only required when order_type is delivery
+    address_line1        = fields.Str(load_default=None)
+    address_line2        = fields.Str(load_default=None)
+    city                 = fields.Str(load_default=None)
+    postcode             = fields.Str(load_default=None)
     special_instructions = fields.Str(load_default=None)
-    coupon_code   = fields.Str(load_default=None)
-    discount_amount = fields.Float(load_default=0)
+    coupon_code          = fields.Str(load_default=None)
+    discount_amount      = fields.Float(load_default=0)
+    # csrf_token is injected by Flask-WTF accepted here so Marshmallow doesn't reject it
+    csrf_token           = fields.Str(load_default=None)
+    payment_intent_id = fields.Str(load_default=None)
+    payment_status = fields.Str(load_default=None)
+
 
 class RegisterSchema(Schema):
     """Validates the customer registration form."""
@@ -65,6 +70,9 @@ class RegisterSchema(Schema):
         required=True,
         validate=validate.Length(min=6, error="Password must be at least 6 characters.")
     )
+    # csrf_token is injected by Flask-WTF accepted here so Marshmallow doesn't reject it
+    csrf_token = fields.Str(load_default=None)
+
 
 class CouponCreateSchema(Schema):
     """Validates the create coupon form in the admin panel."""
@@ -81,11 +89,8 @@ class CouponCreateSchema(Schema):
         required=True,
         validate=validate.Range(min=0.01, max=100000, error="Discount value must be between 0.01 and 100000.")
     )
-    assigned_email = fields.Email(
-        load_default=None,
-        allow_none=True,
-        error_messages={"invalid": "Please enter a valid email address for the assigned user."}
-    )
+    # assigned_email uses Str not Email empty string from the form fails Email validation
+    assigned_email = fields.Str(load_default=None, allow_none=True)
     uses_limit = fields.Int(
         load_default=1,
         validate=validate.Range(min=1, error="Usage limit must be at least 1.")
@@ -95,6 +100,11 @@ class CouponCreateSchema(Schema):
         allow_none=True,
         error_messages={"invalid": "Please enter a valid expiry date."}
     )
+    # send_to controls bulk sending not saved to DB, just used in the controller
+    send_to    = fields.Str(load_default='none')
+    # csrf_token is injected by Flask-WTF accepted here so Marshmallow doesn't reject it
+    csrf_token = fields.Str(load_default=None)
+
 
 class UpdateProfileSchema(Schema):
     """Validates the customer profile update form."""
@@ -119,3 +129,5 @@ class UpdateProfileSchema(Schema):
         validate=validate.Length(min=6, error="Password must be at least 6 characters.")
     )
     confirm_password = fields.Str(load_default=None)
+    # csrf_token is injected by Flask-WTF accepted here so Marshmallow doesn't reject it
+    csrf_token = fields.Str(load_default=None)

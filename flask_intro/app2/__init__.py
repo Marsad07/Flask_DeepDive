@@ -4,7 +4,6 @@ from flask_mailman import Mail
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from datetime import timedelta
-
 from app2.database import db, get_db
 from app2.config import get_config
 
@@ -12,7 +11,6 @@ socketio   = SocketIO()
 mail       = Mail()
 login_manager = LoginManager()
 csrf       = CSRFProtect()
-
 
 def create_app():
     app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -42,36 +40,41 @@ def create_app():
     @app.context_processor
     def inject_site_globals():
         """Injects hours, social links, branding, reviews, dishes into every template."""
-        from app2.models.homepage_model import get_branding, get_reviews, get_dishes
+        try:
+            from app2.models.homepage_model import get_branding, get_reviews, get_dishes
 
-        db_conn = get_db()
-        cursor  = db_conn.cursor(dictionary=True)
+            db_conn = get_db()
+            cursor = db_conn.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT * FROM restaurant_info 
-            ORDER BY FIELD(day_of_week,
-            'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')
-        """)
-        hours = cursor.fetchall()
-        address = hours[0].get('address') if hours and hours[0].get('address') else None
+            cursor.execute("""
+                SELECT * FROM restaurant_info 
+                ORDER BY FIELD(day_of_week,
+                'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')
+            """)
+            hours = cursor.fetchall()
+            address = hours[0].get('address') if hours and hours[0].get('address') else None
 
-        cursor.execute("""
-            SELECT * FROM social_links 
-            WHERE is_active = TRUE 
-            ORDER BY display_order ASC
-        """)
-        social_links = cursor.fetchall()
-        cursor.close()
-        db_conn.close()
+            cursor.execute("""
+                SELECT * FROM social_links 
+                WHERE is_active = TRUE 
+                ORDER BY display_order ASC
+            """)
+            social_links = cursor.fetchall()
+            cursor.close()
+            db_conn.close()
 
-        return dict(
-            restaurant_hours=hours,
-            social_links=social_links,
-            restaurant_address=address,
-            branding=get_branding(),
-            reviews=get_reviews(),
-            dishes=get_dishes()
-        )
+            return dict(
+                restaurant_hours=hours,
+                social_links=social_links,
+                restaurant_address=address,
+                branding=get_branding(),
+                reviews=get_reviews(),
+                dishes=get_dishes()
+            )
+        except Exception as e:
+            print(f"Context processor error: {e}")
+            return dict(restaurant_hours=[], social_links=[], restaurant_address=None,
+                        branding={}, reviews=[], dishes={})
 
     @app.context_processor
     def inject_theme():
@@ -130,8 +133,10 @@ def create_app():
     def join_driver(data):
         from flask_socketio import join_room
         driver_id = data.get("driver_id")
+        print(f"DEBUG join_driver: {driver_id} type={type(driver_id)}")
         if driver_id:
-            join_room(f"driver_{driver_id}")
+            join_room(f"driver_{int(driver_id)}")
+            print(f"DEBUG joined room: driver_{int(driver_id)}")
 
     @socketio.on('join_kitchen')
     def join_kitchen():
