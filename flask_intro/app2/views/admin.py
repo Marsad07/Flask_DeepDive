@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request, session, redirect, url_for
 from app2.controllers.admin_controller import (admin_login, dashboard, logout, view_reservations, manage_menu,
                                                add_menu_item, edit_menu_item, delete_menu_item, update_hours,
                                                view_analytics, view_all_orders, view_customer_order,
@@ -15,7 +15,6 @@ from app2.controllers.admin_controller import (admin_login, dashboard, logout, v
                                                update_admin_settings, manage_theme)
 
 from app2.controllers.admin_orders_controller import refund_order
-
 from app2.controllers.newsletter_coupon_controller import (
     manage_newsletter,
     delete_newsletter_subscriber,
@@ -29,8 +28,20 @@ from app2.controllers.newsletter_coupon_controller import (
 
 from app2.controllers.staff_controller import reset_staff_email, reset_staff_default
 from app2.controllers.admin_reservations_controller import (edit_reservation, cancel_reservation)
+from app2.controllers.image_manager_controller import remove_image
+from app2.controllers.customer_management_controller import (
+    view_all_customers, view_customer_profile,
+    edit_customer, toggle_customer_active, reset_customer_password
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+@admin_bp.before_request
+def require_admin_login():
+    if request.endpoint in ('admin.admin_login', 'admin.logout'):
+        return None
+    if 'admin_id' not in session:
+        return redirect(url_for('admin.admin_login'))
+
 admin_bp.route("/login", methods=["GET", "POST"])(admin_login)
 admin_bp.route("/dashboard")(dashboard)
 admin_bp.route("/logout")(logout)
@@ -103,3 +114,10 @@ admin_bp.route("/coupons/toggle/<int:coupon_id>", methods=["POST"])(toggle_coupo
 
 admin_bp.route('/settings', methods=['GET', 'POST'])(admin_settings)
 admin_bp.route('/settings/update', methods=['POST'])(update_admin_settings)
+admin_bp.route('/image_manager/remove/<image_key>', methods=['POST'])(remove_image)
+
+admin_bp.route('/customers')(view_all_customers)
+admin_bp.route('/customers/<int:customer_id>')(view_customer_profile)
+admin_bp.route('/customers/<int:customer_id>/edit', methods=['POST'])(edit_customer)
+admin_bp.route('/customers/<int:customer_id>/toggle-active', methods=['POST'])(toggle_customer_active)
+admin_bp.route('/customers/<int:customer_id>/reset-password', methods=['POST'])(reset_customer_password)
